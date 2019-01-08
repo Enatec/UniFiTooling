@@ -1,4 +1,4 @@
-﻿---
+---
 external help file: UniFiTooling-help.xml
 Module Name: UniFiTooling
 online version:

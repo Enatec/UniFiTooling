@@ -1,4 +1,4 @@
-﻿## Pre-Loaded Module code ##
+## Pre-Loaded Module code ##
 
 <#
    This is an early beta version! I can't recommend using it in production.

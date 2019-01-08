@@ -1,4 +1,4 @@
-﻿#requires -Version 3.0 -Modules UniFiTooling
+#requires -Version 3.0 -Modules UniFiTooling
 
 <#
       .SYNOPSIS
