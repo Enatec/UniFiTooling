@@ -10,7 +10,7 @@ Please see the [UseCases](UseCases) directory.
 
 ### Version
 
-This document is based on UniFiTooling version 1.0.3
+This document is based on UniFiTooling version 1.0.5
 
 ### PowerShell Gallery
 
@@ -35,6 +35,12 @@ Early beta version, use at your own risk!
 ### Config
 
 Keep this file in a secure place, especially in a shared environment. It contains the credentials (Yes, username and password) of your UniFi Admin User in plain text (human readable).
+
+
+
+**The config file (config.json) needs to be in the acctual directory. At least for now, only `./config.json` is supported.**
+
+
 
 Here is a sample configuration:
 
@@ -99,7 +105,7 @@ N.N. (could be you)
 
 ### Copyright
 
-Copyright (c) 2018, [enabling Technology](http://www.enatec.io)
+Copyright (c) 2019, [enabling Technology](http://www.enatec.io)
 All rights reserved.
 
 ### License
