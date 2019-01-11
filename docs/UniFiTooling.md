@@ -1,14 +1,14 @@
 ﻿---
 Module Name: UniFiTooling
 Module Guid: 7fff91a0-02eb-4df2-84d5-c7d3cd7f7a5d
-Download Help Link: https://github.com/jhochwald/UniFiTooling/UniFiTooling/docs/UniFiTooling.md
+Download Help Link: https://github.com/jhochwald/UniFiTooling/docs/UniFiTooling.md
 Help Version: 1.0.4
 Locale: en-US
 ---
 
 # UniFiTooling Module
 ## Description
-My Awesome Description is here ;-)
+Ubiquiti UniFi Security Gateway automation via the API of the Ubiquiti UniFi Controller
 
 ## UniFiTooling Cmdlets
 ### [Get-UnifiFirewallGroupBody](Get-UnifiFirewallGroupBody.md)
