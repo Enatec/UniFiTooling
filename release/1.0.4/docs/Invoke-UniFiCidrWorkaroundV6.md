@@ -1,14 +1,8 @@
-﻿---
-author: Joerg Hochwald
-category: UNIFITOOLING
+---
 external help file: UniFiTooling-help.xml
-layout: post
 Module Name: UniFiTooling
 online version:
 schema: 2.0.0
-tags: OnlineHelp PowerShell
-timestamp: 2019-01-12
-title: UniFiTooling
 ---
 
 # Invoke-UniFiCidrWorkaroundV6

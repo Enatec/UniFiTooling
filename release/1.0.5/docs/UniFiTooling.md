@@ -33,7 +33,7 @@ Logout from the API of the UniFi Controller
 IPv4 CIDR Workaround for UBNT USG Firewall Rules
 
 ### [Invoke-UniFiCidrWorkaroundV6](Invoke-UniFiCidrWorkaroundV6.md)
-IPv6 CIDR Workaround for UBNT USG Firewall Rules
+{{Manually Enter Invoke-UniFiCidrWorkaroundV6 Description Here}}
 
 ### [Set-UnifiFirewallGroup](Set-UnifiFirewallGroup.md)
 Get a given Firewall Group via the API of the UniFi Controller
