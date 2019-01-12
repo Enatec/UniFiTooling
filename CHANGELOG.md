@@ -1,4 +1,14 @@
-### Add the default Logo fot the PowerShell Gallery Upload (HEAD -> master)
+### Remove the automated Changelog updates and update the Readme File (HEAD -> master)
+>Sat, 12 Jan 2019 22:14:33 +0100
+
+>Author: Joerg Hochwald (joerg@hochwald.net)
+
+>Commiter: Joerg Hochwald (joerg@hochwald.net)
+
+
+
+
+### Add the default Logo fot the PowerShell Gallery Upload (origin/master, origin/HEAD)
 >Sat, 12 Jan 2019 18:12:14 +0100
 
 >Author: Joerg Hochwald (joerg@hochwald.net)
@@ -38,7 +48,7 @@
 
 
 
-### Reade updated (origin/master, origin/HEAD)
+### Reade updated
 >Sat, 12 Jan 2019 04:04:19 +0100
 
 >Author: Joerg Hochwald (joerg@hochwald.net)
