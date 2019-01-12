@@ -11,7 +11,7 @@ I use this module for many automated updates for my UniFi Security Gateway Firew
 
 ### Version
 
-This document is based on UniFiTooling version 1.0.5
+This document is based on UniFiTooling version 1.0.6 (Development)
 
 ### PowerShell Gallery
 
