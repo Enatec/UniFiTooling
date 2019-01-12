@@ -6,7 +6,7 @@ I use this module for many automated updates for my UniFi Security Gateway Firew
 
 ### Use Cases
 
-Please see the [UseCases](https://github.com/jhochwald/UniFiTooling/tree/master/release/UniFiTooling) directory.
+Please see the [UseCases](https://github.com/jhochwald/UniFiTooling/tree/master/release/UniFiTooling/UseCases) directory.
 
 ### Version
 
