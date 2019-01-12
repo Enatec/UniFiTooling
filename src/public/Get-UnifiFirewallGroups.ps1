@@ -1,4 +1,4 @@
-function Get-UnifiFirewallGroups
+﻿function Get-UnifiFirewallGroups
 {
    <#
          .SYNOPSIS

@@ -1,4 +1,4 @@
-function Invoke-UniFiApiLogout
+﻿function Invoke-UniFiApiLogout
 {
    <#
          .SYNOPSIS

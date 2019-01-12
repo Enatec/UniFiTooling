@@ -1,4 +1,4 @@
-# Contribution Guide
+﻿# Contribution Guide
 
 This is a guide for everyone interested in contributing to our open source projects. It's based on well known community workflows.
 
@@ -42,6 +42,11 @@ If you want to contribute code, please try to:
 
 Once you have tried the above, create a GitHub [pull request](https://github.com/jhochwald/PowerShell-collection/pulls) to notify me of your changes.
 
+### Code Signing
+
+If you have a valid codesigning certificate, please sign the contributed file within the `signed` directory.
+If you don't have a valid codesigning certificate, just go ahead and contribute. I will take care about the signing for you.
+
 ## License
 
 Please specify your license terms! This only applies for new modules and/or scripts. You are not allowed to change the license terms of the existing code! There should be enough options out there.
@@ -52,8 +57,7 @@ If you do not specify any other License  or Terms, I apply the following default
 
 ### License Terms
 
-Copyright (c) 2018, enabling Technology <[http://enatec.io](http://enatec.io)>
-All rights reserved.
+(c) 2019 by enabling Technology. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 
@@ -66,6 +70,7 @@ Redistribution and use in source and binary forms, with or without modification,
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS AS IS AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #### BSD-3-Clause
+
 This is the **BSD-3-Clause** license.
 
 ### Your Name
@@ -77,4 +82,4 @@ I will publish your name to mention you as the contributor. If you don't want th
 You might also read these two blog posts about contributing code:
 
 * [Open Source Contribution Etiquette](http://tirania.org/blog/archive/2010/Dec-31.html) by *Miguel de Icaza*
-* [Don’t "Push" Your Pull Requests](https://www.igvita.com/2011/12/19/dont-push-your-pull-requests/) by *Ilya Grigorik*
+* [Do not "Push" Your Pull Requests](https://www.igvita.com/2011/12/19/dont-push-your-pull-requests/) by *Ilya Grigorik*

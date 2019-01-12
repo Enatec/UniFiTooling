@@ -1,4 +1,4 @@
-function Set-UnifiFirewallGroup
+﻿function Set-UnifiFirewallGroup
 {
    <#
          .SYNOPSIS

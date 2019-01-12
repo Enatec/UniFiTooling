@@ -1,4 +1,4 @@
-function Set-UniFiApiLoginBody
+﻿function Set-UniFiApiLoginBody
       {
          <#
                .SYNOPSIS

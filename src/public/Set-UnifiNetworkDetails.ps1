@@ -1,4 +1,4 @@
-function Set-UnifiNetworkDetails
+﻿function Set-UnifiNetworkDetails
 {
    <#
          .SYNOPSIS
