@@ -18,7 +18,7 @@
     "CLRVersion":  null,
     "PowerShellHostVersion":  null,
     "CmdletsToExport":  null,
-    "ReleaseNotes":  "Initial Release for the new repository",
+    "ReleaseNotes":  "Bug fixes and enhancements.",
     "Copyright":  "(c) 2019 by enabling Technology. All rights reserved.",
     "Tags":  [
                  "UniFi",
@@ -34,7 +34,7 @@
     "ExternalModuleDependencies":  null,
     "RequiredAssemblies":  null,
     "Prerelease":  "beta",
-    "ModuleVersion":  "1.0.5",
+    "ModuleVersion":  "1.0.6",
     "GUID":  "7fff91a0-02eb-4df2-84d5-c7d3cd7f7a5d",
     "PowerShellVersion":  "5.1",
     "CompanyName":  "enabling Technology",
