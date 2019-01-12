@@ -1,4 +1,14 @@
-### Remove doc for old command (HEAD -> master)
+### Add the default Logo fot the PowerShell Gallery Upload (HEAD -> master)
+>Sat, 12 Jan 2019 18:12:14 +0100
+
+>Author: Joerg Hochwald (joerg@hochwald.net)
+
+>Commiter: Joerg Hochwald (joerg@hochwald.net)
+
+
+
+
+### Remove doc for old command
 >Sat, 12 Jan 2019 18:11:55 +0100
 
 >Author: Joerg Hochwald (joerg@hochwald.net)
