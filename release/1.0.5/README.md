@@ -10,7 +10,7 @@ Please see the [UseCases](UseCases) directory.
 
 ### Version
 
-This document is based on UniFiTooling version 1.0.6 (Development)
+This document is based on UniFiTooling version 1.0.5
 
 ### PowerShell Gallery
 
