@@ -1,4 +1,14 @@
-### Development snapshot (Master update) (HEAD -> release/v1.0.6)
+### Readme updated (HEAD -> release/v1.0.6)
+>Sat, 12 Jan 2019 22:11:57 +0100
+
+>Author: Joerg Hochwald (joerg@hochwald.net)
+
+>Commiter: Joerg Hochwald (joerg@hochwald.net)
+
+
+
+
+### Development snapshot (Master update) (origin/release/v1.0.6)
 >Sat, 12 Jan 2019 18:14:15 +0100
 
 >Author: Joerg Hochwald (joerg@hochwald.net)
@@ -8,7 +18,7 @@
 
 
 
-### Re-Release: Backlinks fixed No code change, only the documentation (origin/release/v1.0.6)
+### Re-Release: Backlinks fixed No code change, only the documentation
 >Sat, 12 Jan 2019 09:17:31 +0100
 
 >Author: Joerg Hochwald (joerg@hochwald.net)
