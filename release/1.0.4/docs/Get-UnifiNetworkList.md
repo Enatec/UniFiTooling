@@ -1,59 +1,54 @@
-﻿---
-author: Joerg Hochwald
-category: UNIFITOOLING
+---
 external help file: UniFiTooling-help.xml
-layout: post
 Module Name: UniFiTooling
 online version:
 schema: 2.0.0
-tags: OnlineHelp PowerShell
-timestamp: 2019-01-12
-title: UniFiTooling
 ---
 
-# Invoke-UniFiCidrWorkaroundV6
+# Get-UnifiNetworkList
 
 ## SYNOPSIS
-IPv6 CIDR Workaround for UBNT USG Firewall Rules
+Get a List Networks via the API of the UniFi Controller
 
 ## SYNTAX
 
 ```
-Invoke-UniFiCidrWorkaroundV6 [-CidrList] <PSObject> [<CommonParameters>]
+Get-UnifiNetworkList [[-UnifiSite] <String>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-IPv6 CIDR Workaround for UBNT USG Firewall Rules (Single IPv6 has to be without /128)
+Get a List Networks via the API of the Ubiquiti UniFi Controller
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-Invoke-UniFiCidrWorkaroundV6 -CidrList $value1
+Get-UnifiNetworkList
 ```
 
-IPv6 CIDR Workaround for UBNT USG Firewall Rules
+Get a List Networks via the API of the UniFi Controller
 
 ### EXAMPLE 2
 ```
-$value1 | Invoke-UniFiCidrWorkaroundV6
+Get-UnifiNetworkList -UnifiSite 'Contoso'
 ```
 
-IPv6 CIDR Workaround for UBNT USG Firewall Rules via Pipeline
+Get a List Networks on Site 'Contoso' via the API of the UniFi Controller
 
 ## PARAMETERS
 
-### -CidrList
-Existing CIDR List Object
+### -UnifiSite
+UniFi Site as configured.
+The default is: default
 
 ```yaml
-Type: PSObject
+Type: String
 Parameter Sets: (All)
-Aliases: UniFiCidrList
+Aliases: Site
 
-Required: True
+Required: False
 Position: 2
-Default value: None
+Default value: Default
 Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False
 ```
@@ -68,9 +63,13 @@ For more information, see about_CommonParameters (http://go.microsoft.com/fwlink
 
 ### System.Management.Automation.PSObject
 ## NOTES
-This is an internal helper function only
+Initial version of the Ubiquiti UniFi Controller automation function
 
 ## RELATED LINKS
 
-[Invoke-UniFiCidrWorkaround]()
+[Get-UniFiConfig]()
+
+[Set-UniFiDefaultRequestHeader]()
+
+[Set-UniFiDefaultRequestHeader]()
 

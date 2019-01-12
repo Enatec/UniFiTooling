@@ -1,58 +1,60 @@
-﻿---
-author: Joerg Hochwald
-category: UNIFITOOLING
+---
 external help file: UniFiTooling-help.xml
-layout: post
 Module Name: UniFiTooling
 online version:
 schema: 2.0.0
-tags: OnlineHelp PowerShell
-timestamp: 2019-01-12
-title: UniFiTooling
 ---
 
-# Invoke-UniFiCidrWorkaroundV6
+# Get-UnifiFirewallGroupBody
 
 ## SYNOPSIS
-IPv6 CIDR Workaround for UBNT USG Firewall Rules
+Build a Body for Set-UnifiFirewallGroup call
 
 ## SYNTAX
 
 ```
-Invoke-UniFiCidrWorkaroundV6 [-CidrList] <PSObject> [<CommonParameters>]
+Get-UnifiFirewallGroupBody [-UnfiFirewallGroup] <PSObject> [-UnifiCidrInput] <PSObject> [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-IPv6 CIDR Workaround for UBNT USG Firewall Rules (Single IPv6 has to be without /128)
+Build a JSON based Body for Set-UnifiFirewallGroup call
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-Invoke-UniFiCidrWorkaroundV6 -CidrList $value1
+Get-UnifiFirewallGroupBody -UnfiFirewallGroup $value1 -UnifiCidrInput $value2
 ```
 
-IPv6 CIDR Workaround for UBNT USG Firewall Rules
-
-### EXAMPLE 2
-```
-$value1 | Invoke-UniFiCidrWorkaroundV6
-```
-
-IPv6 CIDR Workaround for UBNT USG Firewall Rules via Pipeline
+Build a Body for Set-UnifiFirewallGroup call
 
 ## PARAMETERS
 
-### -CidrList
-Existing CIDR List Object
+### -UnfiFirewallGroup
+Existing Unfi Firewall Group
 
 ```yaml
 Type: PSObject
 Parameter Sets: (All)
-Aliases: UniFiCidrList
+Aliases: FirewallGroup
 
 Required: True
 Position: 2
+Default value: None
+Accept pipeline input: True (ByPropertyName, ByValue)
+Accept wildcard characters: False
+```
+
+### -UnifiCidrInput
+IPv4 or IPv6 input List
+
+```yaml
+Type: PSObject
+Parameter Sets: (All)
+Aliases: CidrInput
+
+Required: True
+Position: 3
 Default value: None
 Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False
@@ -70,7 +72,8 @@ For more information, see about_CommonParameters (http://go.microsoft.com/fwlink
 ## NOTES
 This is an internal helper function only
 
+.
+LINK
+Set-UnifiFirewallGroup
+
 ## RELATED LINKS
-
-[Invoke-UniFiCidrWorkaround]()
-

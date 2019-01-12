@@ -1,10 +1,11 @@
-﻿#region ModulePreLoaded
+## Pre-Loaded Module code ##
+
 <#
    This is an early beta version! I can't recommend using it in production.
 #>
-#endregion ModulePreLoaded
 
-#region ModulePrivateFunctions
+## PRIVATE MODULE FUNCTIONS AND DATA ##
+
 function Get-UniFiConfig
 {
    <#
@@ -310,9 +311,9 @@ function Set-UniFiDefaultRequestHeader
       Write-Verbose -Message ('Default Request Header is {0}' -f $RestHeader)
    }
 }
-#endregion ModulePrivateFunctions
 
-#region ModulePublicFunctions
+## PUBLIC MODULE FUNCTIONS AND DATA ##
+
 function Get-UnifiFirewallGroupBody
 {
    <#
@@ -1089,108 +1090,152 @@ function Invoke-UniFiApiLogout
 
 function Invoke-UniFiCidrWorkaround
 {
-<#
-	.SYNOPSIS
-		IPv4 and IPv6 CIDR Workaround for UBNT USG Firewall Rules
+   <#
+         .SYNOPSIS
+         IPv4 CIDR Workaround for UBNT USG Firewall Rules
 	
-	.DESCRIPTION
-		IPv4 and IPv6 CIDR Workaround for UBNT USG Firewall Rules (Single IPv4 has to be without /32 OR single IPv6 has to be without /128)
+         .DESCRIPTION
+         IPv4 CIDR Workaround for UBNT USG Firewall Rules (Single IPv4 has to be without /32)
 	
-	.PARAMETER CidrList
-		Existing CIDR List Object
+         .PARAMETER CidrList
+         Existing CIDR List Object
 	
-	.PARAMETER 6
-		Process IPv6 CIDR (Single IPv6 has to be without /128)
+         .EXAMPLE
+         PS C:\> Invoke-UniFiCidrWorkaround -CidrList $value1
+
+         IPv4 CIDR Workaround for UBNT USG Firewall Rules
+
+         .EXAMPLE
+         PS C:\> $value1 | Invoke-UniFiCidrWorkaround
+
+         IPv4 CIDR Workaround for UBNT USG Firewall Rules via Pipeline
 	
-	.EXAMPLE
-		PS C:\> Invoke-UniFiCidrWorkaround -CidrList $value1
-		
-		IPv4 CIDR Workaround for UBNT USG Firewall Rules
+         .NOTES
+         This is an internal helper function only
+
+         .LINK
+         Invoke-UniFiCidrWorkaroundV6
+   #>
 	
-	.EXAMPLE
-		PS C:\> Invoke-UniFiCidrWorkaround -6 -CidrList $value1
-		
-		IPv6 CIDR Workaround for UBNT USG Firewall Rules
+   [CmdletBinding(ConfirmImpact = 'None')]
+   [OutputType([psobject])]
+   param
+   (
+      [Parameter(Mandatory,
+            ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+            Position = 1,
+      HelpMessage = 'Existing CIDR List Object')]
+      [ValidateNotNullOrEmpty()]
+      [Alias('UniFiCidrList')]
+      [psobject]
+      $CidrList
+   )
 	
-	.EXAMPLE
-		PS C:\> $value1 | Invoke-UniFiCidrWorkaround
-		
-		IPv4 or IPv6 CIDR Workaround for UBNT USG Firewall Rules via Pipeline
+   begin
+   {
+      # Cleanup
+      $AddItem = @()
+   }
 	
-	.EXAMPLE
-		PS C:\> $value1 | Invoke-UniFiCidrWorkaround -6
-		
-		IPv6 CIDR Workaround for UBNT USG Firewall Rules via Pipeline
+   process
+   {
+      # Loop over the new list
+      foreach ($NewInputItem in $CidrList)
+      {
+         # CIDR Workaround for UBNT USG Firewall Rules (Single IP has to be without /32)
+         if ($NewInputItem -match '/32')
+         {
+            $NewInputItem = $NewInputItem.Replace('/32', '')
+         }
+         # Add to the List
+         $AddItem = $AddItem + $NewInputItem
+      }
+   }
 	
-	.NOTES
-		This is an internal helper function only (Will be moved to the private functions soon)
+   end
+   {
+      # Dump
+      $AddItem
+
+      # Cleanup
+      $AddItem = $null
+   }
+}
+
+function Invoke-UniFiCidrWorkaroundV6
+{
+   <#
+         .SYNOPSIS
+         IPv6 CIDR Workaround for UBNT USG Firewall Rules
 	
-	.LINK
-		https://github.com/jhochwald/UniFiTooling/issues/5
-#>
+         .DESCRIPTION
+         IPv6 CIDR Workaround for UBNT USG Firewall Rules (Single IPv6 has to be without /128)
 	
-	[CmdletBinding(ConfirmImpact = 'None')]
-	[OutputType([psobject])]
-	param
-	(
-		[Parameter(Mandatory = $true,
-				   ValueFromPipeline = $true,
-				   ValueFromPipelineByPropertyName = $true,
-				   Position = 1,
-				   HelpMessage = 'Existing CIDR List Object')]
-		[ValidateNotNullOrEmpty()]
-		[Alias('UniFiCidrList')]
-		[psobject]
-		$CidrList,
-		[Parameter(ValueFromPipeline = $true,
-				   ValueFromPipelineByPropertyName = $true,
-				   Position = 2)]
-		[Alias('IPv6', 'V6')]
-		[switch]
-		$6 = $false
-	)
+         .PARAMETER CidrList
+         Existing CIDR List Object
 	
-	begin
-	{
-		# Cleanup
-		$AddItem = @()
-	}
+         .EXAMPLE
+         PS C:\> Invoke-UniFiCidrWorkaroundV6 -CidrList $value1
+
+         IPv6 CIDR Workaround for UBNT USG Firewall Rules
+
+         .EXAMPLE
+         PS C:\> $value1 | Invoke-UniFiCidrWorkaroundV6
+
+         IPv6 CIDR Workaround for UBNT USG Firewall Rules via Pipeline
 	
-	process
-	{
-		# Loop over the new list
-		foreach ($NewInputItem in $CidrList)
-		{
-			if ($6)
-			{
-				# CIDR Workaround for UBNT USG Firewall Rules (Single IPv6 has to be without /128)
-				if ($NewInputItem -match '/128')
-				{
-					$NewInputItem = $NewInputItem.Replace('/128', '')
-				}
-			}
-			else
-			{
-				# CIDR Workaround for UBNT USG Firewall Rules (Single IP has to be without /32)
-				if ($NewInputItem -match '/32')
-				{
-					$NewInputItem = $NewInputItem.Replace('/32', '')
-				}
-			}
-			
-			# Add to the List
-			$AddItem = $AddItem + $NewInputItem
-		}
-	}
+         .NOTES
+         This is an internal helper function only
+
+         .LINK
+         Invoke-UniFiCidrWorkaround
+   #>
 	
-	end
-	{
-		# Dump
-		$AddItem
-		
-		# Cleanup
-		$AddItem = $null
-	}
+   [CmdletBinding(ConfirmImpact = 'None')]
+   [OutputType([psobject])]
+   param
+   (
+      [Parameter(Mandatory,
+            ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+            Position = 1,
+      HelpMessage = 'Existing CIDR List Object')]
+      [ValidateNotNullOrEmpty()]
+      [Alias('UniFiCidrList')]
+      [psobject]
+      $CidrList
+   )
+	
+   begin
+   {
+      # Cleanup
+      $AddItem = @()
+   }
+	
+   process
+   {
+      # Loop over the new list
+      foreach ($NewInputItem in $CidrList)
+      {
+         # CIDR Workaround for UBNT USG Firewall Rules (Single IPv6 has to be without /128)
+         if ($NewInputItem -match '/128')
+         {
+            $NewInputItem = $NewInputItem.Replace('/128', '')
+         }
+         # Add to the List
+         $AddItem = $AddItem + $NewInputItem
+      }
+   }
+	
+   end
+   {
+      # Dump
+      $AddItem
+
+      # Cleanup
+      $AddItem = $null
+   }
 }
 
 function Set-UnifiFirewallGroup
@@ -1528,42 +1573,11 @@ function Set-UnifiNetworkDetails
       $Session = $null
    }
 }
-#endregion ModulePublicFunctions
 
-#region CHANGELOG
-<#
-      Soon
-#>
-#endregion CHANGELOG
+## Post-Load Module code ##
 
-#region LICENSE
-<#
-      Copyright 2018 by enabling Technology - http://enatec.io
-
-      Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-      1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-      2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-      3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
-
-      THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-      By using the Software, you agree to the License, Terms and Conditions above!
-#>
-#endregion LICENSE
-
-#region DISCLAIMER
-<#
-      DISCLAIMER:
-      - Use at your own risk, etc.
-      - This is open-source software, if you find an issue try to fix it yourself. There is no support and/or warranty in any kind
-      - This is a third-party Software
-      - The developer of this Software is NOT sponsored by or affiliated with Microsoft Corp (MSFT) or any of its subsidiaries in any way
-      - The developer of this Software is NOT sponsored by or affiliated with Ubiquiti Networks, Inc (UBNT) or any of its subsidiaries in any way
-      - The Software is not supported by Microsoft Corp (MSFT)
-      - The Software is not supported by Ubiquiti Networks, Inc (UBNT)
-      - By using the Software, you agree to the License, Terms, and any Conditions declared and described above
-      - If you disagree with any of the Terms, and any Conditions declared: Just delete it and build your own solution
-#>
-#endregion DISCLAIMER
 
 $ThisModuleLoaded = $true
+
+
+

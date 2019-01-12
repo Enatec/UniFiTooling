@@ -679,10 +679,6 @@
     </command:examples>
     <command:relatedLinks>
       <maml:navigationLink>
-        <maml:linkText>Online Version:</maml:linkText>
-        <maml:uri>https://github.com/jhochwald/UniFiTooling/docs/Invoke-UniFiCidrWorkaroundV6.md</maml:uri>
-      </maml:navigationLink>
-      <maml:navigationLink>
         <maml:linkText>Invoke-UniFiCidrWorkaround</maml:linkText>
         <maml:uri></maml:uri>
       </maml:navigationLink>

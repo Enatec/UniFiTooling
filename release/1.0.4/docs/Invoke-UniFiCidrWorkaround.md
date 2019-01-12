@@ -1,45 +1,39 @@
-﻿---
-author: Joerg Hochwald
-category: UNIFITOOLING
+---
 external help file: UniFiTooling-help.xml
-layout: post
 Module Name: UniFiTooling
 online version:
 schema: 2.0.0
-tags: OnlineHelp PowerShell
-timestamp: 2019-01-12
-title: UniFiTooling
 ---
 
-# Invoke-UniFiCidrWorkaroundV6
+# Invoke-UniFiCidrWorkaround
 
 ## SYNOPSIS
-IPv6 CIDR Workaround for UBNT USG Firewall Rules
+IPv4 CIDR Workaround for UBNT USG Firewall Rules
 
 ## SYNTAX
 
 ```
-Invoke-UniFiCidrWorkaroundV6 [-CidrList] <PSObject> [<CommonParameters>]
+Invoke-UniFiCidrWorkaround [-CidrList] <PSObject> [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-IPv6 CIDR Workaround for UBNT USG Firewall Rules (Single IPv6 has to be without /128)
+IPv4 CIDR Workaround for UBNT USG Firewall Rules (Single IPv4 has to be without /32)
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-Invoke-UniFiCidrWorkaroundV6 -CidrList $value1
+Invoke-UniFiCidrWorkaround -CidrList $value1
 ```
 
-IPv6 CIDR Workaround for UBNT USG Firewall Rules
+IPv4 CIDR Workaround for UBNT USG Firewall Rules
 
 ### EXAMPLE 2
 ```
-$value1 | Invoke-UniFiCidrWorkaroundV6
+$value1 | Invoke-UniFiCidrWorkaround
 ```
 
-IPv6 CIDR Workaround for UBNT USG Firewall Rules via Pipeline
+IPv4 CIDR Workaround for UBNT USG Firewall Rules via Pipeline
 
 ## PARAMETERS
 
@@ -72,5 +66,5 @@ This is an internal helper function only
 
 ## RELATED LINKS
 
-[Invoke-UniFiCidrWorkaround]()
+[Invoke-UniFiCidrWorkaroundV6]()
 

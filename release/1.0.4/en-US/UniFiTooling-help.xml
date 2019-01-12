@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <helpItems schema="maml" xmlns="http://msh">
   <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
     <command:details>
@@ -93,12 +93,7 @@
         </dev:remarks>
       </command:example>
     </command:examples>
-    <command:relatedLinks>
-      <maml:navigationLink>
-        <maml:linkText>Online Version:</maml:linkText>
-        <maml:uri>https://github.com/jhochwald/UniFiTooling/docs/Get-UnifiFirewallGroupBody.md</maml:uri>
-      </maml:navigationLink>
-    </command:relatedLinks>
+    <command:relatedLinks />
   </command:command>
   <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
     <command:details>
@@ -176,10 +171,6 @@
       </command:example>
     </command:examples>
     <command:relatedLinks>
-      <maml:navigationLink>
-        <maml:linkText>Online Version:</maml:linkText>
-        <maml:uri>https://github.com/jhochwald/UniFiTooling/docs/Get-UnifiFirewallGroups.md</maml:uri>
-      </maml:navigationLink>
       <maml:navigationLink>
         <maml:linkText>Get-UniFiConfig</maml:linkText>
         <maml:uri></maml:uri>
@@ -295,10 +286,6 @@
     </command:examples>
     <command:relatedLinks>
       <maml:navigationLink>
-        <maml:linkText>Online Version:</maml:linkText>
-        <maml:uri>https://github.com/jhochwald/UniFiTooling/docs/Get-UnifiNetworkDetails.md</maml:uri>
-      </maml:navigationLink>
-      <maml:navigationLink>
         <maml:linkText>Get-UniFiConfig</maml:linkText>
         <maml:uri></maml:uri>
       </maml:navigationLink>
@@ -389,10 +376,6 @@
     </command:examples>
     <command:relatedLinks>
       <maml:navigationLink>
-        <maml:linkText>Online Version:</maml:linkText>
-        <maml:uri>https://github.com/jhochwald/UniFiTooling/docs/Get-UnifiNetworkList.md</maml:uri>
-      </maml:navigationLink>
-      <maml:navigationLink>
         <maml:linkText>Get-UniFiConfig</maml:linkText>
         <maml:uri></maml:uri>
       </maml:navigationLink>
@@ -441,10 +424,6 @@
       </command:example>
     </command:examples>
     <command:relatedLinks>
-      <maml:navigationLink>
-        <maml:linkText>Online Version:</maml:linkText>
-        <maml:uri>https://github.com/jhochwald/UniFiTooling/docs/Invoke-UniFiApiLogin.md</maml:uri>
-      </maml:navigationLink>
       <maml:navigationLink>
         <maml:linkText>Get-UniFiConfig</maml:linkText>
         <maml:uri></maml:uri>
@@ -498,10 +477,6 @@
       </command:example>
     </command:examples>
     <command:relatedLinks>
-      <maml:navigationLink>
-        <maml:linkText>Online Version:</maml:linkText>
-        <maml:uri>https://github.com/jhochwald/UniFiTooling/docs/Invoke-UniFiApiLogout.md</maml:uri>
-      </maml:navigationLink>
       <maml:navigationLink>
         <maml:linkText>Get-UniFiConfig</maml:linkText>
         <maml:uri></maml:uri>
@@ -593,10 +568,6 @@
     </command:examples>
     <command:relatedLinks>
       <maml:navigationLink>
-        <maml:linkText>Online Version:</maml:linkText>
-        <maml:uri>https://github.com/jhochwald/UniFiTooling/docs/Invoke-UniFiCidrWorkaround.md</maml:uri>
-      </maml:navigationLink>
-      <maml:navigationLink>
         <maml:linkText>Invoke-UniFiCidrWorkaroundV6</maml:linkText>
         <maml:uri></maml:uri>
       </maml:navigationLink>
@@ -678,10 +649,6 @@
       </command:example>
     </command:examples>
     <command:relatedLinks>
-      <maml:navigationLink>
-        <maml:linkText>Online Version:</maml:linkText>
-        <maml:uri>https://github.com/jhochwald/UniFiTooling/docs/Invoke-UniFiCidrWorkaroundV6.md</maml:uri>
-      </maml:navigationLink>
       <maml:navigationLink>
         <maml:linkText>Invoke-UniFiCidrWorkaround</maml:linkText>
         <maml:uri></maml:uri>
@@ -796,10 +763,6 @@
       </command:example>
     </command:examples>
     <command:relatedLinks>
-      <maml:navigationLink>
-        <maml:linkText>Online Version:</maml:linkText>
-        <maml:uri>https://github.com/jhochwald/UniFiTooling/docs/Set-UnifiFirewallGroup.md</maml:uri>
-      </maml:navigationLink>
       <maml:navigationLink>
         <maml:linkText>Get-UnifiFirewallGroups</maml:linkText>
         <maml:uri></maml:uri>
@@ -942,10 +905,6 @@
       </command:example>
     </command:examples>
     <command:relatedLinks>
-      <maml:navigationLink>
-        <maml:linkText>Online Version:</maml:linkText>
-        <maml:uri>https://github.com/jhochwald/UniFiTooling/docs/Set-UnifiNetworkDetails.md</maml:uri>
-      </maml:navigationLink>
       <maml:navigationLink>
         <maml:linkText>Get-UniFiConfig</maml:linkText>
         <maml:uri></maml:uri>
