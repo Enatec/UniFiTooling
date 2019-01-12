@@ -1,4 +1,14 @@
-### Add Acknowledgements (HEAD -> master)
+###  Update Link in docs (HEAD -> master)
+>Sat, 12 Jan 2019 18:11:26 +0100
+
+>Author: Joerg Hochwald (joerg@hochwald.net)
+
+>Commiter: Joerg Hochwald (joerg@hochwald.net)
+
+
+
+
+### Add Acknowledgements
 >Sat, 12 Jan 2019 18:10:38 +0100
 
 >Author: Joerg Hochwald (joerg@hochwald.net)
