@@ -1,4 +1,14 @@
-### Readme updated (HEAD -> release/v1.0.6)
+### Removed the automated changelog (HEAD -> release/v1.0.6)
+>Sat, 12 Jan 2019 22:13:09 +0100
+
+>Author: Joerg Hochwald (joerg@hochwald.net)
+
+>Commiter: Joerg Hochwald (joerg@hochwald.net)
+
+
+
+
+### Readme updated (origin/release/v1.0.6)
 >Sat, 12 Jan 2019 22:11:57 +0100
 
 >Author: Joerg Hochwald (joerg@hochwald.net)
@@ -8,7 +18,7 @@
 
 
 
-### Development snapshot (Master update) (origin/release/v1.0.6)
+### Development snapshot (Master update)
 >Sat, 12 Jan 2019 18:14:15 +0100
 
 >Author: Joerg Hochwald (joerg@hochwald.net)
