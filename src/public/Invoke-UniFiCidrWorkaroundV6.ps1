@@ -1,4 +1,4 @@
-function Invoke-UniFiCidrWorkaroundV6
+﻿function Invoke-UniFiCidrWorkaroundV6
 {
    <#
          .SYNOPSIS

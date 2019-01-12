@@ -1,8 +1,14 @@
 ﻿---
+author: Joerg Hochwald
+category: UNIFITOOLING
 external help file: UniFiTooling-help.xml
+layout: post
 Module Name: UniFiTooling
-online version:
+online version: https://github.com/jhochwald/UniFiTooling/docs/Get-UnifiFirewallGroupBody.md
 schema: 2.0.0
+tags: OnlineHelp PowerShell
+timestamp: 2019-01-12
+title: Get-UnifiFirewallGroupBody
 ---
 
 # Get-UnifiFirewallGroupBody

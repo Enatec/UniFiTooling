@@ -1,4 +1,4 @@
-function Get-UniFiCredentials
+﻿function Get-UniFiCredentials
 {
    <#
          .SYNOPSIS

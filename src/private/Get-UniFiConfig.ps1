@@ -1,4 +1,4 @@
-function Get-UniFiConfig
+﻿function Get-UniFiConfig
 {
    <#
          .SYNOPSIS

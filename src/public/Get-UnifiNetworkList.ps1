@@ -1,4 +1,4 @@
-function Get-UnifiNetworkList
+﻿function Get-UnifiNetworkList
 {
    <#
          .SYNOPSIS
