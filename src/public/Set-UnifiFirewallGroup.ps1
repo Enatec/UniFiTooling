@@ -71,8 +71,13 @@
       # Cleanup
       $TargetFirewallGroup = $null
       $Session = $null
+      
+      # Safe ProgressPreference and Setup SilentlyContinue for the function
+      $ExistingProgressPreference = ($ProgressPreference)
+      $ProgressPreference = 'SilentlyContinue'
 		
       Write-Verbose -Message ('Check if {0} exists' -f $UnfiFirewallGroup)
+
       $TargetFirewallGroup = (Get-UnifiFirewallGroups | Where-Object -FilterScript {
             ($_.Name -eq $UnfiFirewallGroup)
       })
@@ -88,6 +93,7 @@
          # Only here to catch a global ErrorAction overwrite
          break
       }
+
       Write-Verbose -Message ('{0} exists' -f $UnfiFirewallGroup)
 		
       $UnfiFirewallGroupBody = (Get-UnifiFirewallGroupBody -UnfiFirewallGroup $TargetFirewallGroup -UnifiCidrInput $UnifiCidrInput)
@@ -98,21 +104,27 @@
       try
       {
          Write-Verbose -Message 'Read the Config'
+
          $null = (Get-UniFiConfig)
 			
          Write-Verbose -Message ('Certificate check - Should be {0}' -f $ApiSelfSignedCert)
+
          [Net.ServicePointManager]::ServerCertificateValidationCallback = {
             $ApiSelfSignedCert
          }
 			
          Write-Verbose -Message 'Set the API Call default Header'
+
          $null = (Set-UniFiDefaultRequestHeader)
 			
          Write-Verbose -Message 'Create the Request URI'
+
          $ApiRequestUri = $ApiUri + 's/' + $UnifiSite + '/rest/firewallgroup/' + $TargetFirewallGroup._id
+
          Write-Verbose -Message ('URI: {0}' -f $ApiRequestUri)
 			
          Write-Verbose -Message 'Send the Request'
+
          $paramInvokeRestMethod = @{
             Method        = 'Put'
             Uri           = $ApiRequestUri
@@ -123,6 +135,7 @@
             WebSession    = $RestSession
          }
          $Session = (Invoke-RestMethod @paramInvokeRestMethod)
+
          Write-Verbose -Message ('Session Info: {0}' -f $Session)
       }
       catch
@@ -170,5 +183,8 @@
    {
       # Cleanup
       $Session = $null
+      
+      # Restore ProgressPreference
+      $ProgressPreference = $ExistingProgressPreference
    }
 }

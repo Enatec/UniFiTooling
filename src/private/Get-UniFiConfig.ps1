@@ -89,5 +89,7 @@
       # Cleanup
       $RawJson = $null
       $UnifiConfig = $null
+
+      Write-Verbose -Message 'Get-UniFiConfig done'
    }
 }
