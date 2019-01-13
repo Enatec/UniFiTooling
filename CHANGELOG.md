@@ -4,7 +4,7 @@ All notable changes to the **UniFiTooling** project will be documented in this f
 
 ---
 
-### 1.0.6 - [Unreleased]
+### 1.0.6 - 2019-01-13
 
 Working Release
 
@@ -12,10 +12,12 @@ Working Release
 
 - Set `$ProgressPreference` to `'SilentlyContinue'` - #7
 - `CHANGELOG.md` (this file) is back
+- New function `New-UniFiConfig` - #1
 
 #### Changed
 
 - Build Process optimized
+- Add Verbose messages to `Get-UniFiConfig`
 
 ### 1.0.5 - 2019-01-12
 
