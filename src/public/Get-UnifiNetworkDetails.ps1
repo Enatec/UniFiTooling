@@ -62,6 +62,10 @@
    {
       # Cleanup
       $Session = $null
+      
+      # Safe ProgressPreference and Setup SilentlyContinue for the function
+      $ExistingProgressPreference = ($ProgressPreference)
+      $ProgressPreference = 'SilentlyContinue'
    }
 	
    process
@@ -143,5 +147,8 @@
 		
       # Cleanup
       $Session = $null
+      
+      # Restore ProgressPreference
+      $ProgressPreference = $ExistingProgressPreference
    }
 }
