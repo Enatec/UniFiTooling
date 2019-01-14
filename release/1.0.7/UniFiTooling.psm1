@@ -952,7 +952,7 @@ function Get-UnifiNetworkDetails
 
          switch ($PsCmdlet.ParameterSetName)
          {
-            'ByName'
+            'Request by Name'
             {
                foreach ($SingleName in $Name)
                {
@@ -1002,7 +1002,7 @@ function Get-UnifiNetworkDetails
                   $SessionData = $SessionData + $Session
                }
             }
-            'ById'
+            'Request by Id'
             {
                foreach ($SingleId in $Id)
                {
