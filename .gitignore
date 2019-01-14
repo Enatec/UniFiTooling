@@ -1,5 +1,8 @@
 # General
 *.tmp
+_ReSharper*
+
+# Sapien related
 *.TempPoint.*
 *.Export.*
 *.psprojs
@@ -9,8 +12,15 @@
 CustomMenu.inf
 *.iso
 
+# Might contain an API key
+.psgallery
+
+# Certificates
+*.pfx
+
 # enaTec Scratch Folder
 temp/
+temp/*
 
 # Visual Studio Code
 .vscode/*
@@ -59,7 +69,7 @@ Temporary Items
 .apdisk
 
 # Windows thumbnail cache files
-Thumbs.db
+[Tt]humbs.db
 ehthumbs.db
 ehthumbs_vista.db
 
@@ -74,3 +84,24 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+# From the old Build tooling - Legacy
+*.buildenvironment.xml
+*.buildenvironment.json
+BuildWrapper.ps1
+
+# Backup Files
+~$*
+*~
+
+# PowerShell
+.vs/
+.dotnet/
+module/Plaster
+module/PSScriptAnalyzer
+
+# Visual Studio for Mac generated file
+*.userprefs
+
+# JetBrains generated file (Rider, intelliJ)
+.idea/
