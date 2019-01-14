@@ -18,7 +18,7 @@
     "CLRVersion":  null,
     "PowerShellHostVersion":  null,
     "CmdletsToExport":  null,
-    "ReleaseNotes":  "Mainly a bugfix and refactoring release",
+    "ReleaseNotes":  "Mainly a bugfix and refactoring release.",
     "Copyright":  "(c) 2019 by enabling Technology. All rights reserved.",
     "Tags":  [
                  "UniFi",

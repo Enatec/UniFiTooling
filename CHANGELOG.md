@@ -4,7 +4,7 @@ All notable changes to the **UniFiTooling** project will be documented in this f
 
 ---
 
-### 1.0.7 - [Unreleased]
+### 1.0.8 - [Unreleased]
 
 Mainly a bugfix and refactoring release
 

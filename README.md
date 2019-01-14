@@ -12,15 +12,14 @@ Please see the [UseCases](https://github.com/jhochwald/UniFiTooling/tree/master/
 
 This document is based on UniFiTooling version 1.0.8 (Development)
 
-[![Powershell Gallery](https://img.shields.io/powershellgallery/vpre/UniFiTooling.svg)](https://www.powershellgallery.com/packages/UniFiTooling/)
-
 ### Requirements
 
 PowerShell 5.0, or later. Desktop or Core.
 
 ### Installation
 
-Install the module with PowerShellGet directly from the Powershell Gallery, Preferred method
+Install the module with PowerShellGet directly from the Powershell Gallery, Preferred method!
+[![Powershell Gallery](https://img.shields.io/powershellgallery/vpre/UniFiTooling.svg)](https://www.powershellgallery.com/packages/UniFiTooling/) [![Powershell Gallery](https://img.shields.io/powershellgallery/dt/UniFiTooling.svg)](https://www.powershellgallery.com/packages/UniFiTooling/)
 
 #### With PowerShellGet
 
@@ -32,7 +31,6 @@ PS C:\> Install-Module -Name 'UniFiTooling' -Scope CurrentUser
 # Install the module for the All Users with PowerShellGet directly from the Powershell Gallery, Preferred method.# Run this in an administrative PowerShell prompt (Elevated).
 PS C:\> Install-Module -Name 'UniFiTooling' -Scope AllUsers
 ```
-<!-- ![](https://img.shields.io/powershellgallery/dt/UniFiTooling.svg) -->
 
 #### Manual Installation (unsupported)
 

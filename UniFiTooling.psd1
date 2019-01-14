@@ -30,7 +30,7 @@ CompanyName = 'enabling Technology'
 Copyright = '(c) 2019 by enabling Technology. All rights reserved.'
 
 # Description of the functionality provided by this module
-Description = 'Ubiquiti UniFi Security Gateway automation via the API of the Ubiquiti UniFi Controller'
+Description = 'Ubiquiti (UBNT) UniFi Security Gateway automation via the API of the Ubiquiti UniFi Controller'
 
 # Minimum version of the Windows PowerShell engine required by this module
 PowerShellVersion = '5.1'
@@ -111,7 +111,7 @@ PrivateData = @{
         IconUri = 'https://github.com/jhochwald/UniFiTooling/raw/master/src/other/powershell-project.png'
 
         # ReleaseNotes of this module
-        ReleaseNotes = 'Mainly a bugfix and refactoring release'
+        ReleaseNotes = 'Mainly a bugfix and refactoring release.'
 
         # Prerelease string of this module
         # Prerelease = ''
