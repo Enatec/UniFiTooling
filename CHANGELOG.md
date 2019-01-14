@@ -10,7 +10,7 @@ Mainly a bugfix and refactoring release
 
 #### Added
 
-- `Get-UnifiFirewallGroupDetails` -Related to #10 [Unreleased]
+- `Get-UnifiFirewallGroupDetails` -Related to #10
 - Git Attributes File
 - Editor Config
 

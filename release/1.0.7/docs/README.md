@@ -11,6 +11,9 @@ Locale: en-US
 Ubiquiti UniFi Security Gateway automation via the API of the Ubiquiti UniFi Controller
 
 ## UniFiTooling Cmdlets
+### [Get-UnifiFirewallGroupDetails](Get-UnifiFirewallGroupDetails.md)
+Get the details about one Firewall Group via the API of the UniFi Controller
+
 ### [Get-UnifiFirewallGroups](Get-UnifiFirewallGroups.md)
 Get a List Firewall Groups via the API of the UniFi Controller
 
