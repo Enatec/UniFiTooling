@@ -1,3 +1,5 @@
+# General
+*.tmp
 *.TempPoint.*
 *.Export.*
 *.psprojs
@@ -5,3 +7,70 @@
 *.Run.ps1
 *.Package.ps1
 CustomMenu.inf
+*.iso
+
+# enaTec Scratch Folder
+temp/
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Office Word temporary
+~$*.doc*
+
+# Office Excel temporary
+~$*.xls*
+
+# Office Excel Backup File
+*.xlk
+
+# Office PowerPoint temporary
+~$*.ppt*
+
+# Office Visio autosave temporary files
+*.~vsd*
+
+# macOS General
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# macOS Thumbnails
+._*
+
+# macOS Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# macOS Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows thumbnail cache files
+Thumbs.db
+ehthumbs.db
+ehthumbs_vista.db
+
+# Windows Dump file
+*.stackdump
+
+# Windows Folder config file
+[Dd]esktop.ini
+
+# Windows Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# Windows shortcuts
+*.lnk
