@@ -126,7 +126,7 @@
 
          switch ($PsCmdlet.ParameterSetName)
          {
-            'ByName'
+            'Request by Name'
             {
                foreach ($SingleName in $Name)
                {
@@ -176,7 +176,7 @@
                   $SessionData = $SessionData + $Session
                }
             }
-            'ById'
+            'Request by Id'
             {
                foreach ($SingleId in $Id)
                {
