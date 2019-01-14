@@ -4,9 +4,30 @@ All notable changes to the **UniFiTooling** project will be documented in this f
 
 ---
 
+### 1.0.7 - [Unreleased]
+
+Mainly a bugfix and refactoring release
+
+#### Added
+
+- `Get-UnifiFirewallGroupDetails` -Related to #10 [Unreleased]
+- Git Attributes File
+- Editor Config
+
+#### Changed
+
+- Markdown Documents tweaked (Header)
+- Git Ignore extended
+- Add Multi valued inputs to `Get-UnifiNetworkDetails`
+- Add `-Id` parameter to `Get-UnifiNetworkDetails`. This replaced the -UnifiNetworkName` parameter - Related to #9
+ - `-UnifiNetworkName` is now a legacy alias, necessary to make it a non breaking change
+ - For the parameter `-UnifiNetworkName` an ID (`network_id`) must be used, necessary to make it a non breaking change
+- Add `-name` parameter to `Get-UnifiNetworkDetails` - Related to #9
+- Moved `Get-UnifiFirewallGroupBody` from Public to Private (No longer exported as command)
+
 ### 1.0.6 - 2019-01-13
 
-Working Release
+Mainly a bugfix and refactoring release
 
 #### Added
 

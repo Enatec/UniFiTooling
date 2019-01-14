@@ -1,5 +1,8 @@
 ﻿---
 external help file: UniFiTooling-help.xml
+HelpVersion: 1.0.7
+Locale: en-US
+Module Guid: 7fff91a0-02eb-4df2-84d5-c7d3cd7f7a5d
 Module Name: UniFiTooling
 online version: https://github.com/jhochwald/UniFiTooling/raw/master/docs/Get-UnifiNetworkDetails.md
 schema: 2.0.0
@@ -12,8 +15,14 @@ Get the details about one network via the API of the UniFi Controller
 
 ## SYNTAX
 
+### ById
 ```
-Get-UnifiNetworkDetails [-UnifiNetwork] <String> [[-UnifiSite] <String>] [<CommonParameters>]
+Get-UnifiNetworkDetails [-Id] <String[]> [[-UnifiSite] <String>] [<CommonParameters>]
+```
+
+### ByName
+```
+Get-UnifiNetworkDetails [-Name] <String[]> [[-UnifiSite] <String>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -23,27 +32,79 @@ Get the details about one network via the API of the UniFi Controller
 
 ### EXAMPLE 1
 ```
-Get-UnifiNetworkDetails -UnifiNetwork $value1
+Get-UnifiNetworkDetails -id 'ba7e58be13574ef4881a79c3'
 ```
 
-Get the details about one network via the API of the UniFi Controller
+Get the details about the network with ID ba7e58be13574ef4881a79c3 via the API of the UniFi Controller
 
 ### EXAMPLE 2
 ```
-Get-UnifiNetworkDetails -UnifiNetwork $value1 -UnifiSite 'Contoso'
+Get-UnifiNetworkDetails -UnifiNetwork 'ba7e58be13574ef4881a79c3'
 ```
 
-Get the details about one network on Site 'Contoso' via the API of the UniFi Controller
+Same as above, with the legacy parameter alias used.
+
+### EXAMPLE 3
+```
+Get-UnifiNetworkDetails -name 'JoshHome'
+```
+
+Get the details about the network JoshHome via the API of the UniFi Controller
+
+### EXAMPLE 4
+```
+Get-UnifiNetworkDetails -name 'JoshHome', 'JohnHome'
+```
+
+Get the details about the networks JoshHome and JohnHome via the API of the UniFi Controller
+
+### EXAMPLE 5
+```
+Get-UnifiNetworkDetails -id 'ba7e58be13574ef4881a79c3', '2437bdf7fdf04f1a96c0fd32'
+```
+
+Get the details about the networks with IDs ba7e58be13574ef4881a79c3 and 2437bdf7fdf04f1a96c0fd32 via the API of the UniFi Controller
+
+### EXAMPLE 6
+```
+Get-UnifiNetworkDetails -id 'ba7e58be13574ef4881a79c3' -UnifiSite 'Contoso'
+```
+
+Get the details about the network with ID ba7e58be13574ef4881a79c3 on Site 'Contoso' via the API of the UniFi Controller
+
+### EXAMPLE 7
+```
+Get-UnifiNetworkDetails -name 'JoshHome' -UnifiSite 'Contoso'
+```
+
+Get the details about the network JoshHome on Site 'Contoso' via the API of the UniFi Controller
 
 ## PARAMETERS
 
-### -UnifiNetwork
+### -Id
 The ID (network_id) of the network you would like to get detaild information about.
+Multiple values are supported.
 
 ```yaml
-Type: String
-Parameter Sets: (All)
-Aliases: UnifiNetworkId, NetworkId
+Type: String[]
+Parameter Sets: ById
+Aliases: UnifiNetwork, UnifiNetworkId, NetworkId
+
+Required: True
+Position: 2
+Default value: None
+Accept pipeline input: True (ByPropertyName, ByValue)
+Accept wildcard characters: False
+```
+
+### -Name
+The Name (not the ID/network_id) of the network you would like to get detaild information about.
+Multiple values are supported.
+
+```yaml
+Type: String[]
+Parameter Sets: ByName
+Aliases: UnifiNetworkName, NetworkName
 
 Required: True
 Position: 2
@@ -78,13 +139,15 @@ For more information, see about_CommonParameters (http://go.microsoft.com/fwlink
 
 ### System.Management.Automation.PSObject
 ## NOTES
-Initial version of the Ubiquiti UniFi Controller automation function
+The parameter UnifiNetwork is now an Alias.
+If the UnifiNetwork parameter is used, it must(!) be the ID (network_id).
+This was necessary to make it a non breaking change.
 
 ## RELATED LINKS
 
 [Get-UniFiConfig]()
 
-[Set-UniFiDefaultRequestHeader]()
+[Get-UnifiNetworkList]()
 
 [Set-UniFiDefaultRequestHeader]()
 

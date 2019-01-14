@@ -209,14 +209,41 @@
     <command:syntax>
       <command:syntaxItem>
         <maml:name>Get-UnifiNetworkDetails</maml:name>
-        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="2" aliases="UnifiNetworkId, NetworkId">
-          <maml:name>UnifiNetwork</maml:name>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="2" aliases="UnifiNetwork, UnifiNetworkId, NetworkId">
+          <maml:name>Id</maml:name>
           <maml:Description>
-            <maml:para>The ID (network_id) of the network you would like to get detaild information about.</maml:para>
+            <maml:para>The ID (network_id) of the network you would like to get detaild information about. Multiple values are supported.</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <dev:type>
+            <maml:name>String[]</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="3" aliases="Site">
+          <maml:name>UnifiSite</maml:name>
+          <maml:Description>
+            <maml:para>UniFi Site as configured. The default is: default</maml:para>
           </maml:Description>
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
             <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>Default</dev:defaultValue>
+        </command:parameter>
+      </command:syntaxItem>
+      <command:syntaxItem>
+        <maml:name>Get-UnifiNetworkDetails</maml:name>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="2" aliases="UnifiNetworkName, NetworkName">
+          <maml:name>Name</maml:name>
+          <maml:Description>
+            <maml:para>The Name (not the ID/network_id) of the network you would like to get detaild information about. Multiple values are supported.</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <dev:type>
+            <maml:name>String[]</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -236,14 +263,26 @@
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="2" aliases="UnifiNetworkId, NetworkId">
-        <maml:name>UnifiNetwork</maml:name>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="2" aliases="UnifiNetwork, UnifiNetworkId, NetworkId">
+        <maml:name>Id</maml:name>
         <maml:Description>
-          <maml:para>The ID (network_id) of the network you would like to get detaild information about.</maml:para>
+          <maml:para>The ID (network_id) of the network you would like to get detaild information about. Multiple values are supported.</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
         <dev:type>
-          <maml:name>String</maml:name>
+          <maml:name>String[]</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="2" aliases="UnifiNetworkName, NetworkName">
+        <maml:name>Name</maml:name>
+        <maml:Description>
+          <maml:para>The Name (not the ID/network_id) of the network you would like to get detaild information about. Multiple values are supported.</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <dev:type>
+          <maml:name>String[]</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -274,22 +313,57 @@
     </command:returnValues>
     <maml:alertSet>
       <maml:alert>
-        <maml:para>Initial version of the Ubiquiti UniFi Controller automation function</maml:para>
+        <maml:para>The parameter UnifiNetwork is now an Alias. If the UnifiNetwork parameter is used, it must(!) be the ID (network_id). This was necessary to make it a non breaking change.</maml:para>
       </maml:alert>
     </maml:alertSet>
     <command:examples>
       <command:example>
         <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
-        <dev:code>Get-UnifiNetworkDetails -UnifiNetwork $value1</dev:code>
+        <dev:code>Get-UnifiNetworkDetails -id 'ba7e58be13574ef4881a79c3'</dev:code>
         <dev:remarks>
-          <maml:para>Get the details about one network via the API of the UniFi Controller</maml:para>
+          <maml:para>Get the details about the network with ID ba7e58be13574ef4881a79c3 via the API of the UniFi Controller</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
         <maml:title>-------------------------- EXAMPLE 2 --------------------------</maml:title>
-        <dev:code>Get-UnifiNetworkDetails -UnifiNetwork $value1 -UnifiSite 'Contoso'</dev:code>
+        <dev:code>Get-UnifiNetworkDetails -UnifiNetwork 'ba7e58be13574ef4881a79c3'</dev:code>
         <dev:remarks>
-          <maml:para>Get the details about one network on Site 'Contoso' via the API of the UniFi Controller</maml:para>
+          <maml:para>Same as above, with the legacy parameter alias used.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 3 --------------------------</maml:title>
+        <dev:code>Get-UnifiNetworkDetails -name 'JoshHome'</dev:code>
+        <dev:remarks>
+          <maml:para>Get the details about the network JoshHome via the API of the UniFi Controller</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 4 --------------------------</maml:title>
+        <dev:code>Get-UnifiNetworkDetails -name 'JoshHome', 'JohnHome'</dev:code>
+        <dev:remarks>
+          <maml:para>Get the details about the networks JoshHome and JohnHome via the API of the UniFi Controller</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 5 --------------------------</maml:title>
+        <dev:code>Get-UnifiNetworkDetails -id 'ba7e58be13574ef4881a79c3', '2437bdf7fdf04f1a96c0fd32'</dev:code>
+        <dev:remarks>
+          <maml:para>Get the details about the networks with IDs ba7e58be13574ef4881a79c3 and 2437bdf7fdf04f1a96c0fd32 via the API of the UniFi Controller</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 6 --------------------------</maml:title>
+        <dev:code>Get-UnifiNetworkDetails -id 'ba7e58be13574ef4881a79c3' -UnifiSite 'Contoso'</dev:code>
+        <dev:remarks>
+          <maml:para>Get the details about the network with ID ba7e58be13574ef4881a79c3 on Site 'Contoso' via the API of the UniFi Controller</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 7 --------------------------</maml:title>
+        <dev:code>Get-UnifiNetworkDetails -name 'JoshHome' -UnifiSite 'Contoso'</dev:code>
+        <dev:remarks>
+          <maml:para>Get the details about the network JoshHome on Site 'Contoso' via the API of the UniFi Controller</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>
@@ -303,7 +377,7 @@
         <maml:uri></maml:uri>
       </maml:navigationLink>
       <maml:navigationLink>
-        <maml:linkText>Set-UniFiDefaultRequestHeader</maml:linkText>
+        <maml:linkText>Get-UnifiNetworkList</maml:linkText>
         <maml:uri></maml:uri>
       </maml:navigationLink>
       <maml:navigationLink>

@@ -10,7 +10,7 @@ Please see the [UseCases](https://github.com/jhochwald/UniFiTooling/tree/master/
 
 ### Version
 
-This document is based on UniFiTooling version 1.0.6 (Development)
+This document is based on UniFiTooling version 1.0.7 (Development)
 
 ![](https://img.shields.io/powershellgallery/vpre/UniFiTooling.svg)
 

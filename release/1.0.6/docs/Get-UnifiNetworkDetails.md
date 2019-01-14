@@ -1,8 +1,10 @@
 ﻿---
+author: Joerg Hochwald
 external help file: UniFiTooling-help.xml
 Module Name: UniFiTooling
 online version: https://github.com/jhochwald/UniFiTooling/raw/master/docs/Get-UnifiNetworkDetails.md
 schema: 2.0.0
+timestamp: 2019-01-14
 ---
 
 # Get-UnifiNetworkDetails
