@@ -3,19 +3,19 @@
    <#
          .SYNOPSIS
          Build a Body for Set-UnifiFirewallGroup call
-	
+
          .DESCRIPTION
          Build a JSON based Body for Set-UnifiFirewallGroup call
-	
+
          .PARAMETER UnfiFirewallGroup
          Existing Unfi Firewall Group
-	
+
          .PARAMETER UnifiCidrInput
          IPv4 or IPv6 input List
-	
+
          .EXAMPLE
          PS C:\> Get-UnifiFirewallGroupBody -UnfiFirewallGroup $value1 -UnifiCidrInput $value2
-	
+
          Build a Body for Set-UnifiFirewallGroup call
 
          .NOTES
@@ -24,7 +24,7 @@
          . LINK
          Set-UnifiFirewallGroup
    #>
-	
+
    [CmdletBinding(ConfirmImpact = 'None')]
    [OutputType([psobject])]
    param
@@ -48,24 +48,24 @@
       [psobject]
       $UnifiCidrInput
    )
-	
+
    begin
    {
       Write-Verbose -Message 'Cleanup exitsing Group'
       Write-Verbose -Message "Old Values: $UnfiFirewallGroup.group_members"
       $UnfiFirewallGroup.group_members = $null
    }
-	
+
    process
    {
       Write-Verbose -Message 'Create a new Object'
       $NewUnifiCidrItem = @()
-		
+
       foreach ($UnifiCidrItem in $UnifiCidrInput)
       {
          $NewUnifiCidrItem = $NewUnifiCidrItem + $UnifiCidrItem
       }
-		
+
       # Add the new values
       $paramAddMember = @{
          MemberType = 'NoteProperty'
@@ -74,10 +74,10 @@
          Force      = $true
       }
       $UnfiFirewallGroup | Add-Member @paramAddMember
-		
+
       # Cleanup
       $NewUnifiCidrItem = $null
-		
+
       try
       {
          # Create a new Request Body
@@ -92,13 +92,13 @@
       catch
       {
          $null = (Invoke-InternalScriptVariables)
-			
+
          Write-Error -Message 'Unable to convert new List to JSON' -ErrorAction Stop
-			
+
          break
       }
    }
-	
+
    end
    {
       # Dump

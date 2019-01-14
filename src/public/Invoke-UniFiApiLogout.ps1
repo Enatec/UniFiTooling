@@ -3,16 +3,16 @@
    <#
          .SYNOPSIS
          Logout from the API of the UniFi Controller
-	
+
          .DESCRIPTION
          Logout from the API of the Ubiquiti UniFi Controller
-	
+
          .EXAMPLE
-         
+
          PS C:\> Invoke-UniFiApiLogout
 
          Logout from the API of the Ubiquiti UniFi Controller
-	
+
          .NOTES
          Initial version of the Ubiquiti UniFi Controller automation function
 
@@ -27,17 +27,17 @@
    #>
    [CmdletBinding(ConfirmImpact = 'None')]
    param ()
-	
+
    begin
    {
       # Cleanup
       $Session = $null
-      
+
       # Safe ProgressPreference and Setup SilentlyContinue for the function
       $ExistingProgressPreference = ($ProgressPreference)
       $ProgressPreference = 'SilentlyContinue'
    }
-	
+
    process
    {
       try
@@ -79,7 +79,7 @@
 
          # Error Message
          Write-Error -Message 'Unable to Logout' -ErrorAction Stop
-			
+
          # Only here to catch a global ErrorAction overwrite
          break
       }
@@ -96,21 +96,21 @@
          $Script:line = $_.InvocationInfo.ScriptLineNumber
          Write-Verbose -Message ('Error was in Line {0}' -f $line)
          Write-Verbose -Message ('Error was {0}' -f $Session.meta.rc)
-			
+
          # Error Message
          Write-Error -Message 'Unable to Login' -ErrorAction Stop
-			
+
          # Only here to catch a global ErrorAction overwrite
          break
       }
    }
-	
+
    end
    {
       # Cleanup
       $Session = $null
       $RestSession = $null
-      
+
       # Restore ProgressPreference
       $ProgressPreference = $ExistingProgressPreference
    }

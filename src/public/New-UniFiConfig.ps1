@@ -3,57 +3,57 @@
    <#
          .SYNOPSIS
          Creates the UniFi config JSON file
-	
+
          .DESCRIPTION
          Creates the UniFi config JSON file. If no input is given it creates one with all the defaults.
-	
+
          .PARAMETER UniFiUsername
          The login of a UniFi User with admin rights
-	
+
          .PARAMETER UniFiPassword
          The password for the user given above. It is clear text for now. I know... But the Ubiquiti UniFi Controller seems to understand plain text only.
-	
+
          .PARAMETER UniFiProtocol
          Valid is http and https. default is https
          Please note: http is untested and it might not even work!
-	
+
          .PARAMETER UniFiSelfSignedCert
          If you use a self signed certificate and/or a certificate from an untrusted CA, you might want to use true here.
          Default is FALSE
-	
+
          .PARAMETER UniFiHostname
          The Ubiquiti UniFi Controller you want to use. You can use a Fully-Qualified Host Name (FQHN) or an IP address.
-	
+
          .PARAMETER UniFiPort
          The port number that you have configured on your Ubiquiti UniFi Controller.
          The default is 8443
-	
+
          .PARAMETER Path
          Where to safe the JSON config. Default is the directory where you call the function.
          e.g. .\UniFiConfig.json
-	
+
          .PARAMETER force
          Replaces the contents of a file, even if the file is read-only. Without this parameter, read-only files are not changed.
-	
+
          .EXAMPLE
          PS C:\> New-UniFiConfig
-	
+
          .EXAMPLE
          PS C:\> New-UniFiConfig -UniFiUsername 'unfi.admin.user' -UniFiPassword 'mySuperSecretPassworHere' -UniFiProtocol 'https' -UniFiSelfSignedCert $true -UniFiHostname 'unifi.contoso.com' -UniFiPort '8443' -Path '.\UniFiConfig.json'
-	
+
          .EXAMPLE
          PS C:\> New-UniFiConfig -UniFiUsername 'unfi.admin.user' -UniFiPassword 'mySuperSecretPassworHere' -UniFiProtocol 'https' -UniFiSelfSignedCert $true -UniFiHostname 'unifi.contoso.com' -UniFiPort '8443' -Path '.\UniFiConfig.json' -force
-	
+
          .NOTES
          Just an helper function to create a JSON config
-	
+
          .LINK
          Get-UniFiConfig
-	
+
          .LINK
          Get-UniFiCredentials
    #>
-	
+
    [CmdletBinding(ConfirmImpact = 'None',
    SupportsShouldProcess)]
    param
@@ -114,7 +114,7 @@
       [switch]
       $force = $false
    )
-	
+
    begin
    {
       #region JsonInputData
@@ -130,7 +130,7 @@
       }
       #endregion JsonInputData
    }
-	
+
    process
    {
       #region JsonData
@@ -156,13 +156,13 @@
          $null = (Set-Content @paramSetContent)
       }
    }
-	
+
    end
    {
       # Cleanup
       $JsonInputData = $null
       $paramConvertToJson = $null
-      
+
       Write-Verbose -Message 'New-UniFiConfig done'
    }
 }

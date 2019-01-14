@@ -3,15 +3,15 @@
    <#
          .SYNOPSIS
          Read the API Credentials from the UniFi config file
-	
+
          .DESCRIPTION
          Read the API Credentials from the UniFi config file
-	
+
          .EXAMPLE
          PS C:\> Get-UniFiCredentials
 
          Read the API Credentials from the UniFi config file
-	
+
          .NOTES
          Only import/read the username and password
 
@@ -29,14 +29,14 @@
       [string]
       $Path = '.\UniFiConfig.json'
    )
-	
+
    begin
    {
       # Cleanup
       $RawJson = $null
       $UnifiConfig = $null
    }
-	
+
    process
    {
       try
@@ -62,10 +62,10 @@
 
       # Cleanup
       $RawJson = $null
-		
+
       Write-Verbose -Message 'Try to setup the API Credentials'
 
-      if ((-not $UnifiConfig.Login.Username) -or (-not $UnifiConfig.Login.Password)) 
+      if ((-not $UnifiConfig.Login.Username) -or (-not $UnifiConfig.Login.Password))
       {
          # Verbose stuff
          $Script:line = $_.InvocationInfo.ScriptLineNumber
@@ -85,12 +85,12 @@
 
       Write-Verbose -Message 'API Credentials set'
    }
-	
+
    end
    {
       # Cleanup
       $RawJson = $null
       $UnifiConfig = $null
-		
+
    }
 }

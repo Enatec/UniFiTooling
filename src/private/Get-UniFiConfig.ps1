@@ -3,18 +3,18 @@
    <#
          .SYNOPSIS
          Read the UniFi config file
-	
+
          .DESCRIPTION
          Get the default values from the  UniFi config file
-	
+
          .PARAMETER Path
          Path to the config file
-	
+
          .EXAMPLE
          PS C:\> Get-UniFiConfig
 
          Read the UniFi config file
-	
+
          .NOTES
          We do not import/read the username and password
 
@@ -32,14 +32,14 @@
       [string]
       $Path = '.\UniFiConfig.json'
    )
-	
+
    begin
    {
       # Cleanup
       $RawJson = $null
       $UnifiConfig = $null
    }
-	
+
    process
    {
       try
@@ -65,7 +65,7 @@
 
       # Cleanup
       $RawJson = $null
-		
+
       # Set the config for later use
       $Global:ApiProto = $UnifiConfig.protocol
       Write-Verbose -Message ('ApiProto is {0}' -f $ApiProto)
@@ -83,7 +83,7 @@
       $Global:ApiUri = $ApiProto + '://' + $ApiHost + ':' + $ApiPort + '/api/'
       Write-Verbose -Message ('ApiUri is {0}' -f $ApiUri)
    }
-	
+
    end
    {
       # Cleanup

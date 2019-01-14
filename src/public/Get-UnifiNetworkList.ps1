@@ -3,13 +3,13 @@
    <#
          .SYNOPSIS
          Get a List Networks via the API of the UniFi Controller
-	
+
          .DESCRIPTION
          Get a List Networks via the API of the Ubiquiti UniFi Controller
-	
+
          .PARAMETER UnifiSite
          UniFi Site as configured. The default is: default
-	
+
          .EXAMPLE
          PS C:\> Get-UnifiNetworkList
 
@@ -19,7 +19,7 @@
          PS C:\> Get-UnifiNetworkList -UnifiSite 'Contoso'
 
          Get a List Networks on Site 'Contoso' via the API of the UniFi Controller
-	
+
          .NOTES
          Initial version of the Ubiquiti UniFi Controller automation function
 
@@ -32,7 +32,7 @@
          .LINK
          Set-UniFiDefaultRequestHeader
    #>
-	
+
    [CmdletBinding(ConfirmImpact = 'None')]
    [OutputType([psobject])]
    param
@@ -45,36 +45,36 @@
       [string]
       $UnifiSite = 'default'
    )
-	
+
    begin
    {
       # Cleanup
       $Session = $null
-      
+
       # Safe ProgressPreference and Setup SilentlyContinue for the function
       $ExistingProgressPreference = ($ProgressPreference)
       $ProgressPreference = 'SilentlyContinue'
    }
-	
+
    process
    {
       try
       {
          Write-Verbose -Message 'Read the Config'
          $null = (Get-UniFiConfig)
-			
+
          Write-Verbose -Message ('Certificate check - Should be {0}' -f $ApiSelfSignedCert)
          [Net.ServicePointManager]::ServerCertificateValidationCallback = {
             $ApiSelfSignedCert
          }
-			
+
          Write-Verbose -Message 'Set the API Call default Header'
          $null = (Set-UniFiDefaultRequestHeader)
-			
+
          Write-Verbose -Message 'Create the Request URI'
          $ApiRequestUri = $ApiUri + 's/' + $UnifiSite + '/rest/networkconf/'
          Write-Verbose -Message ('URI: {0}' -f $ApiRequestUri)
-			
+
          Write-Verbose -Message 'Send the Request'
          $paramInvokeRestMethod = @{
             Method        = 'Get'
@@ -99,10 +99,10 @@
          $Script:line = $_.InvocationInfo.ScriptLineNumber
          Write-Verbose -Message ('Error was in Line {0}' -f $line)
          Write-Verbose -Message ('Error was {0}' -f $_)
-			
+
          # Error Message
          Write-Error -Message 'Unable to get Firewall Groups' -ErrorAction Stop
-			
+
          # Only here to catch a global ErrorAction overwrite
          break
       }
@@ -111,7 +111,7 @@
          # Reset the SSL Trust (make sure everything is back to default)
          [Net.ServicePointManager]::ServerCertificateValidationCallback = $null
       }
-		
+
       # check result
       if ($Session.meta.rc -ne 'ok')
       {
@@ -119,23 +119,23 @@
          $Script:line = $_.InvocationInfo.ScriptLineNumber
          Write-Verbose -Message ('Error was in Line {0}' -f $line)
          Write-Verbose -Message ('Error was {0}' -f $Session.meta.rc)
-			
+
          # Error Message
          Write-Error -Message 'Unable to get the network list' -ErrorAction Stop
-			
+
          # Only here to catch a global ErrorAction overwrite
          break
       }
    }
-	
+
    end
    {
       # Dump the Result
       $Session.data
-		
+
       # Cleanup
       $Session = $null
-      
+
       # Restore ProgressPreference
       $ProgressPreference = $ExistingProgressPreference
    }
