@@ -12,7 +12,7 @@
 RootModule = 'UniFiTooling.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.0.7'
+ModuleVersion = '1.0.8'
 
 # Supported PSEditions
 CompatiblePSEditions = 'Core', 'Desktop'
@@ -69,11 +69,11 @@ PowerShellVersion = '5.1'
 # NestedModules = @()
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-FunctionsToExport = @('Get-UnifiFirewallGroups', 'Get-UnifiFirewallGroupDetails',
+FunctionsToExport = 'Get-UnifiFirewallGroupDetails', 'Get-UnifiFirewallGroups', 
                'Get-UnifiNetworkDetails', 'Get-UnifiNetworkList', 
                'Invoke-UniFiApiLogin', 'Invoke-UniFiApiLogout', 
                'Invoke-UniFiCidrWorkaround', 'New-UniFiConfig', 
-               'Set-UnifiFirewallGroup', 'Set-UnifiNetworkDetails')
+               'Set-UnifiFirewallGroup', 'Set-UnifiNetworkDetails'
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 CmdletsToExport = '*'
