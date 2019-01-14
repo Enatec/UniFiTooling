@@ -12,7 +12,7 @@ Please see the [UseCases](https://github.com/jhochwald/UniFiTooling/tree/master/
 
 This document is based on UniFiTooling version 1.0.7 (Development)
 
-![](https://img.shields.io/powershellgallery/vpre/UniFiTooling.svg)
+[![Powershell Gallery](https://img.shields.io/powershellgallery/vpre/UniFiTooling.svg)](https://www.powershellgallery.com/packages/UniFiTooling/)
 
 ### Requirements
 
@@ -44,7 +44,7 @@ PS C:\> iex (New-Object Net.WebClient).DownloadString("https://github.com/jhochw
 
 You will find tha latest version in the [release page](https://github.com/jhochwald/UniFiTooling/releases) of the [GitHub repository](https://github.com/jhochwald/UniFiTooling/)
 
-[![GitHub release](https://img.shields.io/github/release/jhochwald/UniFiTooling.svg)](https://github.com/jhochwald/UniFiTooling/releases/) ![https://github.com/jhochwald/UniFiTooling/releases](https://img.shields.io/github/downloads/jhochwald/UniFiTooling/total.svg) [![Download Size](https://badge-size.herokuapp.com/jhochwald/UniFiTooling/master/release/UniFiTooling-current.zip)](https://github.com/jhochwald/UniFiTooling/blob/master/release/UniFiTooling-current.zip)
+[![GitHub release](https://img.shields.io/github/release/jhochwald/UniFiTooling.svg)](https://github.com/jhochwald/UniFiTooling/releases/) [![GitHub release](https://img.shields.io/github/downloads/jhochwald/UniFiTooling/total.svg)](https://github.com/jhochwald/UniFiTooling/releases/) [![Download Size](https://badge-size.herokuapp.com/jhochwald/UniFiTooling/master/release/UniFiTooling-current.zip)](https://github.com/jhochwald/UniFiTooling/blob/master/release/UniFiTooling-current.zip)
 
 #### Clone the repository
 
@@ -61,7 +61,7 @@ Any Feedback is appreciated! Please open a [GitHub issue](https://github.com/jho
 Anything missing? Please open a [GitHub issue](https://github.com/jhochwald/UniFiTooling/issues/new/choose) as *Feature request*.
 Suggest an idea for this Module will help to improve this module.
 
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com) [![GitHub pull-requests](https://img.shields.io/github/issues-pr/jhochwald/UniFiTooling.svg)](https://GitHub.com/jhochwald/UniFiTooling/pull/) [![GitHub pull-requests closed](https://img.shields.io/github/issues-pr-closed/jhochwald/UniFiTooling.svg)](https://GitHub.com/jhochwald/UniFiTooling/pull/)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com) [![GitHub pull-requests](https://img.shields.io/github/issues-pr/jhochwald/UniFiTooling.svg)](https://GitHub.com/jhochwald/UniFiTooling/pull/) [![GitHub pull-requests closed](https://img.shields.io/github/issues-pr-closed/jhochwald/UniFiTooling.svg)](https://github.com/jhochwald/UniFiTooling/pulls?q=is%3Apr+is%3Aclosed)
 
 Please read our [Contribution Guide](https://github.com/jhochwald/UniFiTooling/blob/master/CONTRIBUTING.md) and [Code of Conduct](https://github.com/jhochwald/UniFiTooling/blob/master/CODE_OF_CONDUCT.md).
 
