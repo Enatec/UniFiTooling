@@ -8,11 +8,17 @@ All notable changes to the **UniFiTooling** project will be documented in this f
 
 Mainly a bugfix and refactoring release
 
+#### Fixed
+
+- Position numbers corrected (Now starts with 0 instead off 1)
+- Found the following issue: Even if an obejct is not found (e.g. network) the UniFi API returns OK (200) with null bytes in Data. That is OK, but we need a workaround. Added the Workaround to `Get-UnifiFirewallGroupDetails` and `Get-UnifiNetworkDetails` for testing.
+
 #### Added
 
 - `Get-UnifiFirewallGroupDetails` -Related to #10
 - Git Attributes File
 - Editor Config
+- Add `License.md`, a Markdown version of `LICENSE`
 
 #### Changed
 
@@ -24,8 +30,6 @@ Mainly a bugfix and refactoring release
  - For the parameter `-UnifiNetworkName` an ID (`network_id`) must be used, necessary to make it a non breaking change
 - Add `-name` parameter to `Get-UnifiNetworkDetails` - Related to #9
 - Moved `Get-UnifiFirewallGroupBody` from Public to Private (No longer exported as command)
-- Position numbers corrected (Now starts with 0 instead off 1)
-- Found the following issue: Even if an obejct is not found (e.g. network) the UniFi API returns OK (200) with null bytes in Data. That is OK, but we need a workaround. Added the Workaround to `Get-UnifiFirewallGroupDetails` and `Get-UnifiNetworkDetails` for testing.
 
 ### 1.0.6 - 2019-01-13
 
