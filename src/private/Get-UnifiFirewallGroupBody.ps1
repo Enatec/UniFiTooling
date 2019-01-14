@@ -32,7 +32,7 @@
       [Parameter(Mandatory,
             ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-            Position = 1,
+            Position = 0,
       HelpMessage = 'Existing Unfi Firewall Group')]
       [ValidateNotNullOrEmpty()]
       [Alias('FirewallGroup')]
@@ -41,7 +41,7 @@
       [Parameter(Mandatory,
             ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-            Position = 2,
+            Position = 1,
       HelpMessage = 'IPv4 or IPv6 input List')]
       [ValidateNotNullOrEmpty()]
       [Alias('CidrInput')]

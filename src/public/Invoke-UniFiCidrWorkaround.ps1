@@ -47,7 +47,7 @@
 		[Parameter(Mandatory = $true,
 				   ValueFromPipeline = $true,
 				   ValueFromPipelineByPropertyName = $true,
-				   Position = 1,
+				   Position = 0,
 				   HelpMessage = 'Existing CIDR List Object')]
 		[ValidateNotNullOrEmpty()]
 		[Alias('UniFiCidrList')]
@@ -55,7 +55,7 @@
 		$CidrList,
 		[Parameter(ValueFromPipeline = $true,
 				   ValueFromPipelineByPropertyName = $true,
-				   Position = 2)]
+				   Position = 1)]
 		[Alias('IPv6', 'V6')]
 		[switch]
 		$6 = $false

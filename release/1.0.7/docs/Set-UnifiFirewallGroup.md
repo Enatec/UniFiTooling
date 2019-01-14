@@ -43,7 +43,7 @@ Parameter Sets: (All)
 Aliases: FirewallGroup
 
 Required: True
-Position: 2
+Position: 1
 Default value: None
 Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False
@@ -58,7 +58,7 @@ Parameter Sets: (All)
 Aliases: CidrInput
 
 Required: True
-Position: 3
+Position: 2
 Default value: None
 Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False
@@ -74,7 +74,7 @@ Parameter Sets: (All)
 Aliases: Site
 
 Required: False
-Position: 4
+Position: 3
 Default value: Default
 Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False

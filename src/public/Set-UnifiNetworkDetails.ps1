@@ -34,9 +34,6 @@
 
          .LINK
          Set-UniFiDefaultRequestHeader
-
-         .LINK
-         Set-UniFiDefaultRequestHeader
    #>
 
    [CmdletBinding(ConfirmImpact = 'None')]
@@ -46,7 +43,7 @@
       [Parameter(Mandatory,
             ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-            Position = 1,
+            Position = 0,
       HelpMessage = 'The ID (network_id) of the network you would like to get detaild information about.')]
       [ValidateNotNullOrEmpty()]
       [Alias('UnifiNetworkId', 'NetworkId')]
@@ -55,7 +52,7 @@
       [Parameter(Mandatory,
             ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-            Position = 2,
+            Position = 1,
       HelpMessage = 'JSON formed Body for the Request')]
       [ValidateNotNullOrEmpty()]
       [Alias('Body')]
@@ -63,7 +60,7 @@
       $UniFiBody,
       [Parameter(ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-      Position = 3)]
+      Position = 2)]
       [ValidateNotNullOrEmpty()]
       [Alias('Site')]
       [string]

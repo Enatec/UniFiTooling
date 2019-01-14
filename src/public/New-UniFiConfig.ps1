@@ -60,21 +60,21 @@
    (
       [Parameter(ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-      Position = 1)]
+      Position = 0)]
       [ValidateNotNullOrEmpty()]
       [Alias('enUniFiUsername')]
       [string]
       $UniFiUsername = 'unfi.admin.user',
       [Parameter(ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-      Position = 2)]
+      Position = 1)]
       [ValidateNotNullOrEmpty()]
       [Alias('enUniFiPassword')]
       [string]
       $UniFiPassword = 'mySuperSecretPassworHere',
       [Parameter(ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-      Position = 3)]
+      Position = 2)]
       [ValidateSet('http', 'https', IgnoreCase = $true)]
       [ValidateNotNullOrEmpty()]
       [Alias('enUniFiProtocol')]
@@ -82,35 +82,35 @@
       $UniFiProtocol = 'https',
       [Parameter(ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-      Position = 4)]
+      Position = 3)]
       [ValidateNotNullOrEmpty()]
       [Alias('enUniFiSelfSignedCert')]
       [bool]
       $UniFiSelfSignedCert = $false,
       [Parameter(ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-      Position = 5)]
+      Position = 4)]
       [ValidateNotNullOrEmpty()]
       [Alias('enUniFiHostname')]
       [string]
       $UniFiHostname = 'unifi.contoso.com',
       [Parameter(ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-      Position = 6)]
+      Position = 5)]
       [ValidateNotNullOrEmpty()]
       [Alias('enUniFiPort')]
       [int]
       $UniFiPort = 8443,
       [Parameter(ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-      Position = 7)]
+      Position = 6)]
       [ValidateNotNullOrEmpty()]
       [Alias('enConfigPath', 'ConfigPath')]
       [string]
       $Path = '.\UniFiConfig.json',
       [Parameter(ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-      Position = 8)]
+      Position = 7)]
       [switch]
       $force = $false
    )

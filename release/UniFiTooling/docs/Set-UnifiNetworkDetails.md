@@ -50,7 +50,7 @@ Parameter Sets: (All)
 Aliases: UnifiNetworkId, NetworkId
 
 Required: True
-Position: 2
+Position: 1
 Default value: None
 Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False
@@ -65,7 +65,7 @@ Parameter Sets: (All)
 Aliases: Body
 
 Required: True
-Position: 3
+Position: 2
 Default value: None
 Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False
@@ -81,7 +81,7 @@ Parameter Sets: (All)
 Aliases: Site
 
 Required: False
-Position: 4
+Position: 3
 Default value: Default
 Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False
@@ -102,8 +102,6 @@ Initial version of the Ubiquiti UniFi Controller automation function
 ## RELATED LINKS
 
 [Get-UniFiConfig]()
-
-[Set-UniFiDefaultRequestHeader]()
 
 [Set-UniFiDefaultRequestHeader]()
 

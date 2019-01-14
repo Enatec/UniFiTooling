@@ -69,19 +69,19 @@
    [OutputType([psobject])]
    param
    (
-      [Parameter(ParameterSetName = 'ById',Mandatory,
+      [Parameter(ParameterSetName = 'Request by Id',Mandatory,
             ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-            Position = 1,
+            Position = 0,
       HelpMessage = 'The ID (network_id) of the network you would like to get detaild information about.')]
       [ValidateNotNullOrEmpty()]
       [Alias('UnifiNetwork', 'UnifiNetworkId', 'NetworkId')]
       [string[]]
       $Id,
-      [Parameter(ParameterSetName = 'ByName', Mandatory,
+      [Parameter(ParameterSetName = 'Request by Name', Mandatory,
             ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-            Position = 1,
+            Position = 0,
       HelpMessage = 'The Name (not the ID/network_id) of the network you would like to get detaild information about.')]
       [ValidateNotNullOrEmpty()]
       [Alias('UnifiNetworkName', 'NetworkName')]
@@ -89,7 +89,7 @@
       $Name,
       [Parameter(ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-      Position = 2)]
+      Position = 1)]
       [ValidateNotNullOrEmpty()]
       [Alias('Site')]
       [string]

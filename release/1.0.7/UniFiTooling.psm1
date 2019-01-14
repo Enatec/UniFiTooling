@@ -33,7 +33,7 @@ function Get-UniFiConfig
    (
       [Parameter(ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-      Position = 1)]
+      Position = 0)]
       [ValidateNotNullOrEmpty()]
       [Alias('UnifiConfig')]
       [string]
@@ -126,7 +126,7 @@ function Get-UniFiCredentials
    (
       [Parameter(ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-      Position = 1)]
+      Position = 0)]
       [ValidateNotNullOrEmpty()]
       [Alias('UnifiConfig')]
       [string]
@@ -232,7 +232,7 @@ function Get-UnifiFirewallGroupBody
       [Parameter(Mandatory,
             ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-            Position = 1,
+            Position = 0,
       HelpMessage = 'Existing Unfi Firewall Group')]
       [ValidateNotNullOrEmpty()]
       [Alias('FirewallGroup')]
@@ -241,7 +241,7 @@ function Get-UnifiFirewallGroupBody
       [Parameter(Mandatory,
             ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-            Position = 2,
+            Position = 1,
       HelpMessage = 'IPv4 or IPv6 input List')]
       [ValidateNotNullOrEmpty()]
       [Alias('CidrInput')]
@@ -488,19 +488,19 @@ function Get-UnifiFirewallGroupDetails
    [OutputType([psobject])]
    param
    (
-      [Parameter(ParameterSetName = 'ById',Mandatory,
+      [Parameter(ParameterSetName = 'Request by Id',Mandatory,
             ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-            Position = 1,
+            Position = 0,
       HelpMessage = 'The ID (_id) of the Firewall Group you would like to get detaild information about.')]
       [ValidateNotNullOrEmpty()]
       [Alias('FirewallGroupId')]
       [string[]]
       $Id,
-      [Parameter(ParameterSetName = 'ByName', Mandatory,
+      [Parameter(ParameterSetName = 'Request by Name', Mandatory,
             ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-            Position = 1,
+            Position = 0,
       HelpMessage = 'The Name (not the _id) of the Firewall Group you would like to get detaild information about.')]
       [ValidateNotNullOrEmpty()]
       [Alias('FirewallGroupName')]
@@ -508,7 +508,7 @@ function Get-UnifiFirewallGroupDetails
       $Name,
       [Parameter(ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-      Position = 2)]
+      Position = 1)]
       [ValidateNotNullOrEmpty()]
       [Alias('Site')]
       [string]
@@ -722,7 +722,7 @@ function Get-UnifiFirewallGroups
    (
       [Parameter(ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-      Position = 1)]
+      Position = 0)]
       [ValidateNotNullOrEmpty()]
       [Alias('Site')]
       [string]
@@ -895,19 +895,19 @@ function Get-UnifiNetworkDetails
    [OutputType([psobject])]
    param
    (
-      [Parameter(ParameterSetName = 'ById',Mandatory,
+      [Parameter(ParameterSetName = 'Request by Id',Mandatory,
             ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-            Position = 1,
+            Position = 0,
       HelpMessage = 'The ID (network_id) of the network you would like to get detaild information about.')]
       [ValidateNotNullOrEmpty()]
       [Alias('UnifiNetwork', 'UnifiNetworkId', 'NetworkId')]
       [string[]]
       $Id,
-      [Parameter(ParameterSetName = 'ByName', Mandatory,
+      [Parameter(ParameterSetName = 'Request by Name', Mandatory,
             ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-            Position = 1,
+            Position = 0,
       HelpMessage = 'The Name (not the ID/network_id) of the network you would like to get detaild information about.')]
       [ValidateNotNullOrEmpty()]
       [Alias('UnifiNetworkName', 'NetworkName')]
@@ -915,7 +915,7 @@ function Get-UnifiNetworkDetails
       $Name,
       [Parameter(ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-      Position = 2)]
+      Position = 1)]
       [ValidateNotNullOrEmpty()]
       [Alias('Site')]
       [string]
@@ -1129,7 +1129,7 @@ function Get-UnifiNetworkList
    (
       [Parameter(ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-      Position = 1)]
+      Position = 0)]
       [ValidateNotNullOrEmpty()]
       [Alias('Site')]
       [string]
@@ -1540,7 +1540,7 @@ function Invoke-UniFiCidrWorkaround
 		[Parameter(Mandatory = $true,
 				   ValueFromPipeline = $true,
 				   ValueFromPipelineByPropertyName = $true,
-				   Position = 1,
+				   Position = 0,
 				   HelpMessage = 'Existing CIDR List Object')]
 		[ValidateNotNullOrEmpty()]
 		[Alias('UniFiCidrList')]
@@ -1548,7 +1548,7 @@ function Invoke-UniFiCidrWorkaround
 		$CidrList,
 		[Parameter(ValueFromPipeline = $true,
 				   ValueFromPipelineByPropertyName = $true,
-				   Position = 2)]
+				   Position = 1)]
 		[Alias('IPv6', 'V6')]
 		[switch]
 		$6 = $false
@@ -1659,21 +1659,21 @@ function New-UniFiConfig
    (
       [Parameter(ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-      Position = 1)]
+      Position = 0)]
       [ValidateNotNullOrEmpty()]
       [Alias('enUniFiUsername')]
       [string]
       $UniFiUsername = 'unfi.admin.user',
       [Parameter(ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-      Position = 2)]
+      Position = 1)]
       [ValidateNotNullOrEmpty()]
       [Alias('enUniFiPassword')]
       [string]
       $UniFiPassword = 'mySuperSecretPassworHere',
       [Parameter(ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-      Position = 3)]
+      Position = 2)]
       [ValidateSet('http', 'https', IgnoreCase = $true)]
       [ValidateNotNullOrEmpty()]
       [Alias('enUniFiProtocol')]
@@ -1681,35 +1681,35 @@ function New-UniFiConfig
       $UniFiProtocol = 'https',
       [Parameter(ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-      Position = 4)]
+      Position = 3)]
       [ValidateNotNullOrEmpty()]
       [Alias('enUniFiSelfSignedCert')]
       [bool]
       $UniFiSelfSignedCert = $false,
       [Parameter(ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-      Position = 5)]
+      Position = 4)]
       [ValidateNotNullOrEmpty()]
       [Alias('enUniFiHostname')]
       [string]
       $UniFiHostname = 'unifi.contoso.com',
       [Parameter(ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-      Position = 6)]
+      Position = 5)]
       [ValidateNotNullOrEmpty()]
       [Alias('enUniFiPort')]
       [int]
       $UniFiPort = 8443,
       [Parameter(ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-      Position = 7)]
+      Position = 6)]
       [ValidateNotNullOrEmpty()]
       [Alias('enConfigPath', 'ConfigPath')]
       [string]
       $Path = '.\UniFiConfig.json',
       [Parameter(ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-      Position = 8)]
+      Position = 7)]
       [switch]
       $force = $false
    )
@@ -1810,7 +1810,7 @@ function Set-UnifiFirewallGroup
       [Parameter(Mandatory,
             ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-            Position = 1,
+            Position = 0,
       HelpMessage = 'Unfi Firewall Group')]
       [ValidateNotNullOrEmpty()]
       [Alias('FirewallGroup')]
@@ -1819,7 +1819,7 @@ function Set-UnifiFirewallGroup
       [Parameter(Mandatory,
             ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-            Position = 2,
+            Position = 1,
       HelpMessage = 'IPv4 or IPv6 input List')]
       [ValidateNotNullOrEmpty()]
       [Alias('CidrInput')]
@@ -1827,7 +1827,7 @@ function Set-UnifiFirewallGroup
       $UnifiCidrInput,
       [Parameter(ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-      Position = 3)]
+      Position = 2)]
       [ValidateNotNullOrEmpty()]
       [Alias('Site')]
       [string]
@@ -1993,9 +1993,6 @@ function Set-UnifiNetworkDetails
 
          .LINK
          Set-UniFiDefaultRequestHeader
-
-         .LINK
-         Set-UniFiDefaultRequestHeader
    #>
 
    [CmdletBinding(ConfirmImpact = 'None')]
@@ -2005,7 +2002,7 @@ function Set-UnifiNetworkDetails
       [Parameter(Mandatory,
             ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-            Position = 1,
+            Position = 0,
       HelpMessage = 'The ID (network_id) of the network you would like to get detaild information about.')]
       [ValidateNotNullOrEmpty()]
       [Alias('UnifiNetworkId', 'NetworkId')]
@@ -2014,7 +2011,7 @@ function Set-UnifiNetworkDetails
       [Parameter(Mandatory,
             ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-            Position = 2,
+            Position = 1,
       HelpMessage = 'JSON formed Body for the Request')]
       [ValidateNotNullOrEmpty()]
       [Alias('Body')]
@@ -2022,7 +2019,7 @@ function Set-UnifiNetworkDetails
       $UniFiBody,
       [Parameter(ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-      Position = 3)]
+      Position = 2)]
       [ValidateNotNullOrEmpty()]
       [Alias('Site')]
       [string]

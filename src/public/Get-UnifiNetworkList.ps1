@@ -39,7 +39,7 @@
    (
       [Parameter(ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-      Position = 1)]
+      Position = 0)]
       [ValidateNotNullOrEmpty()]
       [Alias('Site')]
       [string]

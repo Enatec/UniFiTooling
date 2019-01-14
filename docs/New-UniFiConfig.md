@@ -53,7 +53,7 @@ Parameter Sets: (All)
 Aliases: enUniFiUsername
 
 Required: False
-Position: 2
+Position: 1
 Default value: Unfi.admin.user
 Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False
@@ -71,7 +71,7 @@ Parameter Sets: (All)
 Aliases: enUniFiPassword
 
 Required: False
-Position: 3
+Position: 2
 Default value: MySuperSecretPassworHere
 Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False
@@ -88,7 +88,7 @@ Parameter Sets: (All)
 Aliases: enUniFiProtocol
 
 Required: False
-Position: 4
+Position: 3
 Default value: Https
 Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False
@@ -104,7 +104,7 @@ Parameter Sets: (All)
 Aliases: enUniFiSelfSignedCert
 
 Required: False
-Position: 5
+Position: 4
 Default value: False
 Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False
@@ -120,7 +120,7 @@ Parameter Sets: (All)
 Aliases: enUniFiHostname
 
 Required: False
-Position: 6
+Position: 5
 Default value: Unifi.contoso.com
 Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False
@@ -136,7 +136,7 @@ Parameter Sets: (All)
 Aliases: enUniFiPort
 
 Required: False
-Position: 7
+Position: 6
 Default value: 8443
 Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False
@@ -154,7 +154,7 @@ Parameter Sets: (All)
 Aliases: enConfigPath, ConfigPath
 
 Required: False
-Position: 8
+Position: 7
 Default value: .\UniFiConfig.json
 Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False
@@ -170,7 +170,7 @@ Parameter Sets: (All)
 Aliases:
 
 Required: False
-Position: 9
+Position: 8
 Default value: False
 Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False

@@ -63,19 +63,19 @@
    [OutputType([psobject])]
    param
    (
-      [Parameter(ParameterSetName = 'ById',Mandatory,
+      [Parameter(ParameterSetName = 'Request by Id',Mandatory,
             ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-            Position = 1,
+            Position = 0,
       HelpMessage = 'The ID (_id) of the Firewall Group you would like to get detaild information about.')]
       [ValidateNotNullOrEmpty()]
       [Alias('FirewallGroupId')]
       [string[]]
       $Id,
-      [Parameter(ParameterSetName = 'ByName', Mandatory,
+      [Parameter(ParameterSetName = 'Request by Name', Mandatory,
             ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-            Position = 1,
+            Position = 0,
       HelpMessage = 'The Name (not the _id) of the Firewall Group you would like to get detaild information about.')]
       [ValidateNotNullOrEmpty()]
       [Alias('FirewallGroupName')]
@@ -83,7 +83,7 @@
       $Name,
       [Parameter(ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-      Position = 2)]
+      Position = 1)]
       [ValidateNotNullOrEmpty()]
       [Alias('Site')]
       [string]

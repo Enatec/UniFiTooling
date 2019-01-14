@@ -15,12 +15,12 @@ Get the details about one network via the API of the UniFi Controller
 
 ## SYNTAX
 
-### ById
+### Request by Id
 ```
 Get-UnifiNetworkDetails [-Id] <String[]> [[-UnifiSite] <String>] [<CommonParameters>]
 ```
 
-### ByName
+### Request by Name
 ```
 Get-UnifiNetworkDetails [-Name] <String[]> [[-UnifiSite] <String>] [<CommonParameters>]
 ```
@@ -87,11 +87,11 @@ Multiple values are supported.
 
 ```yaml
 Type: String[]
-Parameter Sets: ById
+Parameter Sets: Request by Id
 Aliases: UnifiNetwork, UnifiNetworkId, NetworkId
 
 Required: True
-Position: 2
+Position: 1
 Default value: None
 Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False
@@ -103,11 +103,11 @@ Multiple values are supported.
 
 ```yaml
 Type: String[]
-Parameter Sets: ByName
+Parameter Sets: Request by Name
 Aliases: UnifiNetworkName, NetworkName
 
 Required: True
-Position: 2
+Position: 1
 Default value: None
 Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False
@@ -123,7 +123,7 @@ Parameter Sets: (All)
 Aliases: Site
 
 Required: False
-Position: 3
+Position: 2
 Default value: Default
 Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False
