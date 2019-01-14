@@ -1,7 +1,7 @@
 ﻿---
 Module Name: UniFiTooling
 Module Guid: 7fff91a0-02eb-4df2-84d5-c7d3cd7f7a5d
-Download Help Link: https://github.com/jhochwald/UniFiTooling/raw/master/docs/UniFiTooling.md
+Download Help Link: https://github.com/jhochwald/UniFiTooling/raw/master/docs/README.md
 Help Version: 1.0.6
 Locale: en-US
 ---
@@ -31,6 +31,9 @@ Logout from the API of the UniFi Controller
 
 ### [Invoke-UniFiCidrWorkaround](Invoke-UniFiCidrWorkaround.md)
 IPv4 and IPv6 CIDR Workaround for UBNT USG Firewall Rules
+
+### [New-UniFiConfig](New-UniFiConfig.md)
+Creates the UniFi config JSON file
 
 ### [Set-UnifiFirewallGroup](Set-UnifiFirewallGroup.md)
 Get a given Firewall Group via the API of the UniFi Controller

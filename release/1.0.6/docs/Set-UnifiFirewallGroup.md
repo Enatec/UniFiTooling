@@ -1,14 +1,10 @@
 ﻿---
 author: Joerg Hochwald
-category: UNIFITOOLING
 external help file: UniFiTooling-help.xml
-layout: post
 Module Name: UniFiTooling
 online version: https://github.com/jhochwald/UniFiTooling/raw/master/docs/Set-UnifiFirewallGroup.md
 schema: 2.0.0
-tags: OnlineHelp PowerShell
-timestamp: 2019-01-13
-title: Set-UnifiFirewallGroup
+timestamp: 2019-01-14
 ---
 
 # Set-UnifiFirewallGroup

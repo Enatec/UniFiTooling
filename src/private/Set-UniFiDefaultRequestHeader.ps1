@@ -3,21 +3,21 @@
    <#
          .SYNOPSIS
          Set the default Header for all UniFi Requests
-	
+
          .DESCRIPTION
          Set the default Header for all UniFi Requests
-	
+
          .EXAMPLE
          PS C:\> Set-UniFiDefaultRequestHeader
 
          Set the default Header for all UniFi Requests
-	
+
          .NOTES
          This is an internal helper function only
    #>
    [CmdletBinding(ConfirmImpact = 'None')]
    param ()
-	
+
    begin
    {
       # Cleanup

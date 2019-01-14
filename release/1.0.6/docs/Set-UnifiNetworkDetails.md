@@ -1,14 +1,10 @@
 ﻿---
 author: Joerg Hochwald
-category: UNIFITOOLING
 external help file: UniFiTooling-help.xml
-layout: post
 Module Name: UniFiTooling
 online version: https://github.com/jhochwald/UniFiTooling/raw/master/docs/Set-UnifiNetworkDetails.md
 schema: 2.0.0
-tags: OnlineHelp PowerShell
-timestamp: 2019-01-13
-title: Set-UnifiNetworkDetails
+timestamp: 2019-01-14
 ---
 
 # Set-UnifiNetworkDetails
@@ -45,7 +41,7 @@ Get the details about one network on Site 'Contoso' via the API of the UniFi Con
 ## PARAMETERS
 
 ### -UnifiNetwork
-The ID (network_id) of the network you would like to get detaild information about.
+The ID (network_id) of the network you would like to get detailed information about.
 
 ```yaml
 Type: String

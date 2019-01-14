@@ -1,14 +1,10 @@
 ﻿---
 author: Joerg Hochwald
-category: UNIFITOOLING
 external help file: UniFiTooling-help.xml
-layout: post
 Module Name: UniFiTooling
 online version: https://github.com/jhochwald/UniFiTooling/raw/master/docs/Invoke-UniFiApiLogin.md
 schema: 2.0.0
-tags: OnlineHelp PowerShell
-timestamp: 2019-01-13
-title: Invoke-UniFiApiLogin
+timestamp: 2019-01-14
 ---
 
 # Invoke-UniFiApiLogin
