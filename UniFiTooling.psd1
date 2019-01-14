@@ -73,7 +73,7 @@ FunctionsToExport = 'Get-UnifiFirewallGroupBody', 'Get-UnifiFirewallGroups',
                'Get-UnifiNetworkDetails', 'Get-UnifiNetworkList', 
                'Invoke-UniFiApiLogin', 'Invoke-UniFiApiLogout', 
                'Invoke-UniFiCidrWorkaround', 'Set-UnifiFirewallGroup', 
-               'Set-UnifiNetworkDetails'
+               'Set-UnifiNetworkDetails', 'New-UniFiConfig'
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 CmdletsToExport = '*'

@@ -1,14 +1,8 @@
 ﻿---
-author: Joerg Hochwald
-category: UNIFITOOLING
-external help file:
-layout: post
-Module Name:
+external help file: UniFiTooling-help.xml
+Module Name: UniFiTooling
 online version: https://github.com/jhochwald/UniFiTooling/raw/master/docs/New-UniFiConfig.md
 schema: 2.0.0
-tags: OnlineHelp PowerShell
-timestamp: 2019-01-13
-title: New-UniFiConfig
 ---
 
 # New-UniFiConfig
