@@ -30,107 +30,107 @@
 // ${cwd} the task runner's current working directory on startup
 // ${lineNumber} the current selected line number in the active file
 {
-   "version": "2.0.0",
-   "windows": {
-       "options": {
-           "shell": {
-               "executable": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
-               "args": [
-                   "-NoProfile",
-                   "-ExecutionPolicy",
-                   "Bypass",
-                   "-Command"
-               ]
-           }
-       }
-   },
-   "linux": {
-       "options": {
-           "shell": {
-               "executable": "/usr/bin/pwsh",
-               "args": [
-                   "-NoProfile",
-                   "-Command"
-               ]
-           }
-       }
-   },
-   "osx": {
-       "options": {
-           "shell": {
-               "executable": "/usr/local/bin/pwsh",
-               "args": [
-                   "-NoProfile",
-                   "-Command"
-               ]
-           }
-       }
-   },
-   "tasks": [
-       {
-           "label": "Clean",
-           "type": "shell",
-           "command": "${cwd}/../build.ps1 -Project 'UniFiTooling' -Task 'Clean'",
-           "presentation": {
-            "reveal": "never",
-            "panel": "shared",
-            "clear": true,
-            "focus": false
+    "version": "2.0.0",
+    "windows": {
+        "options": {
+            "shell": {
+                "executable": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+                "args": [
+                    "-NoProfile",
+                    "-ExecutionPolicy",
+                    "Bypass",
+                    "-Command"
+                ]
+            }
         }
-       },
-       {
-           "label": "Build",
-           "type": "shell",
-           "command": "${cwd}/../build.ps1  -Project 'UniFiTooling' -Task 'Build'",
-           "group": {
-               "kind": "build",
-               "isDefault": true
-           },
-           "presentation": {
-            "reveal": "always",
-            "panel": "never",
-            "clear": true,
-            "focus": false
+    },
+    "linux": {
+        "options": {
+            "shell": {
+                "executable": "/usr/bin/pwsh",
+                "args": [
+                    "-NoProfile",
+                    "-Command"
+                ]
+            }
         }
-       },
-       {
-           "label": "Test",
-           "type": "shell",
-           "command": "${cwd}/../build.ps1 -Project 'UniFiTooling' -Task 'Build 'Test'",
-           "group": {
-               "kind": "test",
-               "isDefault": true
-           },
-           "presentation": {
-            "reveal": "silent",
-            "panel": "shared",
-            "clear": true,
-            "focus": false
+    },
+    "osx": {
+        "options": {
+            "shell": {
+                "executable": "/usr/local/bin/pwsh",
+                "args": [
+                    "-NoProfile",
+                    "-Command"
+                ]
+            }
+        }
+    },
+    "tasks": [
+        {
+            "label": "Clean",
+            "type": "shell",
+            "command": "${cwd}/../build.ps1 -Project 'UniFiTooling' -Task 'Clean'",
+            "presentation": {
+                "reveal": "never",
+                "panel": "shared",
+                "clear": true,
+                "focus": false
+            }
         },
-           "problemMatcher": [
-               "$pester"
-           ]
-       },
-       {
-           "label": "Publish",
-           "type": "shell",
-           "command": "${cwd}/../build.ps1 -Project 'UniFiTooling' -Task 'Publish'",
-           "presentation": {
-            "reveal": "silent",
-            "panel": "shared",
-            "clear": true,
-            "focus": false
+        {
+            "label": "Build",
+            "type": "shell",
+            "command": "${cwd}/../build.ps1  -Project 'UniFiTooling' -Task 'Build'",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "never",
+                "clear": true,
+                "focus": false
+            }
+        },
+        {
+            "label": "Test",
+            "type": "shell",
+            "command": "${cwd}/../build.ps1 -Project 'UniFiTooling' -Task 'Build 'Test'",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "silent",
+                "panel": "shared",
+                "clear": true,
+                "focus": false
+            },
+            "problemMatcher": [
+                "$pester"
+            ]
+        },
+        {
+            "label": "Publish",
+            "type": "shell",
+            "command": "${cwd}/../build.ps1 -Project 'UniFiTooling' -Task 'Publish'",
+            "presentation": {
+                "reveal": "silent",
+                "panel": "shared",
+                "clear": true,
+                "focus": false
+            }
+        },
+        {
+            "label": "Release",
+            "type": "shell",
+            "command": "${cwd}/../build.ps1 -Project 'UniFiTooling' -Task 'Release'",
+            "presentation": {
+                "reveal": "silent",
+                "panel": "shared",
+                "clear": true
+            }
         }
-       },
-       {
-         "label": "Release",
-         "type": "shell",
-         "command": "${cwd}/../build.ps1 -Project 'UniFiTooling' -Task 'Release'",
-         "presentation": {
-          "reveal": "silent",
-          "panel": "shared",
-          "clear": true
-      }
-     }
-   ]
+    ]
 }

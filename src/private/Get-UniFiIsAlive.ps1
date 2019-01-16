@@ -21,7 +21,7 @@
          Use a simple API call to see if the session is alive on Site 'Contoso'
 
          .NOTES
-         Dummy Function
+         Internal Helper Function
 
          .LINK
          Get-UniFiConfig
