@@ -2,34 +2,59 @@
 {
    <#
          .SYNOPSIS
-         Get the UniFi Security Gateway (USG) Speedtest results
+         Get the UniFi Security Gateway (USG) Speed Test results
 
          .DESCRIPTION
-         Get the UniFi Security Gateway (USG) Speedtest results
+         Get the UniFi Security Gateway (USG) Speed Test results
+
+         .PARAMETER Timeframe
+         Timeframe in hours, default is 24
+
+         .PARAMETER StartDate
+         Start date (valid Date String)
+         Default is now
+
+         .PARAMETER EndDate
+         End date (valid Date String), default is now minus 24 hours
 
          .PARAMETER UnifiSite
          UniFi Site as configured. The default is: default
 
-         .EXAMPLE
-         PS C:\> Get-UnifiSpeedTestResult
+         .PARAMETER all
+         Get all existing Speed Test Results
 
-         Get the UniFi Security Gateway (USG) Speedtest results
+         .PARAMETER UniFiValues
+         Show results without modifications, like the UniFi Controller creates them
+
+         .EXAMPLE
+         PS C:\> Get-UnifiSpeedTestResult -all
+
+         Get all the UniFi Security Gateway (USG) Speed Test results
 
          .EXAMPLE
          PS C:\> Get-UnifiSpeedTestResult | Select-Object -Property *
 
-         Get the UniFi Security Gateway (USG) Speedtest results, returns all values
+         Get the UniFi Security Gateway (USG) Speed Test results from the last 24 hours (default), returns all values
 
          .EXAMPLE
          PS C:\> Get-UnifiSpeedTestResult -UnifiSite 'Contoso'
 
-         Get the UniFi Security Gateway (USG) Speedtest results
+         Get the UniFi Security Gateway (USG) Speed Test results from the last 24 hours (default)
+
+         .EXAMPLE
+         PS C:\> Get-UnifiSpeedTestResult -Timeframe 48
+
+         Get the UniFi Security Gateway (USG) Speed Test results of the last 48 hours
+
+         .EXAMPLE
+         PS C:\> Get-UnifiSpeedTestResult -StartDate '1/16/2019 12:00 AM' -EndDate '1/16/2019 11:59:59 PM'
+
+         Get the UniFi Security Gateway (USG) Speed Test results for a given time/date
+         In the example, all results from 1/16/2019 (all day) will be returned
 
          .NOTES
-         Initial version that makes it more human readable
-
-         TODO: Select Time
-         TODO: Filtering
+         Initial version that makes it more human readable.
+         The filetring needs a few more tests
 
          .LINK
          Get-UniFiConfig
@@ -42,25 +67,58 @@
 
          .LINK
          Invoke-RestMethod
+
+         .LINK
+         ConvertFrom-UnixTimeStamp
+
+         .LINK
+         ConvertTo-UnixTimeStamp
    #>
-   [CmdletBinding(ConfirmImpact = 'None')]
+   [CmdletBinding(DefaultParameterSetName = 'DateSet',ConfirmImpact = 'None')]
    [OutputType([psobject])]
    param
    (
       [Parameter(ValueFromPipeline,
             ValueFromPipelineByPropertyName,
       Position = 0)]
+      [Alias('Start')]
+      [datetime]
+      $StartDate,
+      [Parameter(ParameterSetName = 'TimeFrameSet',
+            ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 1)]
+      [Alias('hours')]
+      [int]
+      $Timeframe,
+      [Parameter(ParameterSetName = 'DateSet',
+            ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 1)]
+      [ValidateNotNullOrEmpty()]
+      [datetime]
+      $EndDate = (Get-Date),
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 2)]
       [ValidateNotNullOrEmpty()]
       [Alias('Site')]
       [string]
-      $UnifiSite = 'default'
+      $UnifiSite = 'default',
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 3)]
+      [switch]
+      $all = $false,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 4)]
+      [switch]
+      $UniFiValues = $false
    )
 
    begin
    {
-      # TODO: Move to parameters
-      $UniFiValues = $false
-
       # Cleanup
       $Session = $null
 
@@ -150,12 +208,61 @@
       }
       #endregion ReCheckSession
 
-      # Configure a default display set
+      #region ConfigureDefaultDisplaySet
       $defaultDisplaySet = 'time', 'download', 'upload', 'latency'
 
       # Create the default property display set
       $defaultDisplayPropertySet = (New-Object -TypeName System.Management.Automation.PSPropertySet -ArgumentList ('DefaultDisplayPropertySet', [string[]]$defaultDisplaySet))
       $PSStandardMembers = [Management.Automation.PSMemberInfo[]]@($defaultDisplayPropertySet)
+      #endregion ConfigureDefaultDisplaySet
+
+      #region Filtering
+      switch ($PsCmdlet.ParameterSetName)
+      {
+         'TimeFrameSet'
+         {
+            Write-Verbose -Message 'TimeFrameSet'
+            if (-not ($StartDate))
+            {
+               if ($Timeframe)
+               {
+                  $StartDate = ((Get-Date).AddHours(-$Timeframe))
+               }
+               else
+               {
+                  $StartDate = ((Get-Date).AddDays(-1))
+               }
+            }
+
+            if (-not ($EndDate))
+            {
+               $EndDate = (Get-Date)
+            }
+         }
+         'DateSet'
+         {
+            Write-Verbose -Message 'DateSet'
+            if (-not ($StartDate))
+            {
+               $StartDate = ((Get-Date).AddDays(-1))
+            }
+
+            if (-not ($EndDate))
+            {
+               $EndDate = (Get-Date)
+            }
+         }
+      }
+
+      [string]$FilterStartDate = (ConvertTo-UnixTimestamp -Date $StartDate -Milliseconds)
+      [string]$FilterEndDate = (ConvertTo-UnixTimestamp -Date $EndDate -Milliseconds)
+
+      if ($all)
+      {
+         $FilterStartDate = $null
+         $FilterEndDate = $null
+      }
+      #endregion Filtering
    }
 
    process
@@ -184,8 +291,8 @@
                'latency',
                'time'
             )
-            Start = $null
-            end   = $null
+            start = $FilterStartDate
+            end   = $FilterEndDate
          }
 
          $paramConvertToJson = @{
@@ -293,7 +400,7 @@
                [math]::Round($item.xput_upload,1)
             }
          }
-         $Result = $Result + $object
+         $Result = $Result + $Object
       }
 
       # Give this object a unique typename
