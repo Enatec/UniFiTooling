@@ -69,11 +69,11 @@ PowerShellVersion = '5.1'
 # NestedModules = @()
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-FunctionsToExport = @('Get-UnifiFirewallGroups', 'Get-UnifiFirewallGroupDetails',
+FunctionsToExport = 'Get-UnifiFirewallGroupDetails', 'Get-UnifiFirewallGroups', 
                'Get-UnifiNetworkDetails', 'Get-UnifiNetworkList', 
                'Invoke-UniFiApiLogin', 'Invoke-UniFiApiLogout', 
                'Invoke-UniFiCidrWorkaround', 'New-UniFiConfig', 
-               'Set-UnifiFirewallGroup', 'Set-UnifiNetworkDetails')
+               'Set-UnifiFirewallGroup', 'Set-UnifiNetworkDetails'
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 CmdletsToExport = '*'
@@ -111,7 +111,7 @@ PrivateData = @{
         IconUri = 'https://github.com/jhochwald/UniFiTooling/raw/master/src/other/powershell-project.png'
 
         # ReleaseNotes of this module
-        ReleaseNotes = 'Mainly a bugfix and refactoring release'
+        ReleaseNotes = 'Exported new New-UniFiConfig, was missing in Release 1.0.6 (Sorry)'
 
         # Prerelease string of this module
         # Prerelease = ''

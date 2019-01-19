@@ -189,7 +189,7 @@
                 <div class="col-sm-4 col-md-5 col-lg-4 right-header">
                     <h5>
                         Analyzed path :<span class="right-header-data"> C:\scripts\PowerShell\dev\UniFiTooling\src\public\</span><br>
-                        Analysis date :<span class="right-header-data"> 2019-01-14 20:41:45Z</span>
+                        Analysis date :<span class="right-header-data"> 2019-01-19 01:00:23Z</span>
                     </h5>
                 </div>
             </div>
@@ -228,12 +228,12 @@
                         </div>
                     </div>
                     <div class="col-sm-3 panelContainer">
-                        <div class="panel panel-warning">
+                        <div class="panel panel-danger">
                             <div class="panel-heading">
                                 <h3 class="panel-title"><i class="fa fa-arrows-v" aria-hidden="true">&nbsp;</i> Lines of Code - Total</h3>
                             </div>
                             <div class="panel-body">
-                                <h2>1286</h2>
+                                <h2>2078</h2>
                             </div>
                         </div>
                     </div>
@@ -380,6 +380,12 @@
                                         <td class="success">True</td>
                                     </tr>
                                     <tr>
+                                        <td>Get-UnifiSpeedTestResult</td>
+                                        <td class="success">0</td>
+                                        <td class=""></td>
+                                        <td class="success">True</td>
+                                    </tr>
+                                    <tr>
                                         <td>Invoke-UniFiApiLogin</td>
                                         <td class="success">0</td>
                                         <td class=""></td>
@@ -387,12 +393,6 @@
                                     </tr>
                                     <tr>
                                         <td>Invoke-UniFiApiLogout</td>
-                                        <td class="success">0</td>
-                                        <td class=""></td>
-                                        <td class="success">True</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Invoke-UniFiCidrWorkaround</td>
                                         <td class="success">0</td>
                                         <td class=""></td>
                                         <td class="success">True</td>
@@ -449,12 +449,12 @@ Message                       : Function 'Set-UnifiNetworkDetails' has verb that
             <section id="maintainability" class="tab-pane fade">
                 <div class="row col-sm-offset-3 col-md-offset-1 col-lg-offset-2">
                     <div class="col-sm-3 panelContainer">
-                        <div class="panel panel-warning">
+                        <div class="panel panel-danger">
                             <div class="panel-heading">
                                 <h3 class="panel-title"><i class="fa fa-arrows-v" aria-hidden="true">&nbsp;</i> Lines of Code - Total</h3>
                             </div>
                             <div class="panel-body">
-                                <h2>1286</h2>
+                                <h2>2078</h2>
                             </div>
                         </div>
                     </div>
@@ -464,7 +464,7 @@ Message                       : Function 'Set-UnifiNetworkDetails' has verb that
                                 <h3 class="panel-title"><i class="fa fa-arrows-alt" aria-hidden="true">&nbsp;</i> Complexity - Highest</h3>
                             </div>
                             <div class="panel-body">
-                                <h2>8</h2>
+                                <h2>25</h2>
                             </div>
                         </div>
                     </div>
@@ -486,7 +486,7 @@ Message                       : Function 'Set-UnifiNetworkDetails' has verb that
                                 <h3 class="panel-title"><i class="fa fa-arrows-v" aria-hidden="true">&nbsp;</i> Lines of Code - Average</h3>
                             </div>
                             <div class="panel-body">
-                                <h2>128.6</h2>
+                                <h2>207.8</h2>
                             </div>
                         </div>
                     </div>
@@ -496,17 +496,17 @@ Message                       : Function 'Set-UnifiNetworkDetails' has verb that
                                 <h3 class="panel-title"><i class="fa fa-arrows-alt" aria-hidden="true">&nbsp;</i> Complexity - Average</h3>
                             </div>
                             <div class="panel-body">
-                                <h2>4.1</h2>
+                                <h2>11.5</h2>
                             </div>
                         </div>
                     </div>
                     <div class="col-sm-3 panelContainer">
-                        <div class="panel panel-success">
+                        <div class="panel panel-warning">
                             <div class="panel-heading">
                                 <h3 class="panel-title"><i class="fa fa-object-group" aria-hidden="true">&nbsp;</i> Nesting Depth - Average</h3>
                             </div>
                             <div class="panel-body">
-                                <h2>3.7</h2>
+                                <h2>5.1</h2>
                             </div>
                         </div>
                     </div>
@@ -529,27 +529,33 @@ Message                       : Function 'Set-UnifiNetworkDetails' has verb that
                                 <tbody>
                                     <tr>
                                         <td>Get-UnifiFirewallGroupDetails</td>
-                                        <td class="danger">198</td>
-                                        <td class="success">8</td>
+                                        <td class="danger">277</td>
+                                        <td class="warning">16</td>
                                         <td class="warning">6</td>
                                     </tr>
                                     <tr>
                                         <td>Get-UnifiFirewallGroups</td>
-                                        <td class="danger">110</td>
-                                        <td class="success">3</td>
-                                        <td class="success">3</td>
+                                        <td class="danger">194</td>
+                                        <td class="success">12</td>
+                                        <td class="warning">6</td>
                                     </tr>
                                     <tr>
                                         <td>Get-UnifiNetworkDetails</td>
-                                        <td class="danger">198</td>
-                                        <td class="success">8</td>
+                                        <td class="danger">285</td>
+                                        <td class="warning">17</td>
                                         <td class="warning">6</td>
                                     </tr>
                                     <tr>
                                         <td>Get-UnifiNetworkList</td>
-                                        <td class="danger">110</td>
-                                        <td class="success">3</td>
-                                        <td class="success">3</td>
+                                        <td class="danger">202</td>
+                                        <td class="success">12</td>
+                                        <td class="warning">6</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Get-UnifiSpeedTestResult</td>
+                                        <td class="danger">348</td>
+                                        <td class="warning">25</td>
+                                        <td class="warning">6</td>
                                     </tr>
                                     <tr>
                                         <td>Invoke-UniFiApiLogin</td>
@@ -564,12 +570,6 @@ Message                       : Function 'Set-UnifiNetworkDetails' has verb that
                                         <td class="success">3</td>
                                     </tr>
                                     <tr>
-                                        <td>Invoke-UniFiCidrWorkaround</td>
-                                        <td class="danger">66</td>
-                                        <td class="success">4</td>
-                                        <td class="success">4</td>
-                                    </tr>
-                                    <tr>
                                         <td>New-UniFiConfig</td>
                                         <td class="danger">115</td>
                                         <td class="success">2</td>
@@ -577,15 +577,15 @@ Message                       : Function 'Set-UnifiNetworkDetails' has verb that
                                     </tr>
                                     <tr>
                                         <td>Set-UnifiFirewallGroup</td>
-                                        <td class="danger">154</td>
-                                        <td class="success">4</td>
-                                        <td class="success">3</td>
+                                        <td class="danger">238</td>
+                                        <td class="success">13</td>
+                                        <td class="warning">6</td>
                                     </tr>
                                     <tr>
                                         <td>Set-UnifiNetworkDetails</td>
-                                        <td class="danger">129</td>
-                                        <td class="success">3</td>
-                                        <td class="success">3</td>
+                                        <td class="danger">213</td>
+                                        <td class="success">12</td>
+                                        <td class="warning">6</td>
                                     </tr>
 
                                 </tbody>
@@ -612,7 +612,7 @@ Message                       : Function 'Set-UnifiNetworkDetails' has verb that
                                 <h3 class="panel-title"><i class="fa fa-times" aria-hidden="true">&nbsp;</i> Number of Failed Tests</h3>
                             </div>
                             <div class="panel-body">
-                                <h2>11</h2>
+                                <h2>10</h2>
                             </div>
                         </div>
                     </div>
@@ -622,7 +622,7 @@ Message                       : Function 'Set-UnifiNetworkDetails' has verb that
                                 <h3 class="panel-title"><i class="fa fa-check-square-o" aria-hidden="true">&nbsp;</i> Number of Passed Tests</h3>
                             </div>
                             <div class="panel-body">
-                                <h2>83</h2>
+                                <h2>84</h2>
                             </div>
                         </div>
                     </div>
@@ -634,7 +634,7 @@ Message                       : Function 'Set-UnifiNetworkDetails' has verb that
                                 <h3 class="panel-title"><i class="fa fa-times" aria-hidden="true">&nbsp;</i> Number of Missed Commands</h3>
                             </div>
                             <div class="panel-body">
-                                <h2>524</h2>
+                                <h2>842</h2>
                             </div>
                         </div>
                     </div>
@@ -708,6 +708,13 @@ Message                       : Function 'Set-UnifiNetworkDetails' has verb that
                                         <td>at line</td>
                                         <td></td>
                                         <td>UniFiTooling Module Tests</td>
+                                        <td>Get-UnifiSpeedTestResult.Tests.ps1 should exist</td>
+                                        <td>Expected: {C:\scripts\PowerShell\dev\UniFiTooling\src\tests\Get-UnifiSpeedTestResult.Tests.ps1} to exist</td>
+                                    </tr>
+                                    <tr>
+                                        <td>at line</td>
+                                        <td></td>
+                                        <td>UniFiTooling Module Tests</td>
                                         <td>Invoke-UniFiApiLogin.Tests.ps1 should exist</td>
                                         <td>Expected: {C:\scripts\PowerShell\dev\UniFiTooling\src\tests\Invoke-UniFiApiLogin.Tests.ps1} to exist</td>
                                     </tr>
@@ -717,20 +724,6 @@ Message                       : Function 'Set-UnifiNetworkDetails' has verb that
                                         <td>UniFiTooling Module Tests</td>
                                         <td>Invoke-UniFiApiLogout.Tests.ps1 should exist</td>
                                         <td>Expected: {C:\scripts\PowerShell\dev\UniFiTooling\src\tests\Invoke-UniFiApiLogout.Tests.ps1} to exist</td>
-                                    </tr>
-                                    <tr>
-                                        <td>at line</td>
-                                        <td></td>
-                                        <td>UniFiTooling Module Tests</td>
-                                        <td>Invoke-UniFiCidrWorkaround.ps1 should contain Write-Verbose blocks</td>
-                                        <td>Expected: file C:\scripts\PowerShell\dev\UniFiTooling\src\public\Invoke-UniFiCidrWorkaround.ps1 to contain {Write-Verbose}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>at line</td>
-                                        <td></td>
-                                        <td>UniFiTooling Module Tests</td>
-                                        <td>Invoke-UniFiCidrWorkaround.Tests.ps1 should exist</td>
-                                        <td>Expected: {C:\scripts\PowerShell\dev\UniFiTooling\src\tests\Invoke-UniFiCidrWorkaround.Tests.ps1} to exist</td>
                                     </tr>
                                     <tr>
                                         <td>at line</td>
@@ -777,22 +770,27 @@ Message                       : Function 'Set-UnifiNetworkDetails' has verb that
                                     <tr>
                                         <td>Get-UnifiFirewallGroupDetails</td>
                                         <td class="danger">0</td>
-                                        <td class="danger">79</td>
+                                        <td class="danger">108</td>
                                     </tr>
                                     <tr>
                                         <td>Get-UnifiFirewallGroups</td>
                                         <td class="danger">0</td>
-                                        <td class="danger">50</td>
+                                        <td class="danger">79</td>
                                     </tr>
                                     <tr>
                                         <td>Get-UnifiNetworkDetails</td>
                                         <td class="danger">0</td>
-                                        <td class="danger">79</td>
+                                        <td class="danger">109</td>
                                     </tr>
                                     <tr>
                                         <td>Get-UnifiNetworkList</td>
                                         <td class="danger">0</td>
-                                        <td class="danger">50</td>
+                                        <td class="danger">79</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Get-UnifiSpeedTestResult</td>
+                                        <td class="danger">0</td>
+                                        <td class="danger">153</td>
                                     </tr>
                                     <tr>
                                         <td>Invoke-UniFiApiLogin</td>
@@ -805,11 +803,6 @@ Message                       : Function 'Set-UnifiNetworkDetails' has verb that
                                         <td class="danger">47</td>
                                     </tr>
                                     <tr>
-                                        <td>Invoke-UniFiCidrWorkaround</td>
-                                        <td class="danger">0</td>
-                                        <td class="warning">10</td>
-                                    </tr>
-                                    <tr>
                                         <td>New-UniFiConfig</td>
                                         <td class="danger">0</td>
                                         <td class="danger">29</td>
@@ -817,12 +810,12 @@ Message                       : Function 'Set-UnifiNetworkDetails' has verb that
                                     <tr>
                                         <td>Set-UnifiFirewallGroup</td>
                                         <td class="danger">0</td>
-                                        <td class="danger">68</td>
+                                        <td class="danger">97</td>
                                     </tr>
                                     <tr>
                                         <td>Set-UnifiNetworkDetails</td>
                                         <td class="danger">0</td>
-                                        <td class="danger">51</td>
+                                        <td class="danger">80</td>
                                     </tr>
 
                                 </tbody>
@@ -899,7 +892,7 @@ Message                       : Function 'Set-UnifiNetworkDetails' has verb that
                 labels: ["Pass","Fail"],
                 datasets: [
                 {
-                    data: [83,11],
+                    data: [84,10],
                     backgroundColor: ["#a3d48d","#d59595"],
                     hoverBackgroundColor: ["#a3d48d","#d59595"]
                 }]
@@ -914,7 +907,7 @@ Message                       : Function 'Set-UnifiNetworkDetails' has verb that
                         center: {
                             // This evaluates the max length of the text
                             maxText: '99.99%',
-                            text: '88.3%',
+                            text: '89.36%',
                             fontColor: '#a3d48d',
                             fontFamily: "'Helvetica Neue', 'Helvetica', 'Arial', sans-serif",
                             fontStyle: 'normal'

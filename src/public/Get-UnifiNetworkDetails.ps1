@@ -56,13 +56,19 @@
          If the UnifiNetwork parameter is used, it must(!) be the ID (network_id). This was necessary to make it a non breaking change.
 
          .LINK
-         Get-UniFiConfig
-
-         .LINK
          Get-UnifiNetworkList
 
          .LINK
+         Get-UniFiConfig
+
+         .LINK
          Set-UniFiDefaultRequestHeader
+
+         .LINK
+         Invoke-UniFiApiLogin
+
+         .LINK
+         Invoke-RestMethod
    #>
 
    [CmdletBinding(ConfirmImpact = 'None')]
@@ -104,6 +110,85 @@
       # Safe ProgressPreference and Setup SilentlyContinue for the function
       $ExistingProgressPreference = ($ProgressPreference)
       $ProgressPreference = 'SilentlyContinue'
+
+      #region CheckSession
+      if (-not (Get-UniFiIsAlive))
+      {
+         #region LoginCheckLoop
+         # TODO: Move to config
+         [int]$NumberOfRetries = '3'
+         [int]$RetryTimer = '5'
+         # Setup the Loop itself
+         $RetryLoop = $false
+         [int]$RetryCounter = '0'
+         # Original code/idea was by Thomas Maurer
+         do
+         {
+            try
+            {
+               # Try to Logout
+               try
+               {
+                  if (-not (Get-UniFiIsAlive)) { Throw }
+               }
+               catch
+               {
+                  # We don't care about that
+                  Write-Verbose -Message 'Logout failed'
+               }
+
+               # Try a Session check (login is inherited here within the helper function)
+               if (-not (Get-UniFiIsAlive -ErrorAction Stop -WarningAction SilentlyContinue))
+               {
+                  Write-Error -Message 'Login failed' -ErrorAction Stop -Category AuthenticationError
+               }
+
+               # End the Loop
+               $RetryLoop = $true
+            }
+            catch
+            {
+               if ($RetryCounter -gt $NumberOfRetries)
+               {
+                  Write-Warning -Message ('Could still not login, after {0} retries.' -f $NumberOfRetries)
+
+                  # Stay in the Loop
+                  $RetryLoop = $true
+               }
+               else
+               {
+                  if ($RetryCounter -eq 0)
+                  {
+                     Write-Warning -Message ('Could not login! Retrying in {0} seconds.' -f $RetryTimer)
+                  }
+                  else
+                  {
+                     Write-Warning -Message ('Retry {0} of {1} failed. Retrying in {2} seconds.' -f $RetryCounter, $NumberOfRetries, $RetryTimer)
+                  }
+
+                  $null = (Start-Sleep -Seconds $RetryTimer)
+
+                  $RetryCounter = $RetryCounter + 1
+               }
+            }
+         }
+         While ($RetryLoop -eq $false)
+         #endregion LoginCheckLoop
+      }
+      #endregion CheckSession
+
+      #region ReCheckSession
+      if (-not ($RestSession))
+      {
+         # Restore ProgressPreference
+         $ProgressPreference = $ExistingProgressPreference
+
+         Write-Error -Message 'Unable to login! Check the connection to the controller, SSL certificates, and your credentials!' -ErrorAction Stop -Category AuthenticationError
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+      }
+      #endregion ReCheckSession
 
       # Create a new Object
       $SessionData = @()
@@ -228,7 +313,15 @@
       catch
       {
          # Try to Logout
-         $null = (Invoke-UniFiApiLogout)
+         try
+         {
+            $null = (Invoke-UniFiApiLogout -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
+         }
+         catch
+         {
+            # We don't care about that
+            Write-Verbose -Message 'Logout failed'
+         }
 
          # Verbose stuff
          $Script:line = $_.InvocationInfo.ScriptLineNumber

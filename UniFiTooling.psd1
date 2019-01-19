@@ -30,7 +30,7 @@ CompanyName = 'enabling Technology'
 Copyright = '(c) 2019 by enabling Technology. All rights reserved.'
 
 # Description of the functionality provided by this module
-Description = 'Ubiquiti UniFi Security Gateway automation via the API of the Ubiquiti UniFi Controller'
+Description = 'Ubiquiti (UBNT) UniFi Security Gateway automation via the API of the Ubiquiti UniFi Controller'
 
 # Minimum version of the Windows PowerShell engine required by this module
 PowerShellVersion = '5.1'
@@ -69,11 +69,7 @@ PowerShellVersion = '5.1'
 # NestedModules = @()
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-FunctionsToExport = 'Get-UnifiFirewallGroupDetails', 'Get-UnifiFirewallGroups', 
-               'Get-UnifiNetworkDetails', 'Get-UnifiNetworkList', 
-               'Invoke-UniFiApiLogin', 'Invoke-UniFiApiLogout', 
-               'Invoke-UniFiCidrWorkaround', 'New-UniFiConfig', 
-               'Set-UnifiFirewallGroup', 'Set-UnifiNetworkDetails'
+FunctionsToExport = @('Get-UnifiFirewallGroupDetails','Get-UnifiFirewallGroups','Get-UnifiNetworkDetails','Get-UnifiNetworkList','Invoke-UniFiApiLogin','Invoke-UniFiApiLogout','New-UniFiConfig','Set-UnifiFirewallGroup','Set-UnifiNetworkDetails', 'Get-UnifiSpeedTestResult')
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 CmdletsToExport = '*'
@@ -111,7 +107,7 @@ PrivateData = @{
         IconUri = 'https://github.com/jhochwald/UniFiTooling/raw/master/src/other/powershell-project.png'
 
         # ReleaseNotes of this module
-        ReleaseNotes = 'Mainly a bugfix and refactoring release'
+        ReleaseNotes = 'Mainly a bugfix and refactoring release.'
 
         # Prerelease string of this module
         # Prerelease = ''

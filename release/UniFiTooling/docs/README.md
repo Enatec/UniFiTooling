@@ -2,7 +2,7 @@
 Module Name: UniFiTooling
 Module Guid: 7fff91a0-02eb-4df2-84d5-c7d3cd7f7a5d
 Download Help Link: https://github.com/jhochwald/UniFiTooling/raw/master/docs/README.md
-Help Version: 1.0.7
+Help Version: 1.0.8
 Locale: en-US
 ---
 
@@ -23,14 +23,14 @@ Get the details about one network via the API of the UniFi Controller
 ### [Get-UnifiNetworkList](Get-UnifiNetworkList.md)
 Get a List Networks via the API of the UniFi Controller
 
+### [Get-UnifiSpeedTestResult](Get-UnifiSpeedTestResult.md)
+Get the UniFi Security Gateway (USG) Speed Test results
+
 ### [Invoke-UniFiApiLogin](Invoke-UniFiApiLogin.md)
 Login to API of the UniFi Controller
 
 ### [Invoke-UniFiApiLogout](Invoke-UniFiApiLogout.md)
 Logout from the API of the UniFi Controller
-
-### [Invoke-UniFiCidrWorkaround](Invoke-UniFiCidrWorkaround.md)
-IPv4 and IPv6 CIDR Workaround for UBNT USG Firewall Rules
 
 ### [New-UniFiConfig](New-UniFiConfig.md)
 Creates the UniFi config JSON file

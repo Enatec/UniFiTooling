@@ -1,6 +1,6 @@
 ﻿---
 external help file: UniFiTooling-help.xml
-HelpVersion: 1.0.7
+HelpVersion: 1.0.8
 Locale: en-US
 Module Guid: 7fff91a0-02eb-4df2-84d5-c7d3cd7f7a5d
 Module Name: UniFiTooling
@@ -136,9 +136,13 @@ Initial Release with 1.0.7
 
 ## RELATED LINKS
 
-[Get-UnifiFirewallGroups]()
+[Get-UniFiConfig]()
 
 [Set-UniFiDefaultRequestHeader]()
+
+[Invoke-UniFiApiLogin]()
+
+[Invoke-RestMethod]()
 
 [https://github.com/jhochwald/UniFiTooling/issues/10](https://github.com/jhochwald/UniFiTooling/issues/10)
 

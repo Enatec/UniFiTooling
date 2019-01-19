@@ -6,7 +6,7 @@
 
       SAMPLE:
       Severity     = @(
-         'Error', 
+         'Error',
          'Warning'
       )
 
@@ -14,13 +14,13 @@
 
       SAMPLE:
       IncludeRules = @(
-         'PSAvoidDefaultValueSwitchParameter', 
-         'PSMissingModuleManifestField', 
-         'PSReservedCmdletChar', 
-         'PSReservedParams', 
-         'PSShouldProcess', 
-         'PSUseApprovedVerbs', 
-         'PSUseDeclaredVarsMoreThanAssigments', 
+         'PSAvoidDefaultValueSwitchParameter',
+         'PSMissingModuleManifestField',
+         'PSReservedCmdletChar',
+         'PSReservedParams',
+         'PSShouldProcess',
+         'PSUseApprovedVerbs',
+         'PSUseDeclaredVarsMoreThanAssigments',
          'PSUseCompatibleCmdlets'
       )
 
@@ -29,7 +29,7 @@
 
       SAMPLE:
       ExcludeRules = @(
-         'PSAvoidTrailingWhitespace', 
+         'PSAvoidTrailingWhitespace',
          'PSUseDeclaredVarsMoreThanAssignments'
       )
 
@@ -49,23 +49,23 @@
 
 @{
    Severity     = @(
-      'Error', 
+      'Error',
       'Warning'
    )
    ExcludeRules = @(
-      'PSAvoidUsingUserNameAndPassWordParams', 
-      'PSAvoidUsingPlainTextForPassword', 
-      'PSAvoidTrailingWhitespace', 
-      'PSUseDeclaredVarsMoreThanAssignments', 
-      'PSUseSingularNouns', 
+      'PSAvoidUsingUserNameAndPassWordParams',
+      'PSAvoidUsingPlainTextForPassword',
+      'PSAvoidTrailingWhitespace',
+      'PSUseDeclaredVarsMoreThanAssignments',
+      'PSUseSingularNouns',
       'PSAvoidGlobalVars'
    )
    Rules        = @{
       PSUseCompatibleCmdlets = @{
          Compatibility = @(
-            'core-6.0.2-alpha-linux', 
-            'core-6.0.2-alpha-windows', 
-            'core-6.0.2-alpha-osx', 
+            'core-6.0.2-alpha-linux',
+            'core-6.0.2-alpha-windows',
+            'core-6.0.2-alpha-osx',
             'desktop-5.1.17763.134-windows'
          )
       }

@@ -5,6 +5,465 @@
 #endregion ModulePreLoaded
 
 #region ModulePrivateFunctions
+function Add-HostsEntry
+{
+   <#
+         .SYNOPSIS
+         Add a single Hosts Entry to the HOSTS File
+
+         .DESCRIPTION
+         Add a single Hosts Entry to the HOSTS File, multiple are not supported yet!
+
+         .PARAMETER Path
+         The path to the hosts file where the entry should be set. Defaults to the local computer's hosts file.
+
+         .PARAMETER Address
+         The Address address for the hosts entry.
+
+         .PARAMETER HostName
+         The hostname for the hosts entry.
+
+         .PARAMETER force
+         Force (replace)
+
+         .EXAMPLE
+         PS C:\> Add-HostsEntry -Address '0.0.0.0' -HostName 'badhost'
+
+         Add the host 'badhost' with the Adress '0.0.0.0' (blackhole) wo the Hosts.
+         If an Entry for 'badhost' exists, the new one will be appended anyway (You end up with two entries)
+
+         .EXAMPLE
+         PS C:\> Add-HostsEntry -Address '0.0.0.0' -HostName 'badhost' -force
+
+         Add the host 'badhost' with the Adress '0.0.0.0' (blackhole) wo the Hosts.
+         If an Entry for 'badhost' exists, the new one will replace the existing one.
+
+         .NOTES
+         Internal Helper, inspired by an old GIST I found
+
+         .LINK
+         Get-HostsFile
+
+         .LINK
+         Remove-HostsEntry
+
+         .LINK
+         https://gist.github.com/markembling/173887/1824b370be3fe468faceaed5f39b12bad010a417
+   #>
+
+   [CmdletBinding(ConfirmImpact = 'Medium',
+   SupportsShouldProcess)]
+   param
+   (
+      [Parameter(Mandatory,
+            Position = 0,
+      HelpMessage = 'The IP address for the hosts entry.')]
+      [ValidateNotNullOrEmpty()]
+      [Alias('ipaddress', 'ip')]
+      [string]
+      $Address,
+      [Parameter(Mandatory,
+            ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+            Position = 1,
+      HelpMessage = 'The hostname for the hosts entry.')]
+      [ValidateNotNullOrEmpty()]
+      [Alias('Host', 'Name')]
+      [string]
+      $HostName,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 3)]
+      [switch]
+      $force = $false,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 2)]
+      [ValidateNotNullOrEmpty()]
+      [Alias('filename', 'Hosts', 'hostsfile', 'file')]
+      [string]
+      $Path = "$env:windir\System32\drivers\etc\hosts"
+   )
+   begin {
+      Write-Verbose -Message 'Start'
+   }
+
+   process {
+      if ($force)
+      {
+         try
+         {
+            $null = (Remove-HostsEntry -HostName $HostName -Path $Path -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
+         }
+         catch
+         {
+            Write-Verbose -Message 'Looks like the entry was not there before'
+         }
+      }
+
+      try
+      {
+         if ($pscmdlet.ShouldProcess('Target', 'Operation'))
+         {
+            # Get a clean (end of) file
+            $paramGetContent = @{
+               Path          = $Path
+               Raw           = $true
+               Force         = $true
+               ErrorAction   = 'Stop'
+               WarningAction = 'SilentlyContinue'
+            }
+            $HostsFileContent = (((Get-Content @paramGetContent ).TrimEnd()).ToString())
+
+            $NewValue = "`n" + $Address + "`t`t" + $HostName
+            $NewHostsFileContent = $HostsFileContent + $NewValue
+
+            $paramSetContent = @{
+               Path          = $Path
+               Value         = $NewHostsFileContent
+               Force         = $true
+               Confirm       = $false
+               Encoding      = 'UTF8'
+               ErrorAction   = 'Stop'
+               WarningAction = 'SilentlyContinue'
+            }
+            $null = (Set-Content @paramSetContent)
+         }
+      }
+      catch
+      {
+         # get error record
+         [Management.Automation.ErrorRecord]$e = $_
+
+         # retrieve information about runtime error
+         $info = [PSCustomObject]@{
+            Exception = $e.Exception.Message
+            Reason    = $e.CategoryInfo.Reason
+            Target    = $e.CategoryInfo.TargetName
+            Script    = $e.InvocationInfo.ScriptName
+            Line      = $e.InvocationInfo.ScriptLineNumber
+            Column    = $e.InvocationInfo.OffsetInLine
+         }
+
+         Write-Verbose -Message $info
+
+         Write-Error -Message ($info.Exception) -ErrorAction Stop
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+      }
+   }
+
+   end {
+      Write-Verbose -Message 'Done'
+   }
+}
+
+function ConvertFrom-UnixTimeStamp
+{
+   <#
+         .SYNOPSIS
+         Converts a Timestamp (Epochdate) into Datetime
+
+         .DESCRIPTION
+         Converts a Timestamp (Epochdate) into Datetime
+
+         .PARAMETER TimeStamp
+         Timestamp (Epochdate)
+
+         .PARAMETER Milliseconds
+         Is the given Timestamp (Epochdate) in Miliseconds instead of Seconds?
+
+         .EXAMPLE
+         PS C:\> ConvertFrom-UnixTimeStamp -TimeStamp 1547839380
+
+         Converts a Timestamp (Epochdate) into Datetime
+
+         .EXAMPLE
+         PS C:\> ConvertFrom-UnixTimeStamp -TimeStamp 1547839380712 -Milliseconds
+
+         Converts a Timestamp (Epochdate) into Datetime, given value is in Milliseconds
+
+         .NOTES
+         Added the 'UniFi' (Alias for the switch 'Milliseconds') because the API returns miliseconds instead of seconds
+   #>
+
+   [CmdletBinding(ConfirmImpact = 'None')]
+   [OutputType([datetime])]
+   param
+   (
+      [Parameter(Mandatory,
+            ValueFromPipeline,
+            Position = 0,
+      HelpMessage = 'Timestamp (Epochdate)')]
+      [ValidateNotNullOrEmpty()]
+      [Alias('Epochdate')]
+      [long]
+      $TimeStamp,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 1)]
+      [Alias('UniFi')]
+      [switch]
+      $Milliseconds = $false
+   )
+
+   begin
+   {
+      # Set some defaults
+      $UnixStartTime = '1/1/1970'
+
+      # Cleanup
+      $Result = $null
+   }
+
+   process
+   {
+      try
+      {
+         if ($Milliseconds)
+         {
+            $Result = ((Get-Date -Date $UnixStartTime -ErrorAction Stop -WarningAction SilentlyContinue).AddMilliseconds($TimeStamp))
+         }
+         else
+         {
+            try
+            {
+               $Result = ((Get-Date -Date $UnixStartTime -ErrorAction Stop -WarningAction SilentlyContinue).AddSeconds($TimeStamp))
+            }
+            catch
+            {
+               # Try a Fallback!
+               $Result = ((Get-Date -Date $UnixStartTime -ErrorAction Stop -WarningAction SilentlyContinue).AddMilliseconds($TimeStamp))
+            }
+         }
+      }
+      catch
+      {
+         # get error record
+         [Management.Automation.ErrorRecord]$e = $_
+
+         # retrieve information about runtime error
+         $info = [PSCustomObject]@{
+            Exception = $e.Exception.Message
+            Reason    = $e.CategoryInfo.Reason
+            Target    = $e.CategoryInfo.TargetName
+            Script    = $e.InvocationInfo.ScriptName
+            Line      = $e.InvocationInfo.ScriptLineNumber
+            Column    = $e.InvocationInfo.OffsetInLine
+         }
+
+         Write-Verbose -Message $info
+
+         Write-Error -Message ($info.Exception) -ErrorAction Stop
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+      }
+   }
+
+   end
+   {
+      $Result
+   }
+}
+
+function ConvertTo-UnixTimeStamp
+{
+   <#
+         .SYNOPSIS
+         Converts a Datetime into a Unix Timestamp (Epochdate)
+
+         .DESCRIPTION
+         Converts a Datetime into a Unix Timestamp (Epochdate)
+
+         .PARAMETER Date
+         The Date String that shoul be converted, default is now (if none is given)
+
+         .PARAMETER Milliseconds
+         Should the Timestamp (Epochdate) in Miliseconds instead of Seconds?
+
+         .EXAMPLE
+         PS C:\> ConvertTo-UnixTimeStamp
+
+         Converts the actual time into a Unix Timestamp (Epochdate)
+
+         .EXAMPLE
+         PS C:\> ConvertTo-UnixTimeStamp -Milliseconds
+
+         Converts the actual time into a Unix Timestamp (Epochdate), in milliseconds
+
+         .EXAMPLE
+         PS C:\> ConvertTo-UnixTimeStamp -Date ((Get-Date).AddDays(-1))
+
+         Covert the same time yesterday into a Unix Timestamp (Epochdate)
+
+         .EXAMPLE
+         PS C:\> ConvertTo-UnixTimeStamp -Date ((Get-Date).AddDays(-1)) -Milliseconds
+
+         Covert the same time yesterday into a Unix Timestamp (Epochdate), in milliseconds
+
+         .NOTES
+         Added the 'UniFi' (Alias for the switch 'Milliseconds') because the API returns miliseconds instead of seconds
+   #>
+
+   [CmdletBinding(ConfirmImpact = 'None')]
+   [OutputType([long])]
+   param
+   (
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 0)]
+      [ValidateNotNullOrEmpty()]
+      [Alias('TimeStamp', 'DateTimeStamp')]
+      [datetime]
+      $Date = (Get-Date),
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 1)]
+      [Alias('UniFi')]
+      [switch]
+      $Milliseconds = $false
+   )
+
+   begin
+   {
+      # Set some defaults
+      $UnixStartTime = '1/1/1970'
+
+      # Cleanup
+      $Result = $null
+   }
+
+   process
+   {
+      try
+      {
+         if ($Milliseconds)
+         {
+            $Result = ([long]((New-TimeSpan -Start (Get-Date -Date $UnixStartTime -ErrorAction Stop -WarningAction SilentlyContinue) -End (Get-Date -Date $Date -ErrorAction Stop -WarningAction SilentlyContinue) -ErrorAction Stop -WarningAction SilentlyContinue).TotalMilliseconds))
+         }
+         else
+         {
+            $Result = ([long]((New-TimeSpan -Start (Get-Date -Date $UnixStartTime -ErrorAction Stop -WarningAction SilentlyContinue) -End (Get-Date -Date $Date -ErrorAction Stop -WarningAction SilentlyContinue) -ErrorAction Stop -WarningAction SilentlyContinue).TotalSeconds))
+         }
+      }
+      catch
+      {
+         # get error record
+         [Management.Automation.ErrorRecord]$e = $_
+
+         # retrieve information about runtime error
+         $info = [PSCustomObject]@{
+            Exception = $e.Exception.Message
+            Reason    = $e.CategoryInfo.Reason
+            Target    = $e.CategoryInfo.TargetName
+            Script    = $e.InvocationInfo.ScriptName
+            Line      = $e.InvocationInfo.ScriptLineNumber
+            Column    = $e.InvocationInfo.OffsetInLine
+         }
+
+         Write-Verbose -Message $info
+
+         Write-Error -Message ($info.Exception) -ErrorAction Stop
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+      }
+   }
+
+   end
+   {
+      $Result
+   }
+}
+
+function Get-HostsFile
+{
+   <#
+         .SYNOPSIS
+         Print the HOSTS File in a more clean format
+
+         .DESCRIPTION
+         Print the HOSTS File in a more clean format
+
+         .PARAMETER Path
+         The path to the hosts file where the entry should be set. Defaults to the local computer's hosts file.
+
+         .PARAMETER raw
+         Print raw Hosts File
+
+         .EXAMPLE
+         PS C:\> Get-HostsFile
+
+         Print the HOSTS File in a more clean format
+
+         .EXAMPLE
+         PS C:\> Get-HostsFile -raw
+
+         Print the HOSTS File in the regular format
+
+         .NOTES
+         Internal Helper, inspired by an old GIST I found
+
+         .LINK
+         Add-HostsEntry
+
+         .LINK
+         Remove-HostsEntry
+
+         .LINK
+         https://gist.github.com/markembling/173887/1824b370be3fe468faceaed5f39b12bad010a417
+   #>
+
+   [CmdletBinding(ConfirmImpact = 'None')]
+   param
+   (
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 0)]
+      [ValidateNotNullOrEmpty()]
+      [Alias('Hosts', 'hostsfile', 'file', 'filename')]
+      [string]
+      $Path = "$env:windir\System32\drivers\etc\hosts",
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 1)]
+      [Alias('plain')]
+      [switch]
+      $raw = $false
+   )
+
+   begin
+   {
+      $HostsFileContent = Get-Content -Path $Path
+   }
+
+   process
+   {
+      foreach ($line in $HostsFileContent)
+      {
+         if ($raw)
+         {
+            Write-Output -InputObject $line
+         }
+         else
+         {
+            $bits = [regex]::Split($line, '\t+')
+            if ($bits.count -eq 2)
+            {
+               [string]$HostsFileLine = $bits
+
+               if (-not ($HostsFileLine.StartsWith('#')))
+               {
+                  Write-Output -InputObject $HostsFileLine
+               }
+            }
+         }
+      }
+   }
+}
+
 function Get-UniFiConfig
 {
    <#
@@ -306,6 +765,440 @@ function Get-UnifiFirewallGroupBody
    }
 }
 
+function Get-UniFiIsAlive
+{
+   <#
+         .SYNOPSIS
+         Use a simple API call to see if the session is alive
+
+         .DESCRIPTION
+         Use a simple API call to see if the session is alive
+
+         .PARAMETER UnifiSite
+         UniFi Site as configured. The default is: default
+
+         .EXAMPLE
+         PS C:\> Get-UniFiIsAlive
+
+         Use a simple API call to see if the session is alive
+
+         .EXAMPLE
+         PS C:\> Get-UniFiIsAlive -UnifiSite 'Contoso'
+
+         Use a simple API call to see if the session is alive on Site 'Contoso'
+
+         .NOTES
+         Internal Helper Function
+
+         .LINK
+         Get-UniFiConfig
+
+         .LINK
+         Set-UniFiDefaultRequestHeader
+
+         .LINK
+         Invoke-UniFiApiLogin
+
+         .LINK
+         Invoke-RestMethod
+   #>
+
+   [CmdletBinding(ConfirmImpact = 'None')]
+   [OutputType([bool])]
+   param
+   (
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 0)]
+      [ValidateNotNullOrEmpty()]
+      [Alias('Site')]
+      [string]
+      $UnifiSite = 'default'
+   )
+
+   begin
+   {
+      # Cleanup
+      $Session = $null
+
+      # Safe ProgressPreference and Setup SilentlyContinue for the function
+      $ExistingProgressPreference = ($ProgressPreference)
+      $ProgressPreference = 'SilentlyContinue'
+
+      # Set the default to FALSE
+      $SessionStatus = $false
+   }
+
+   process
+   {
+      try
+      {
+         Write-Verbose -Message 'Read the Config'
+
+         $null = (Get-UniFiConfig)
+
+         Write-Verbose -Message ('Certificate check - Should be {0}' -f $ApiSelfSignedCert)
+
+         [Net.ServicePointManager]::ServerCertificateValidationCallback = {
+            $ApiSelfSignedCert
+         }
+
+         $null = (Invoke-UniFiApiLogin -ErrorAction SilentlyContinue)
+
+         Write-Verbose -Message 'Set the API Call default Header'
+
+         $null = (Set-UniFiDefaultRequestHeader)
+
+         Write-Verbose -Message 'Create the Request URI'
+
+         $ApiRequestUri = $ApiUri + 's/' + $UnifiSite + '/self'
+
+         Write-Verbose -Message ('URI: {0}' -f $ApiRequestUri)
+
+         Write-Verbose -Message 'Send the Request'
+
+         $paramInvokeRestMethod = @{
+            Method        = 'Get'
+            Uri           = $ApiRequestUri
+            Headers       = $RestHeader
+            ErrorAction   = 'SilentlyContinue'
+            WarningAction = 'SilentlyContinue'
+            WebSession    = $RestSession
+         }
+         $Session = (Invoke-RestMethod @paramInvokeRestMethod)
+
+         Write-Verbose -Message ('Session Info: {0}' -f $Session)
+
+         $SessionStatus = $true
+      }
+      catch
+      {
+         # Try to Logout
+         try
+         {
+            $null = (Invoke-UniFiApiLogout -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
+         }
+         catch
+         {
+            # We don't care about that
+            Write-Verbose -Message 'Logout failed'
+         }
+
+         # Restore ProgressPreference
+         $ProgressPreference = $ExistingProgressPreference
+
+         # Reset the SSL Trust (make sure everything is back to default)
+         [Net.ServicePointManager]::ServerCertificateValidationCallback = $null
+
+         # That was it!
+         $SessionStatus = $false
+      }
+
+      # check result
+      if ($Session.meta.rc -ne 'ok')
+      {
+         # Restore ProgressPreference
+         $ProgressPreference = $ExistingProgressPreference
+
+         # Reset the SSL Trust (make sure everything is back to default)
+         [Net.ServicePointManager]::ServerCertificateValidationCallback = $null
+
+         # That was it!
+         $SessionStatus = $false
+      } else {
+         $SessionStatus = $true
+      }
+   }
+
+   end
+   {
+      # Cleanup
+      $Session = $null
+
+      # Restore ProgressPreference
+      $ProgressPreference = $ExistingProgressPreference
+
+      # Reset the SSL Trust (make sure everything is back to default)
+      [Net.ServicePointManager]::ServerCertificateValidationCallback = $null
+
+      # Dump the Result
+      Return $SessionStatus
+   }
+}
+
+function Invoke-UniFiCidrWorkaround
+{
+<#
+	.SYNOPSIS
+		IPv4 and IPv6 CIDR Workaround for UBNT USG Firewall Rules
+
+	.DESCRIPTION
+		IPv4 and IPv6 CIDR Workaround for UBNT USG Firewall Rules (Single IPv4 has to be without /32 OR single IPv6 has to be without /128)
+
+	.PARAMETER CidrList
+		Existing CIDR List Object
+
+	.PARAMETER 6
+		Process IPv6 CIDR (Single IPv6 has to be without /128)
+
+	.EXAMPLE
+		PS C:\> Invoke-UniFiCidrWorkaround -CidrList $value1
+
+		IPv4 CIDR Workaround for UBNT USG Firewall Rules
+
+	.EXAMPLE
+		PS C:\> Invoke-UniFiCidrWorkaround -6 -CidrList $value1
+
+		IPv6 CIDR Workaround for UBNT USG Firewall Rules
+
+	.EXAMPLE
+		PS C:\> $value1 | Invoke-UniFiCidrWorkaround
+
+		IPv4 or IPv6 CIDR Workaround for UBNT USG Firewall Rules via Pipeline
+
+	.EXAMPLE
+		PS C:\> $value1 | Invoke-UniFiCidrWorkaround -6
+
+		IPv6 CIDR Workaround for UBNT USG Firewall Rules via Pipeline
+
+	.NOTES
+		This is an internal helper function only (Will be moved to the private functions soon)
+
+	.LINK
+		https://github.com/jhochwald/UniFiTooling/issues/5
+#>
+
+	[CmdletBinding(ConfirmImpact = 'None')]
+	[OutputType([psobject])]
+	param
+	(
+		[Parameter(Mandatory = $true,
+				   ValueFromPipeline = $true,
+				   ValueFromPipelineByPropertyName = $true,
+				   Position = 0,
+				   HelpMessage = 'Existing CIDR List Object')]
+		[ValidateNotNullOrEmpty()]
+		[Alias('UniFiCidrList')]
+		[psobject]
+		$CidrList,
+		[Parameter(ValueFromPipeline = $true,
+				   ValueFromPipelineByPropertyName = $true,
+				   Position = 1)]
+		[Alias('IPv6', 'V6')]
+		[switch]
+		$6 = $false
+	)
+
+	begin
+	{
+		# Cleanup
+		$AddItem = @()
+	}
+
+	process
+	{
+		# Loop over the new list
+		foreach ($NewInputItem in $CidrList)
+		{
+			if ($6)
+			{
+				# CIDR Workaround for UBNT USG Firewall Rules (Single IPv6 has to be without /128)
+				if ($NewInputItem -match '/128')
+				{
+					$NewInputItem = $NewInputItem.Replace('/128', '')
+				}
+			}
+			else
+			{
+				# CIDR Workaround for UBNT USG Firewall Rules (Single IP has to be without /32)
+				if ($NewInputItem -match '/32')
+				{
+					$NewInputItem = $NewInputItem.Replace('/32', '')
+				}
+			}
+
+			# Add to the List
+			$AddItem = $AddItem + $NewInputItem
+		}
+	}
+
+	end
+	{
+		# Dump
+		$AddItem
+
+		# Cleanup
+		$AddItem = $null
+	}
+}
+
+function Remove-HostsEntry
+{
+   <#
+         .SYNOPSIS
+         Removes a single Hosts Entry from the HOSTS File
+
+         .DESCRIPTION
+         Removes a single Hosts Entry from the HOSTS File, multiple are not supported yet!
+
+         .PARAMETER Path
+         The path to the hosts file where the entry should be set. Defaults to the local computer's hosts file.
+
+         .PARAMETER HostName
+         The hostname for the hosts entry.
+
+         .EXAMPLE
+         PS C:\> Remove-HostsEntry -HostName 'Dummy'
+
+         Remove the entry for the host 'Dummy' from the HOSTS File
+
+         .NOTES
+         Internal Helper, inspired by an old GIST I found
+
+         .LINK
+         Get-HostsFile
+
+         .LINK
+         Add-HostsEntry
+
+         .LINK
+         https://gist.github.com/markembling/173887/1824b370be3fe468faceaed5f39b12bad010a417
+   #>
+
+   [CmdletBinding(ConfirmImpact = 'Medium',
+   SupportsShouldProcess)]
+   param
+   (
+      [Parameter(Mandatory,
+            ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+            Position = 0,
+      HelpMessage = 'The hostname for the hosts entry.')]
+      [ValidateNotNullOrEmpty()]
+      [Alias('Host', 'Name')]
+      [string]
+      $HostName,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 1)]
+      [ValidateNotNullOrEmpty()]
+      [Alias('Hosts', 'hostsfile', 'file', 'Filename')]
+      [string]
+      $Path = "$env:windir\System32\drivers\etc\hosts"
+   )
+
+   begin {
+      Write-Verbose -Message 'Start'
+
+      try
+      {
+         $paramGetContent = @{
+            Path          = $Path
+            Raw           = $true
+            Force         = $true
+            ErrorAction   = 'Stop'
+            WarningAction = 'SilentlyContinue'
+         }
+         $HostsFileContent = (((Get-Content @paramGetContent ).TrimEnd()).ToString())
+      }
+      catch
+      {
+         # get error record
+         [Management.Automation.ErrorRecord]$e = $_
+
+         # retrieve information about runtime error
+         $info = [PSCustomObject]@{
+            Exception = $e.Exception.Message
+            Reason    = $e.CategoryInfo.Reason
+            Target    = $e.CategoryInfo.TargetName
+            Script    = $e.InvocationInfo.ScriptName
+            Line      = $e.InvocationInfo.ScriptLineNumber
+            Column    = $e.InvocationInfo.OffsetInLine
+         }
+
+         Write-Verbose -Message $info
+
+         Write-Error -Message ($info.Exception) -ErrorAction Stop
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+      }
+
+      $newLines = @()
+   }
+
+   process {
+      foreach ($line in $HostsFileContent)
+      {
+         $bits = [regex]::Split($line, '\t+')
+         if ($bits.count -eq 2)
+         {
+            if ($bits[1] -ne $HostName)
+            {
+               $newLines += $line
+            }
+         }
+         else
+         {
+            $newLines += $line
+         }
+      }
+
+      # Write file
+      try
+      {
+         if ($pscmdlet.ShouldProcess('Target', 'Operation'))
+         {
+            $paramClearContent = @{
+               Path          = $Path
+               Force         = $true
+               Confirm       = $false
+               ErrorAction   = 'Stop'
+               WarningAction = 'SilentlyContinue'
+            }
+            $null = (Clear-Content @paramClearContent)
+
+            $paramSetContent = @{
+               Path          = $Path
+               Value         = $newLines
+               Force         = $true
+               Confirm       = $false
+               Encoding      = 'UTF8'
+               ErrorAction   = 'Stop'
+               WarningAction = 'SilentlyContinue'
+            }
+            $null = (Set-Content @paramSetContent)
+         }
+      }
+      catch
+      {
+         # get error record
+         [Management.Automation.ErrorRecord]$e = $_
+
+         # retrieve information about runtime error
+         $info = [PSCustomObject]@{
+            Exception = $e.Exception.Message
+            Reason    = $e.CategoryInfo.Reason
+            Target    = $e.CategoryInfo.TargetName
+            Script    = $e.InvocationInfo.ScriptName
+            Line      = $e.InvocationInfo.ScriptLineNumber
+            Column    = $e.InvocationInfo.OffsetInLine
+         }
+
+         Write-Verbose -Message $info
+
+         Write-Error -Message ($info.Exception) -ErrorAction Stop
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+      }
+   }
+
+   end {
+      Write-Verbose -Message 'Done'
+   }
+}
+
 function Set-UniFiApiLoginBody
       {
          <#
@@ -475,10 +1368,16 @@ function Get-UnifiFirewallGroupDetails
          Initial Release with 1.0.7
 
          .LINK
-         Get-UnifiFirewallGroups
+         Get-UniFiConfig
 
          .LINK
          Set-UniFiDefaultRequestHeader
+
+         .LINK
+         Invoke-UniFiApiLogin
+
+         .LINK
+         Invoke-RestMethod
 
          .LINK
          https://github.com/jhochwald/UniFiTooling/issues/10
@@ -523,6 +1422,85 @@ function Get-UnifiFirewallGroupDetails
       # Safe ProgressPreference and Setup SilentlyContinue for the function
       $ExistingProgressPreference = ($ProgressPreference)
       $ProgressPreference = 'SilentlyContinue'
+
+      #region CheckSession
+      if (-not (Get-UniFiIsAlive))
+      {
+         #region LoginCheckLoop
+         # TODO: Move to config
+         [int]$NumberOfRetries = '3'
+         [int]$RetryTimer = '5'
+         # Setup the Loop itself
+         $RetryLoop = $false
+         [int]$RetryCounter = '0'
+         # Original code/idea was by Thomas Maurer
+         do
+         {
+            try
+            {
+               # Try to Logout
+               try
+               {
+                  if (-not (Get-UniFiIsAlive)) { Throw }
+               }
+               catch
+               {
+                  # We don't care about that
+                  Write-Verbose -Message 'Logout failed'
+               }
+
+               # Try a Session check (login is inherited here within the helper function)
+               if (-not (Get-UniFiIsAlive -ErrorAction Stop -WarningAction SilentlyContinue))
+               {
+                  Write-Error -Message 'Login failed' -ErrorAction Stop -Category AuthenticationError
+               }
+
+               # End the Loop
+               $RetryLoop = $true
+            }
+            catch
+            {
+               if ($RetryCounter -gt $NumberOfRetries)
+               {
+                  Write-Warning -Message ('Could still not login, after {0} retries.' -f $NumberOfRetries)
+
+                  # Stay in the Loop
+                  $RetryLoop = $true
+               }
+               else
+               {
+                  if ($RetryCounter -eq 0)
+                  {
+                     Write-Warning -Message ('Could not login! Retrying in {0} seconds.' -f $RetryTimer)
+                  }
+                  else
+                  {
+                     Write-Warning -Message ('Retry {0} of {1} failed. Retrying in {2} seconds.' -f $RetryCounter, $NumberOfRetries, $RetryTimer)
+                  }
+
+                  $null = (Start-Sleep -Seconds $RetryTimer)
+
+                  $RetryCounter = $RetryCounter + 1
+               }
+            }
+         }
+         While ($RetryLoop -eq $false)
+         #endregion LoginCheckLoop
+      }
+      #endregion CheckSession
+
+      #region ReCheckSession
+      if (-not ($RestSession))
+      {
+         # Restore ProgressPreference
+         $ProgressPreference = $ExistingProgressPreference
+
+         Write-Error -Message 'Unable to login! Check the connection to the controller, SSL certificates, and your credentials!' -ErrorAction Stop -Category AuthenticationError
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+      }
+      #endregion ReCheckSession
 
       # Create a new Object
       $SessionData = @()
@@ -713,7 +1691,10 @@ function Get-UnifiFirewallGroups
          Set-UniFiDefaultRequestHeader
 
          .LINK
-         Set-UniFiDefaultRequestHeader
+         Invoke-UniFiApiLogin
+
+         .LINK
+         Invoke-RestMethod
    #>
 
    [CmdletBinding(ConfirmImpact = 'None')]
@@ -737,6 +1718,85 @@ function Get-UnifiFirewallGroups
       # Safe ProgressPreference and Setup SilentlyContinue for the function
       $ExistingProgressPreference = ($ProgressPreference)
       $ProgressPreference = 'SilentlyContinue'
+
+      #region CheckSession
+      if (-not (Get-UniFiIsAlive))
+      {
+         #region LoginCheckLoop
+         # TODO: Move to config
+         [int]$NumberOfRetries = '3'
+         [int]$RetryTimer = '5'
+         # Setup the Loop itself
+         $RetryLoop = $false
+         [int]$RetryCounter = '0'
+         # Original code/idea was by Thomas Maurer
+         do
+         {
+            try
+            {
+               # Try to Logout
+               try
+               {
+                  if (-not (Get-UniFiIsAlive)) { Throw }
+               }
+               catch
+               {
+                  # We don't care about that
+                  Write-Verbose -Message 'Logout failed'
+               }
+
+               # Try a Session check (login is inherited here within the helper function)
+               if (-not (Get-UniFiIsAlive -ErrorAction Stop -WarningAction SilentlyContinue))
+               {
+                  Write-Error -Message 'Login failed' -ErrorAction Stop -Category AuthenticationError
+               }
+
+               # End the Loop
+               $RetryLoop = $true
+            }
+            catch
+            {
+               if ($RetryCounter -gt $NumberOfRetries)
+               {
+                  Write-Warning -Message ('Could still not login, after {0} retries.' -f $NumberOfRetries)
+
+                  # Stay in the Loop
+                  $RetryLoop = $true
+               }
+               else
+               {
+                  if ($RetryCounter -eq 0)
+                  {
+                     Write-Warning -Message ('Could not login! Retrying in {0} seconds.' -f $RetryTimer)
+                  }
+                  else
+                  {
+                     Write-Warning -Message ('Retry {0} of {1} failed. Retrying in {2} seconds.' -f $RetryCounter, $NumberOfRetries, $RetryTimer)
+                  }
+
+                  $null = (Start-Sleep -Seconds $RetryTimer)
+
+                  $RetryCounter = $RetryCounter + 1
+               }
+            }
+         }
+         While ($RetryLoop -eq $false)
+         #endregion LoginCheckLoop
+      }
+      #endregion CheckSession
+
+      #region ReCheckSession
+      if (-not ($RestSession))
+      {
+         # Restore ProgressPreference
+         $ProgressPreference = $ExistingProgressPreference
+
+         Write-Error -Message 'Unable to login! Check the connection to the controller, SSL certificates, and your credentials!' -ErrorAction Stop -Category AuthenticationError
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+      }
+      #endregion ReCheckSession
    }
 
    process
@@ -773,10 +1833,15 @@ function Get-UnifiFirewallGroups
       catch
       {
          # Try to Logout
-         $null = (Invoke-UniFiApiLogout)
-
-         # Remove the Body variable
-         $JsonBody = $null
+         try
+         {
+            $null = (Invoke-UniFiApiLogout -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
+         }
+         catch
+         {
+            # We don't care about that
+            Write-Verbose -Message 'Logout failed'
+         }
 
          # Verbose stuff
          $Script:line = $_.InvocationInfo.ScriptLineNumber
@@ -882,13 +1947,19 @@ function Get-UnifiNetworkDetails
          If the UnifiNetwork parameter is used, it must(!) be the ID (network_id). This was necessary to make it a non breaking change.
 
          .LINK
-         Get-UniFiConfig
-
-         .LINK
          Get-UnifiNetworkList
 
          .LINK
+         Get-UniFiConfig
+
+         .LINK
          Set-UniFiDefaultRequestHeader
+
+         .LINK
+         Invoke-UniFiApiLogin
+
+         .LINK
+         Invoke-RestMethod
    #>
 
    [CmdletBinding(ConfirmImpact = 'None')]
@@ -930,6 +2001,85 @@ function Get-UnifiNetworkDetails
       # Safe ProgressPreference and Setup SilentlyContinue for the function
       $ExistingProgressPreference = ($ProgressPreference)
       $ProgressPreference = 'SilentlyContinue'
+
+      #region CheckSession
+      if (-not (Get-UniFiIsAlive))
+      {
+         #region LoginCheckLoop
+         # TODO: Move to config
+         [int]$NumberOfRetries = '3'
+         [int]$RetryTimer = '5'
+         # Setup the Loop itself
+         $RetryLoop = $false
+         [int]$RetryCounter = '0'
+         # Original code/idea was by Thomas Maurer
+         do
+         {
+            try
+            {
+               # Try to Logout
+               try
+               {
+                  if (-not (Get-UniFiIsAlive)) { Throw }
+               }
+               catch
+               {
+                  # We don't care about that
+                  Write-Verbose -Message 'Logout failed'
+               }
+
+               # Try a Session check (login is inherited here within the helper function)
+               if (-not (Get-UniFiIsAlive -ErrorAction Stop -WarningAction SilentlyContinue))
+               {
+                  Write-Error -Message 'Login failed' -ErrorAction Stop -Category AuthenticationError
+               }
+
+               # End the Loop
+               $RetryLoop = $true
+            }
+            catch
+            {
+               if ($RetryCounter -gt $NumberOfRetries)
+               {
+                  Write-Warning -Message ('Could still not login, after {0} retries.' -f $NumberOfRetries)
+
+                  # Stay in the Loop
+                  $RetryLoop = $true
+               }
+               else
+               {
+                  if ($RetryCounter -eq 0)
+                  {
+                     Write-Warning -Message ('Could not login! Retrying in {0} seconds.' -f $RetryTimer)
+                  }
+                  else
+                  {
+                     Write-Warning -Message ('Retry {0} of {1} failed. Retrying in {2} seconds.' -f $RetryCounter, $NumberOfRetries, $RetryTimer)
+                  }
+
+                  $null = (Start-Sleep -Seconds $RetryTimer)
+
+                  $RetryCounter = $RetryCounter + 1
+               }
+            }
+         }
+         While ($RetryLoop -eq $false)
+         #endregion LoginCheckLoop
+      }
+      #endregion CheckSession
+
+      #region ReCheckSession
+      if (-not ($RestSession))
+      {
+         # Restore ProgressPreference
+         $ProgressPreference = $ExistingProgressPreference
+
+         Write-Error -Message 'Unable to login! Check the connection to the controller, SSL certificates, and your credentials!' -ErrorAction Stop -Category AuthenticationError
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+      }
+      #endregion ReCheckSession
 
       # Create a new Object
       $SessionData = @()
@@ -1054,7 +2204,15 @@ function Get-UnifiNetworkDetails
       catch
       {
          # Try to Logout
-         $null = (Invoke-UniFiApiLogout)
+         try
+         {
+            $null = (Invoke-UniFiApiLogout -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
+         }
+         catch
+         {
+            # We don't care about that
+            Write-Verbose -Message 'Logout failed'
+         }
 
          # Verbose stuff
          $Script:line = $_.InvocationInfo.ScriptLineNumber
@@ -1120,7 +2278,10 @@ function Get-UnifiNetworkList
          Set-UniFiDefaultRequestHeader
 
          .LINK
-         Set-UniFiDefaultRequestHeader
+         Invoke-UniFiApiLogin
+
+         .LINK
+         Invoke-RestMethod
    #>
 
    [CmdletBinding(ConfirmImpact = 'None')]
@@ -1144,6 +2305,450 @@ function Get-UnifiNetworkList
       # Safe ProgressPreference and Setup SilentlyContinue for the function
       $ExistingProgressPreference = ($ProgressPreference)
       $ProgressPreference = 'SilentlyContinue'
+
+      #region CheckSession
+      if (-not (Get-UniFiIsAlive))
+      {
+         #region LoginCheckLoop
+         # TODO: Move to config
+         [int]$NumberOfRetries = '3'
+         [int]$RetryTimer = '5'
+         # Setup the Loop itself
+         $RetryLoop = $false
+         [int]$RetryCounter = '0'
+         # Original code/idea was by Thomas Maurer
+         do
+         {
+            try
+            {
+               # Try to Logout
+               try
+               {
+                  if (-not (Get-UniFiIsAlive)) { Throw }
+               }
+               catch
+               {
+                  # We don't care about that
+                  Write-Verbose -Message 'Logout failed'
+               }
+
+               # Try a Session check (login is inherited here within the helper function)
+               if (-not (Get-UniFiIsAlive -ErrorAction Stop -WarningAction SilentlyContinue))
+               {
+                  Write-Error -Message 'Login failed' -ErrorAction Stop -Category AuthenticationError
+               }
+
+               # End the Loop
+               $RetryLoop = $true
+            }
+            catch
+            {
+               if ($RetryCounter -gt $NumberOfRetries)
+               {
+                  Write-Warning -Message ('Could still not login, after {0} retries.' -f $NumberOfRetries)
+
+                  # Stay in the Loop
+                  $RetryLoop = $true
+               }
+               else
+               {
+                  if ($RetryCounter -eq 0)
+                  {
+                     Write-Warning -Message ('Could not login! Retrying in {0} seconds.' -f $RetryTimer)
+                  }
+                  else
+                  {
+                     Write-Warning -Message ('Retry {0} of {1} failed. Retrying in {2} seconds.' -f $RetryCounter, $NumberOfRetries, $RetryTimer)
+                  }
+
+                  $null = (Start-Sleep -Seconds $RetryTimer)
+
+                  $RetryCounter = $RetryCounter + 1
+               }
+            }
+         }
+         While ($RetryLoop -eq $false)
+         #endregion LoginCheckLoop
+      }
+      #endregion CheckSession
+
+      #region ReCheckSession
+      if (-not ($RestSession))
+      {
+         # Restore ProgressPreference
+         $ProgressPreference = $ExistingProgressPreference
+
+         Write-Error -Message 'Unable to login! Check the connection to the controller, SSL certificates, and your credentials!' -ErrorAction Stop -Category AuthenticationError
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+      }
+      #endregion ReCheckSession
+   }
+
+   process
+   {
+      try
+      {
+         Write-Verbose -Message 'Read the Config'
+
+         $null = (Get-UniFiConfig)
+
+         Write-Verbose -Message ('Certificate check - Should be {0}' -f $ApiSelfSignedCert)
+
+         [Net.ServicePointManager]::ServerCertificateValidationCallback = {
+            $ApiSelfSignedCert
+         }
+
+         Write-Verbose -Message 'Set the API Call default Header'
+
+         $null = (Set-UniFiDefaultRequestHeader)
+
+         Write-Verbose -Message 'Create the Request URI'
+
+         $ApiRequestUri = $ApiUri + 's/' + $UnifiSite + '/rest/networkconf/'
+
+         Write-Verbose -Message ('URI: {0}' -f $ApiRequestUri)
+
+         Write-Verbose -Message 'Send the Request'
+
+         $paramInvokeRestMethod = @{
+            Method        = 'Get'
+            Uri           = $ApiRequestUri
+            Headers       = $RestHeader
+            ErrorAction   = 'SilentlyContinue'
+            WarningAction = 'SilentlyContinue'
+            WebSession    = $RestSession
+         }
+         $Session = (Invoke-RestMethod @paramInvokeRestMethod)
+
+         Write-Verbose -Message ('Session Info: {0}' -f $Session)
+      }
+      catch
+      {
+         # Try to Logout
+         try
+         {
+            $null = (Invoke-UniFiApiLogout -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
+         }
+         catch
+         {
+            # We don't care about that
+            Write-Verbose -Message 'Logout failed'
+         }
+
+         # Verbose stuff
+         $Script:line = $_.InvocationInfo.ScriptLineNumber
+         Write-Verbose -Message ('Error was in Line {0}' -f $line)
+         Write-Verbose -Message ('Error was {0}' -f $_)
+
+         # Error Message
+         Write-Error -Message 'Unable to get Firewall Groups' -ErrorAction Stop
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+      }
+      finally
+      {
+         # Reset the SSL Trust (make sure everything is back to default)
+         [Net.ServicePointManager]::ServerCertificateValidationCallback = $null
+      }
+
+      # check result
+      if ($Session.meta.rc -ne 'ok')
+      {
+         # Verbose stuff
+         $Script:line = $_.InvocationInfo.ScriptLineNumber
+
+         Write-Verbose -Message ('Error was in Line {0}' -f $line)
+         Write-Verbose -Message ('Error was {0}' -f $Session.meta.rc)
+
+         # Error Message
+         Write-Error -Message 'Unable to get the network list' -ErrorAction Stop
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+      }
+   }
+
+   end
+   {
+      # Dump the Result
+      $Session.data
+
+      # Cleanup
+      $Session = $null
+
+      # Restore ProgressPreference
+      $ProgressPreference = $ExistingProgressPreference
+   }
+}
+
+function Get-UnifiSpeedTestResult
+{
+   <#
+         .SYNOPSIS
+         Get the UniFi Security Gateway (USG) Speed Test results
+
+         .DESCRIPTION
+         Get the UniFi Security Gateway (USG) Speed Test results
+
+         .PARAMETER Timeframe
+         Timeframe in hours, default is 24
+
+         .PARAMETER StartDate
+         Start date (valid Date String)
+         Default is now
+
+         .PARAMETER EndDate
+         End date (valid Date String), default is now minus 24 hours
+
+         .PARAMETER UnifiSite
+         UniFi Site as configured. The default is: default
+
+         .PARAMETER all
+         Get all existing Speed Test Results
+
+         .PARAMETER UniFiValues
+         Show results without modifications, like the UniFi Controller creates them
+
+         .EXAMPLE
+         PS C:\> Get-UnifiSpeedTestResult -all
+
+         Get all the UniFi Security Gateway (USG) Speed Test results
+
+         .EXAMPLE
+         PS C:\> Get-UnifiSpeedTestResult | Select-Object -Property *
+
+         Get the UniFi Security Gateway (USG) Speed Test results from the last 24 hours (default), returns all values
+
+         .EXAMPLE
+         PS C:\> Get-UnifiSpeedTestResult -UnifiSite 'Contoso'
+
+         Get the UniFi Security Gateway (USG) Speed Test results from the last 24 hours (default)
+
+         .EXAMPLE
+         PS C:\> Get-UnifiSpeedTestResult -Timeframe 48
+
+         Get the UniFi Security Gateway (USG) Speed Test results of the last 48 hours
+
+         .EXAMPLE
+         PS C:\> Get-UnifiSpeedTestResult -StartDate '1/16/2019 12:00 AM' -EndDate '1/16/2019 11:59:59 PM'
+
+         Get the UniFi Security Gateway (USG) Speed Test results for a given time/date
+         In the example, all results from 1/16/2019 (all day) will be returned
+
+         .NOTES
+         Initial version that makes it more human readable.
+         The filetring needs a few more tests
+
+         .LINK
+         Get-UniFiConfig
+
+         .LINK
+         Set-UniFiDefaultRequestHeader
+
+         .LINK
+         Invoke-UniFiApiLogin
+
+         .LINK
+         Invoke-RestMethod
+
+         .LINK
+         ConvertFrom-UnixTimeStamp
+
+         .LINK
+         ConvertTo-UnixTimeStamp
+   #>
+   [CmdletBinding(DefaultParameterSetName = 'DateSet',ConfirmImpact = 'None')]
+   [OutputType([psobject])]
+   param
+   (
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 0)]
+      [Alias('Start')]
+      [datetime]
+      $StartDate,
+      [Parameter(ParameterSetName = 'TimeFrameSet',
+            ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 1)]
+      [Alias('hours')]
+      [int]
+      $Timeframe,
+      [Parameter(ParameterSetName = 'DateSet',
+            ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 1)]
+      [ValidateNotNullOrEmpty()]
+      [datetime]
+      $EndDate = (Get-Date),
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 2)]
+      [ValidateNotNullOrEmpty()]
+      [Alias('Site')]
+      [string]
+      $UnifiSite = 'default',
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 3)]
+      [switch]
+      $all = $false,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 4)]
+      [switch]
+      $UniFiValues = $false
+   )
+
+   begin
+   {
+      # Cleanup
+      $Session = $null
+
+      # Safe ProgressPreference and Setup SilentlyContinue for the function
+      $ExistingProgressPreference = ($ProgressPreference)
+      $ProgressPreference = 'SilentlyContinue'
+
+      #region CheckSession
+      if (-not (Get-UniFiIsAlive))
+      {
+         #region LoginCheckLoop
+         # TODO: Move to config
+         [int]$NumberOfRetries = '3'
+         [int]$RetryTimer = '5'
+         # Setup the Loop itself
+         $RetryLoop = $false
+         [int]$RetryCounter = '0'
+         # Original code/idea was by Thomas Maurer
+         do
+         {
+            try
+            {
+               # Try to Logout
+               try
+               {
+                  if (-not (Get-UniFiIsAlive))
+                  {
+                     Throw
+                  }
+               }
+               catch
+               {
+                  # We don't care about that
+                  Write-Verbose -Message 'Logout failed'
+               }
+
+               # Try a Session check (login is inherited here within the helper function)
+               if (-not (Get-UniFiIsAlive -ErrorAction Stop -WarningAction SilentlyContinue))
+               {
+                  Write-Error -Message 'Login failed' -ErrorAction Stop -Category AuthenticationError
+               }
+
+               # End the Loop
+               $RetryLoop = $true
+            }
+            catch
+            {
+               if ($RetryCounter -gt $NumberOfRetries)
+               {
+                  Write-Warning -Message ('Could still not login, after {0} retries.' -f $NumberOfRetries)
+
+                  # Stay in the Loop
+                  $RetryLoop = $true
+               }
+               else
+               {
+                  if ($RetryCounter -eq 0)
+                  {
+                     Write-Warning -Message ('Could not login! Retrying in {0} seconds.' -f $RetryTimer)
+                  }
+                  else
+                  {
+                     Write-Warning -Message ('Retry {0} of {1} failed. Retrying in {2} seconds.' -f $RetryCounter, $NumberOfRetries, $RetryTimer)
+                  }
+
+                  $null = (Start-Sleep -Seconds $RetryTimer)
+
+                  $RetryCounter = $RetryCounter + 1
+               }
+            }
+         }
+         While ($RetryLoop -eq $false)
+         #endregion LoginCheckLoop
+      }
+      #endregion CheckSession
+
+      #region ReCheckSession
+      if (-not ($RestSession))
+      {
+         # Restore ProgressPreference
+         $ProgressPreference = $ExistingProgressPreference
+
+         Write-Error -Message 'Unable to login! Check the connection to the controller, SSL certificates, and your credentials!' -ErrorAction Stop -Category AuthenticationError
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+      }
+      #endregion ReCheckSession
+
+      #region ConfigureDefaultDisplaySet
+      $defaultDisplaySet = 'time', 'download', 'upload', 'latency'
+
+      # Create the default property display set
+      $defaultDisplayPropertySet = (New-Object -TypeName System.Management.Automation.PSPropertySet -ArgumentList ('DefaultDisplayPropertySet', [string[]]$defaultDisplaySet))
+      $PSStandardMembers = [Management.Automation.PSMemberInfo[]]@($defaultDisplayPropertySet)
+      #endregion ConfigureDefaultDisplaySet
+
+      #region Filtering
+      switch ($PsCmdlet.ParameterSetName)
+      {
+         'TimeFrameSet'
+         {
+            Write-Verbose -Message 'TimeFrameSet'
+            if (-not ($StartDate))
+            {
+               if ($Timeframe)
+               {
+                  $StartDate = ((Get-Date).AddHours(-$Timeframe))
+               }
+               else
+               {
+                  $StartDate = ((Get-Date).AddDays(-1))
+               }
+            }
+
+            if (-not ($EndDate))
+            {
+               $EndDate = (Get-Date)
+            }
+         }
+         'DateSet'
+         {
+            Write-Verbose -Message 'DateSet'
+            if (-not ($StartDate))
+            {
+               $StartDate = ((Get-Date).AddDays(-1))
+            }
+
+            if (-not ($EndDate))
+            {
+               $EndDate = (Get-Date)
+            }
+         }
+      }
+
+      [string]$FilterStartDate = (ConvertTo-UnixTimestamp -Date $StartDate -Milliseconds)
+      [string]$FilterEndDate = (ConvertTo-UnixTimestamp -Date $EndDate -Milliseconds)
+
+      if ($all)
+      {
+         $FilterStartDate = $null
+         $FilterEndDate = $null
+      }
+      #endregion Filtering
    }
 
    process
@@ -1162,28 +2767,58 @@ function Get-UnifiNetworkList
          $null = (Set-UniFiDefaultRequestHeader)
 
          Write-Verbose -Message 'Create the Request URI'
-         $ApiRequestUri = $ApiUri + 's/' + $UnifiSite + '/rest/networkconf/'
+         $ApiRequestUri = $ApiUri + 's/' + $UnifiSite + '/stat/report/archive.speedtest'
          Write-Verbose -Message ('URI: {0}' -f $ApiRequestUri)
 
+         $Script:ApiRequestBodyInput = [PSCustomObject][ordered]@{
+            attrs = @(
+               'xput_download',
+               'xput_upload',
+               'latency',
+               'time'
+            )
+            start = $FilterStartDate
+            end   = $FilterEndDate
+         }
+
+         $paramConvertToJson = @{
+            InputObject   = $ApiRequestBodyInput
+            Depth         = 5
+            ErrorAction   = 'Stop'
+            WarningAction = 'SilentlyContinue'
+         }
+
+         $ApiRequestBodyInput = $null
+
+         $Script:ApiRequestBody = (ConvertTo-Json @paramConvertToJson)
+
          Write-Verbose -Message 'Send the Request'
+
          $paramInvokeRestMethod = @{
-            Method        = 'Get'
+            Method        = 'Post'
             Uri           = $ApiRequestUri
             Headers       = $RestHeader
+            Body          = $ApiRequestBody
             ErrorAction   = 'SilentlyContinue'
             WarningAction = 'SilentlyContinue'
             WebSession    = $RestSession
          }
          $Session = (Invoke-RestMethod @paramInvokeRestMethod)
+
          Write-Verbose -Message ('Session Info: {0}' -f $Session)
       }
       catch
       {
          # Try to Logout
-         $null = (Invoke-UniFiApiLogout)
-
-         # Remove the Body variable
-         $JsonBody = $null
+         try
+         {
+            $null = (Invoke-UniFiApiLogout -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
+         }
+         catch
+         {
+            # We don't care about that
+            Write-Verbose -Message 'Logout failed'
+         }
 
          # Verbose stuff
          $Script:line = $_.InvocationInfo.ScriptLineNumber
@@ -1211,17 +2846,58 @@ function Get-UnifiNetworkList
          Write-Verbose -Message ('Error was {0}' -f $Session.meta.rc)
 
          # Error Message
-         Write-Error -Message 'Unable to get the network list' -ErrorAction Stop
+         Write-Error -Message 'Unable to Login' -ErrorAction Stop
 
          # Only here to catch a global ErrorAction overwrite
          break
       }
+
+      $Result = @()
+
+      foreach ($item in $Session.data)
+      {
+         $Object = $null
+         $Object = [PSCustomObject][ordered]@{
+            id       = $item._id
+            latency  = $item.latency
+            oid      = $item.oid
+            time     = if ($UniFiValues)
+            {
+               $item.time
+            }
+            else
+            {
+               ConvertFrom-UnixTimeStamp -TimeStamp ($item.time) -Milliseconds
+            }
+            download = if ($UniFiValues)
+            {
+               $item.xput_download
+            }
+            else
+            {
+               [math]::Round($item.xput_download,1)
+            }
+            upload   = if ($UniFiValues)
+            {
+               $item.xput_upload
+            }
+            else
+            {
+               [math]::Round($item.xput_upload,1)
+            }
+         }
+         $Result = $Result + $Object
+      }
+
+      # Give this object a unique typename
+      $Result.PSObject.TypeNames.Insert(0,'Speedtest.Result')
+      $Result | Add-Member MemberSet PSStandardMembers $PSStandardMembers
    }
 
    end
    {
       # Dump the Result
-      $Session.data
+      $Result
 
       # Cleanup
       $Session = $null
@@ -1491,112 +3167,6 @@ function Invoke-UniFiApiLogout
    }
 }
 
-function Invoke-UniFiCidrWorkaround
-{
-<#
-	.SYNOPSIS
-		IPv4 and IPv6 CIDR Workaround for UBNT USG Firewall Rules
-
-	.DESCRIPTION
-		IPv4 and IPv6 CIDR Workaround for UBNT USG Firewall Rules (Single IPv4 has to be without /32 OR single IPv6 has to be without /128)
-
-	.PARAMETER CidrList
-		Existing CIDR List Object
-
-	.PARAMETER 6
-		Process IPv6 CIDR (Single IPv6 has to be without /128)
-
-	.EXAMPLE
-		PS C:\> Invoke-UniFiCidrWorkaround -CidrList $value1
-
-		IPv4 CIDR Workaround for UBNT USG Firewall Rules
-
-	.EXAMPLE
-		PS C:\> Invoke-UniFiCidrWorkaround -6 -CidrList $value1
-
-		IPv6 CIDR Workaround for UBNT USG Firewall Rules
-
-	.EXAMPLE
-		PS C:\> $value1 | Invoke-UniFiCidrWorkaround
-
-		IPv4 or IPv6 CIDR Workaround for UBNT USG Firewall Rules via Pipeline
-
-	.EXAMPLE
-		PS C:\> $value1 | Invoke-UniFiCidrWorkaround -6
-
-		IPv6 CIDR Workaround for UBNT USG Firewall Rules via Pipeline
-
-	.NOTES
-		This is an internal helper function only (Will be moved to the private functions soon)
-
-	.LINK
-		https://github.com/jhochwald/UniFiTooling/issues/5
-#>
-
-	[CmdletBinding(ConfirmImpact = 'None')]
-	[OutputType([psobject])]
-	param
-	(
-		[Parameter(Mandatory = $true,
-				   ValueFromPipeline = $true,
-				   ValueFromPipelineByPropertyName = $true,
-				   Position = 0,
-				   HelpMessage = 'Existing CIDR List Object')]
-		[ValidateNotNullOrEmpty()]
-		[Alias('UniFiCidrList')]
-		[psobject]
-		$CidrList,
-		[Parameter(ValueFromPipeline = $true,
-				   ValueFromPipelineByPropertyName = $true,
-				   Position = 1)]
-		[Alias('IPv6', 'V6')]
-		[switch]
-		$6 = $false
-	)
-
-	begin
-	{
-		# Cleanup
-		$AddItem = @()
-	}
-
-	process
-	{
-		# Loop over the new list
-		foreach ($NewInputItem in $CidrList)
-		{
-			if ($6)
-			{
-				# CIDR Workaround for UBNT USG Firewall Rules (Single IPv6 has to be without /128)
-				if ($NewInputItem -match '/128')
-				{
-					$NewInputItem = $NewInputItem.Replace('/128', '')
-				}
-			}
-			else
-			{
-				# CIDR Workaround for UBNT USG Firewall Rules (Single IP has to be without /32)
-				if ($NewInputItem -match '/32')
-				{
-					$NewInputItem = $NewInputItem.Replace('/32', '')
-				}
-			}
-
-			# Add to the List
-			$AddItem = $AddItem + $NewInputItem
-		}
-	}
-
-	end
-	{
-		# Dump
-		$AddItem
-
-		# Cleanup
-		$AddItem = $null
-	}
-}
-
 function New-UniFiConfig
 {
    <#
@@ -1803,6 +3373,12 @@ function Set-UnifiFirewallGroup
 
          .LINK
          Set-UniFiDefaultRequestHeader
+
+         .LINK
+         Invoke-UniFiApiLogin
+
+         .LINK
+         Invoke-RestMethod
    #>
    [CmdletBinding(ConfirmImpact = 'None')]
    param
@@ -1843,6 +3419,85 @@ function Set-UnifiFirewallGroup
       # Safe ProgressPreference and Setup SilentlyContinue for the function
       $ExistingProgressPreference = ($ProgressPreference)
       $ProgressPreference = 'SilentlyContinue'
+
+      #region CheckSession
+      if (-not (Get-UniFiIsAlive))
+      {
+         #region LoginCheckLoop
+         # TODO: Move to config
+         [int]$NumberOfRetries = '3'
+         [int]$RetryTimer = '5'
+         # Setup the Loop itself
+         $RetryLoop = $false
+         [int]$RetryCounter = '0'
+         # Original code/idea was by Thomas Maurer
+         do
+         {
+            try
+            {
+               # Try to Logout
+               try
+               {
+                  if (-not (Get-UniFiIsAlive)) { Throw }
+               }
+               catch
+               {
+                  # We don't care about that
+                  Write-Verbose -Message 'Logout failed'
+               }
+
+               # Try a Session check (login is inherited here within the helper function)
+               if (-not (Get-UniFiIsAlive -ErrorAction Stop -WarningAction SilentlyContinue))
+               {
+                  Write-Error -Message 'Login failed' -ErrorAction Stop -Category AuthenticationError
+               }
+
+               # End the Loop
+               $RetryLoop = $true
+            }
+            catch
+            {
+               if ($RetryCounter -gt $NumberOfRetries)
+               {
+                  Write-Warning -Message ('Could still not login, after {0} retries.' -f $NumberOfRetries)
+
+                  # Stay in the Loop
+                  $RetryLoop = $true
+               }
+               else
+               {
+                  if ($RetryCounter -eq 0)
+                  {
+                     Write-Warning -Message ('Could not login! Retrying in {0} seconds.' -f $RetryTimer)
+                  }
+                  else
+                  {
+                     Write-Warning -Message ('Retry {0} of {1} failed. Retrying in {2} seconds.' -f $RetryCounter, $NumberOfRetries, $RetryTimer)
+                  }
+
+                  $null = (Start-Sleep -Seconds $RetryTimer)
+
+                  $RetryCounter = $RetryCounter + 1
+               }
+            }
+         }
+         While ($RetryLoop -eq $false)
+         #endregion LoginCheckLoop
+      }
+      #endregion CheckSession
+
+      #region ReCheckSession
+      if (-not ($RestSession))
+      {
+         # Restore ProgressPreference
+         $ProgressPreference = $ExistingProgressPreference
+
+         Write-Error -Message 'Unable to login! Check the connection to the controller, SSL certificates, and your credentials!' -ErrorAction Stop -Category AuthenticationError
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+      }
+      #endregion ReCheckSession
 
       Write-Verbose -Message ('Check if {0} exists' -f $UnfiFirewallGroup)
 
@@ -1909,10 +3564,15 @@ function Set-UnifiFirewallGroup
       catch
       {
          # Try to Logout
-         $null = (Invoke-UniFiApiLogout)
-
-         # Remove the Body variable
-         $JsonBody = $null
+         try
+         {
+            $null = (Invoke-UniFiApiLogout -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
+         }
+         catch
+         {
+            # We don't care about that
+            Write-Verbose -Message 'Logout failed'
+         }
 
          # Verbose stuff
          $Script:line = $_.InvocationInfo.ScriptLineNumber
@@ -1993,6 +3653,12 @@ function Set-UnifiNetworkDetails
 
          .LINK
          Set-UniFiDefaultRequestHeader
+
+         .LINK
+         Invoke-UniFiApiLogin
+
+         .LINK
+         Invoke-RestMethod
    #>
 
    [CmdletBinding(ConfirmImpact = 'None')]
@@ -2034,6 +3700,85 @@ function Set-UnifiNetworkDetails
       # Safe ProgressPreference and Setup SilentlyContinue for the function
       $ExistingProgressPreference = ($ProgressPreference)
       $ProgressPreference = 'SilentlyContinue'
+
+      #region CheckSession
+      if (-not (Get-UniFiIsAlive))
+      {
+         #region LoginCheckLoop
+         # TODO: Move to config
+         [int]$NumberOfRetries = '3'
+         [int]$RetryTimer = '5'
+         # Setup the Loop itself
+         $RetryLoop = $false
+         [int]$RetryCounter = '0'
+         # Original code/idea was by Thomas Maurer
+         do
+         {
+            try
+            {
+               # Try to Logout
+               try
+               {
+                  if (-not (Get-UniFiIsAlive)) { Throw }
+               }
+               catch
+               {
+                  # We don't care about that
+                  Write-Verbose -Message 'Logout failed'
+               }
+
+               # Try a Session check (login is inherited here within the helper function)
+               if (-not (Get-UniFiIsAlive -ErrorAction Stop -WarningAction SilentlyContinue))
+               {
+                  Write-Error -Message 'Login failed' -ErrorAction Stop -Category AuthenticationError
+               }
+
+               # End the Loop
+               $RetryLoop = $true
+            }
+            catch
+            {
+               if ($RetryCounter -gt $NumberOfRetries)
+               {
+                  Write-Warning -Message ('Could still not login, after {0} retries.' -f $NumberOfRetries)
+
+                  # Stay in the Loop
+                  $RetryLoop = $true
+               }
+               else
+               {
+                  if ($RetryCounter -eq 0)
+                  {
+                     Write-Warning -Message ('Could not login! Retrying in {0} seconds.' -f $RetryTimer)
+                  }
+                  else
+                  {
+                     Write-Warning -Message ('Retry {0} of {1} failed. Retrying in {2} seconds.' -f $RetryCounter, $NumberOfRetries, $RetryTimer)
+                  }
+
+                  $null = (Start-Sleep -Seconds $RetryTimer)
+
+                  $RetryCounter = $RetryCounter + 1
+               }
+            }
+         }
+         While ($RetryLoop -eq $false)
+         #endregion LoginCheckLoop
+      }
+      #endregion CheckSession
+
+      #region ReCheckSession
+      if (-not ($RestSession))
+      {
+         # Restore ProgressPreference
+         $ProgressPreference = $ExistingProgressPreference
+
+         Write-Error -Message 'Unable to login! Check the connection to the controller, SSL certificates, and your credentials!' -ErrorAction Stop -Category AuthenticationError
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+      }
+      #endregion ReCheckSession
    }
 
    process
@@ -2071,10 +3816,15 @@ function Set-UnifiNetworkDetails
       catch
       {
          # Try to Logout
-         $null = (Invoke-UniFiApiLogout)
-
-         # Remove the Body variable
-         $JsonBody = $null
+         try
+         {
+            $null = (Invoke-UniFiApiLogout -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
+         }
+         catch
+         {
+            # We don't care about that
+            Write-Verbose -Message 'Logout failed'
+         }
 
          # Verbose stuff
          $Script:line = $_.InvocationInfo.ScriptLineNumber
