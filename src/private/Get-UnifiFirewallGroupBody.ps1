@@ -51,35 +51,39 @@
 
    begin
    {
+      Write-Verbose -Message 'Start Get-UnifiFirewallGroupBody'
+
       Write-Verbose -Message 'Cleanup exitsing Group'
       Write-Verbose -Message "Old Values: $UnfiFirewallGroup.group_members"
+
       $UnfiFirewallGroup.group_members = $null
    }
 
    process
    {
-      Write-Verbose -Message 'Create a new Object'
-      $NewUnifiCidrItem = @()
-
-      foreach ($UnifiCidrItem in $UnifiCidrInput)
-      {
-         $NewUnifiCidrItem = $NewUnifiCidrItem + $UnifiCidrItem
-      }
-
-      # Add the new values
-      $paramAddMember = @{
-         MemberType = 'NoteProperty'
-         Name       = 'group_members'
-         Value      = $NewUnifiCidrItem
-         Force      = $true
-      }
-      $UnfiFirewallGroup | Add-Member @paramAddMember
-
-      # Cleanup
-      $NewUnifiCidrItem = $null
-
       try
       {
+         Write-Verbose -Message 'Create a new Object'
+
+         $NewUnifiCidrItem = @()
+
+         foreach ($UnifiCidrItem in $UnifiCidrInput)
+         {
+            $NewUnifiCidrItem = $NewUnifiCidrItem + $UnifiCidrItem
+         }
+
+         # Add the new values
+         $paramAddMember = @{
+            MemberType = 'NoteProperty'
+            Name       = 'group_members'
+            Value      = $NewUnifiCidrItem
+            Force      = $true
+         }
+         $UnfiFirewallGroup | Add-Member @paramAddMember
+
+         # Cleanup
+         $NewUnifiCidrItem = $null
+
          # Create a new Request Body
          $paramConvertToJson = @{
             InputObject   = $UnfiFirewallGroup
@@ -93,8 +97,24 @@
       {
          $null = (Invoke-InternalScriptVariables)
 
-         Write-Error -Message 'Unable to convert new List to JSON' -ErrorAction Stop
+         # get error record
+         [Management.Automation.ErrorRecord]$e = $_
 
+         # retrieve information about runtime error
+         $info = [PSCustomObject]@{
+            Exception = $e.Exception.Message
+            Reason    = $e.CategoryInfo.Reason
+            Target    = $e.CategoryInfo.TargetName
+            Script    = $e.InvocationInfo.ScriptName
+            Line      = $e.InvocationInfo.ScriptLineNumber
+            Column    = $e.InvocationInfo.OffsetInLine
+         }
+
+         Write-Verbose -Message $info
+
+         Write-Error -Message ($info.Exception) -ErrorAction Stop
+
+         # Only here to catch a global ErrorAction overwrite
          break
       }
    }
@@ -103,5 +123,7 @@
    {
       # Dump
       $UnfiFirewallGroupJson
+
+      Write-Verbose -Message 'Done Get-UnifiFirewallGroupBody'
    }
 }

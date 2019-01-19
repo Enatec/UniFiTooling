@@ -49,7 +49,9 @@
 
    begin
    {
-      # Set some defaults
+      Write-Verbose -Message 'Start ConvertFrom-UnixTimeStamp'
+
+      # Set some defaults (Never change this!!!)
       $UnixStartTime = '1/1/1970'
 
       # Cleanup
@@ -79,6 +81,7 @@
       }
       catch
       {
+         #region ErrorHandler
          # get error record
          [Management.Automation.ErrorRecord]$e = $_
 
@@ -88,7 +91,7 @@
             Reason    = $e.CategoryInfo.Reason
             Target    = $e.CategoryInfo.TargetName
             Script    = $e.InvocationInfo.ScriptName
-            Line      = $e.InvocationInfo.ScriptLineNumber
+            Line	  = $e.InvocationInfo.ScriptLineNumber
             Column    = $e.InvocationInfo.OffsetInLine
          }
 
@@ -98,11 +101,15 @@
 
          # Only here to catch a global ErrorAction overwrite
          break
+         #endregion ErrorHandler
       }
    }
 
    end
    {
+      # Dump to the Console
       $Result
+
+      Write-Verbose -Message 'Done ConvertFrom-UnixTimeStamp'
    }
 }

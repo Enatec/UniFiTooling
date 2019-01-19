@@ -32,50 +32,74 @@
 
    begin
    {
+      Write-Verbose -Message 'Start Invoke-UniFiApiLogin'
+
       # Cleanup
       $RestSession = $null
       $Session = $null
 
+      #region SafeProgressPreference
       # Safe ProgressPreference and Setup SilentlyContinue for the function
       $ExistingProgressPreference = ($ProgressPreference)
       $ProgressPreference = 'SilentlyContinue'
+      #endregion SafeProgressPreference
    }
 
    process
    {
-      # Login
       try
       {
-         #
+         #region ReadConfig
          Write-Verbose -Message 'Read the Config'
-         $null = (Get-UniFiConfig)
 
+         $null = (Get-UniFiConfig)
+         #endregion ReadConfig
+
+         #region CertificateHandler
          Write-Verbose -Message ('Certificate check - Should be {0}' -f $ApiSelfSignedCert)
+
          [Net.ServicePointManager]::ServerCertificateValidationCallback = {
             $ApiSelfSignedCert
          }
+         #endregion CertificateHandler
 
+         #region SetRequestHeader
          Write-Verbose -Message 'Set the API Call default Header'
-         $null = (Set-UniFiDefaultRequestHeader)
 
+         $null = (Set-UniFiDefaultRequestHeader)
+         #endregion SetRequestHeader
+
+         #region ReadCredentials
          Write-Verbose -Message 'Read the Credentials'
          $null = (Get-UniFiCredentials)
+         #endregion
 
+         #region
          Write-Verbose -Message 'Create the Body'
          $null = (Set-UniFiApiLoginBody)
+         #endregion
 
-         Write-Verbose -Message 'Cleanup the credentials variables'
-         $ApiUsername = $null
-         $ApiPassword = $null
-
+         #region Cleanup
          # Cleanup
          $Session = $null
 
-         Write-Verbose -Message 'Create the Request URI'
-         $ApiRequestUri = $ApiUri + 'login'
-         Write-Verbose -Message ('URI: {0}' -f $ApiRequestUri)
+         Write-Verbose -Message 'Cleanup the credentials variables'
 
+         $ApiUsername = $null
+         $ApiPassword = $null
+         #endregion Cleanup
+
+         #region SetRequestURI
+         Write-Verbose -Message 'Create the Request URI'
+
+         $ApiRequestUri = $ApiUri + 'login'
+
+         Write-Verbose -Message ('URI: {0}' -f $ApiRequestUri)
+         #endregion SetRequestURI
+
+         #region Request
          Write-Verbose -Message 'Send the Request to Login'
+
          $paramInvokeRestMethod = @{
             Method          = 'Post'
             Uri             = $ApiRequestUri
@@ -86,32 +110,48 @@
             SessionVariable = 'RestSession'
          }
          $Session = (Invoke-RestMethod @paramInvokeRestMethod)
+
          Write-Verbose -Message ('Session Info: {0}' -f $Session)
 
          $Global:RestSession = $RestSession
 
          # Remove the Body variable
          $JsonBody = $null
+         #endregion Request
       }
       catch
       {
-         # Remove the Body variable
-         $JsonBody = $null
-         # Verbose stuff
-         $Script:line = $_.InvocationInfo.ScriptLineNumber
-         Write-Verbose -Message ('Error was in Line {0}' -f $line)
-         Write-Verbose -Message ('Error was {0}' -f $_)
+         #region ErrorHandler
+         # get error record
+         [Management.Automation.ErrorRecord]$e = $_
 
-         # Error Message
-         Write-Error -Message 'Unable to Login' -ErrorAction Stop
+         # retrieve information about runtime error
+         $info = [PSCustomObject]@{
+            Exception = $e.Exception.Message
+            Reason    = $e.CategoryInfo.Reason
+            Target    = $e.CategoryInfo.TargetName
+            Script    = $e.InvocationInfo.ScriptName
+            Line	  = $e.InvocationInfo.ScriptLineNumber
+            Column    = $e.InvocationInfo.OffsetInLine
+         }
+
+         Write-Verbose -Message $info
+
+         Write-Error -Message ($info.Exception) -ErrorAction Stop
 
          # Only here to catch a global ErrorAction overwrite
          break
+         #endregion ErrorHandler
       }
       finally
       {
+         # Remove the Body variable
+         $JsonBody = $null
+
+         #region ResetSslTrust
          # Reset the SSL Trust (make sure everything is back to default)
          [Net.ServicePointManager]::ServerCertificateValidationCallback = $null
+         #endregion ResetSslTrust
       }
 
       # check result
@@ -135,7 +175,10 @@
       # Cleanup
       $Session = $null
 
-      # Restore ProgressPreference
+      #region RestoreProgressPreference
       $ProgressPreference = $ExistingProgressPreference
+      #endregion RestoreProgressPreference
+
+      Write-Verbose -Message 'Done Invoke-UniFiApiLogin'
    }
 }

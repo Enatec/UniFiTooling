@@ -54,7 +54,7 @@
    )
 
    begin {
-      Write-Verbose -Message 'Start'
+      Write-Verbose -Message 'Start Remove-HostsEntry'
 
       try
       {
@@ -161,6 +161,6 @@
    }
 
    end {
-      Write-Verbose -Message 'Done'
+      Write-Verbose -Message 'Donw Remove-HostsEntry'
    }
 }

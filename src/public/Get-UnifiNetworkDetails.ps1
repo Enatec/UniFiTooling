@@ -104,12 +104,16 @@
 
    begin
    {
+      Write-Verbose -Message 'Start Get-UnifiNetworkDetails'
+
       # Cleanup
       $Session = $null
 
+      #region SafeProgressPreference
       # Safe ProgressPreference and Setup SilentlyContinue for the function
       $ExistingProgressPreference = ($ProgressPreference)
       $ProgressPreference = 'SilentlyContinue'
+      #endregion SafeProgressPreference
 
       #region CheckSession
       if (-not (Get-UniFiIsAlive))
@@ -198,16 +202,25 @@
    {
       try
       {
+         #region ReadConfig
          Write-Verbose -Message 'Read the Config'
-         $null = (Get-UniFiConfig)
 
+         $null = (Get-UniFiConfig)
+         #endregion ReadConfig
+
+         #region CertificateHandler
          Write-Verbose -Message ('Certificate check - Should be {0}' -f $ApiSelfSignedCert)
+
          [Net.ServicePointManager]::ServerCertificateValidationCallback = {
             $ApiSelfSignedCert
          }
+         #endregion CertificateHandler
 
+         #region SetRequestHeader
          Write-Verbose -Message 'Set the API Call default Header'
+
          $null = (Set-UniFiDefaultRequestHeader)
+         #endregion SetRequestHeader
 
          switch ($PsCmdlet.ParameterSetName)
          {
@@ -323,21 +336,38 @@
             Write-Verbose -Message 'Logout failed'
          }
 
-         # Verbose stuff
-         $Script:line = $_.InvocationInfo.ScriptLineNumber
-         Write-Verbose -Message ('Error was in Line {0}' -f $line)
-         Write-Verbose -Message ('Error was {0}' -f $_)
+         #region ErrorHandler
+         # get error record
+         [Management.Automation.ErrorRecord]$e = $_
 
-         # Error Message
-         Write-Error -Message 'Unable to get the network details' -ErrorAction Stop
+         # retrieve information about runtime error
+         $info = [PSCustomObject]@{
+            Exception = $e.Exception.Message
+            Reason    = $e.CategoryInfo.Reason
+            Target    = $e.CategoryInfo.TargetName
+            Script    = $e.InvocationInfo.ScriptName
+            Line	  = $e.InvocationInfo.ScriptLineNumber
+            Column    = $e.InvocationInfo.OffsetInLine
+         }
+
+         Write-Verbose -Message $info
+
+         Write-Error -Message ($info.Exception) -ErrorAction Stop
 
          # Only here to catch a global ErrorAction overwrite
          break
+         #endregion ErrorHandler
       }
       finally
       {
+         #region ResetSslTrust
          # Reset the SSL Trust (make sure everything is back to default)
          [Net.ServicePointManager]::ServerCertificateValidationCallback = $null
+         #endregion ResetSslTrust
+
+         #region RestoreProgressPreference
+         $ProgressPreference = $ExistingProgressPreference
+         #endregion RestoreProgressPreference
       }
    }
 
@@ -349,8 +379,10 @@
       # Cleanup
       $SessionData = $null
 
-      # Restore ProgressPreference
+      #region RestoreProgressPreference
       $ProgressPreference = $ExistingProgressPreference
+      #endregion RestoreProgressPreference
+
+      Write-Verbose -Message 'Start Get-UnifiNetworkDetails'
    }
 }
-#get-help Get-UnifiNetworkDetails -Detailed

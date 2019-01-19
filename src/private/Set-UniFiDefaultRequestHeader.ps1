@@ -20,6 +20,8 @@
 
    begin
    {
+      Write-Verbose -Message 'Start Set-UniFiDefaultRequestHeader'
+
       # Cleanup
       $RestHeader = $null
    }
@@ -27,10 +29,16 @@
    process
    {
       Write-Verbose -Message 'Create the Default Request Header'
+
       $Global:RestHeader = @{
          'charset'    = 'utf-8'
          'Content-Type' = 'application/json'
       }
+
       Write-Verbose -Message ('Default Request Header is {0}' -f $RestHeader)
+   }
+
+   end {
+      Write-Verbose -Message 'Done Set-UniFiDefaultRequestHeader'
    }
 }
