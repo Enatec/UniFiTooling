@@ -2495,11 +2495,11 @@ function Get-UnifiSpeedTestResult
 
          .PARAMETER Timeframe
          Timeframe in hours, default is 24
-	
+
          .PARAMETER StartDate
          Start date (valid Date String)
          Default is now
-	
+
          .PARAMETER EndDate
          End date (valid Date String), default is now minus 24 hours
 
@@ -2630,7 +2630,7 @@ function Get-UnifiSpeedTestResult
                # Try to Logout
                try
                {
-                  if (-not (Get-UniFiIsAlive)) 
+                  if (-not (Get-UniFiIsAlive))
                   {
                      Throw
                   }
@@ -2693,7 +2693,7 @@ function Get-UnifiSpeedTestResult
          break
       }
       #endregion ReCheckSession
-      
+
       #region ConfigureDefaultDisplaySet
       $defaultDisplaySet = 'time', 'download', 'upload', 'latency'
 
@@ -2701,39 +2701,39 @@ function Get-UnifiSpeedTestResult
       $defaultDisplayPropertySet = (New-Object -TypeName System.Management.Automation.PSPropertySet -ArgumentList ('DefaultDisplayPropertySet', [string[]]$defaultDisplaySet))
       $PSStandardMembers = [Management.Automation.PSMemberInfo[]]@($defaultDisplayPropertySet)
       #endregion ConfigureDefaultDisplaySet
-      
+
       #region Filtering
       switch ($PsCmdlet.ParameterSetName)
       {
-         'TimeFrameSet' 
+         'TimeFrameSet'
          {
             Write-Verbose -Message 'TimeFrameSet'
-            if (-not ($StartDate)) 
+            if (-not ($StartDate))
             {
                if ($Timeframe)
                {
                   $StartDate = ((Get-Date).AddHours(-$Timeframe))
                }
-               else 
+               else
                {
                   $StartDate = ((Get-Date).AddDays(-1))
                }
             }
 
-            if (-not ($EndDate)) 
+            if (-not ($EndDate))
             {
                $EndDate = (Get-Date)
             }
          }
-         'DateSet' 
+         'DateSet'
          {
             Write-Verbose -Message 'DateSet'
-            if (-not ($StartDate)) 
+            if (-not ($StartDate))
             {
                $StartDate = ((Get-Date).AddDays(-1))
             }
 
-            if (-not ($EndDate)) 
+            if (-not ($EndDate))
             {
                $EndDate = (Get-Date)
             }
@@ -2772,9 +2772,9 @@ function Get-UnifiSpeedTestResult
 
          $Script:ApiRequestBodyInput = [PSCustomObject][ordered]@{
             attrs = @(
-               'xput_download', 
-               'xput_upload', 
-               'latency', 
+               'xput_download',
+               'xput_upload',
+               'latency',
                'time'
             )
             start = $FilterStartDate
@@ -2793,7 +2793,7 @@ function Get-UnifiSpeedTestResult
          $Script:ApiRequestBody = (ConvertTo-Json @paramConvertToJson)
 
          Write-Verbose -Message 'Send the Request'
-         
+
          $paramInvokeRestMethod = @{
             Method        = 'Post'
             Uri           = $ApiRequestUri
@@ -2804,7 +2804,7 @@ function Get-UnifiSpeedTestResult
             WebSession    = $RestSession
          }
          $Session = (Invoke-RestMethod @paramInvokeRestMethod)
-         
+
          Write-Verbose -Message ('Session Info: {0}' -f $Session)
       }
       catch
@@ -2851,9 +2851,9 @@ function Get-UnifiSpeedTestResult
          # Only here to catch a global ErrorAction overwrite
          break
       }
-      
+
       $Result = @()
-      
+
       foreach ($item in $Session.data)
       {
          $Object = $null
@@ -2865,7 +2865,7 @@ function Get-UnifiSpeedTestResult
             {
                $item.time
             }
-            else 
+            else
             {
                ConvertFrom-UnixTimeStamp -TimeStamp ($item.time) -Milliseconds
             }
@@ -2873,7 +2873,7 @@ function Get-UnifiSpeedTestResult
             {
                $item.xput_download
             }
-            else 
+            else
             {
                [math]::Round($item.xput_download,1)
             }
@@ -2881,14 +2881,14 @@ function Get-UnifiSpeedTestResult
             {
                $item.xput_upload
             }
-            else 
+            else
             {
                [math]::Round($item.xput_upload,1)
             }
          }
          $Result = $Result + $Object
       }
-      
+
       # Give this object a unique typename
       $Result.PSObject.TypeNames.Insert(0,'Speedtest.Result')
       $Result | Add-Member MemberSet PSStandardMembers $PSStandardMembers
