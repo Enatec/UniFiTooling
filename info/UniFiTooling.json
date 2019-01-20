@@ -8,7 +8,7 @@
     "FileList":  null,
     "TypesToProcess":  null,
     "DotNetFrameworkVersion":  null,
-    "LicenseUri":  "https://github.com/jhochwald/UniFiTooling/raw/master/LICENSE",
+    "LicenseUri":  "https://github.com/jhochwald/UniFiTooling/wiki/License",
     "RequireLicenseAcceptance":  false,
     "CompatiblePSEditions":  [
                                  "Core",

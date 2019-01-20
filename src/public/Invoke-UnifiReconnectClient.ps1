@@ -1,73 +1,30 @@
-﻿function Get-UnifiSpeedTestResult
+﻿function Invoke-UnifiReconnectClient
 {
    <#
          .SYNOPSIS
-         Get the UniFi Security Gateway (USG) Speed Test results
+         Reconnect a client device via the API of the UniFi Controller
 
          .DESCRIPTION
-         Get the UniFi Security Gateway (USG) Speed Test results
-
-         .PARAMETER Timeframe
-         Timeframe in hours, default is 24
-
-         .PARAMETER StartDate
-         Start date (valid Date String)
-         Default is now
-
-         .PARAMETER EndDate
-         End date (valid Date String), default is now minus 24 hours
+         Reconnect a client device via the API of the Ubiquiti UniFi Controller
 
          .PARAMETER UnifiSite
          UniFi Site as configured. The default is: default
 
-         .PARAMETER all
-         Get all existing Speed Test Results
-
-         .PARAMETER UniFiValues
-         Show results without modifications, like the UniFi Controller creates them
-
-         .PARAMETER last
-         Only test latest Speed Test Result will be displayed
+         .PARAMETER Mac
+         Client MAC address
 
          .EXAMPLE
-         PS C:\> Get-UnifiSpeedTestResult -last
+         PS C:\> Invoke-UnifiReconnectClient -Mac '84:3a:4b:cd:88:2D'
 
-         Only test latest Speed Test Result will be displayed
-
-         .EXAMPLE
-         PS C:\> Get-UnifiSpeedTestResult -all
-
-         Get all the UniFi Security Gateway (USG) Speed Test results
+         Reconnect a client device via the API of the UniFi Controller
 
          .EXAMPLE
-         PS C:\> Get-UnifiSpeedTestResult -all | Sort-Object -Property time
+         PS C:\> Invoke-UnifiReconnectClient -Mac '84:3a:4b:cd:88:2D' -UnifiSite 'Contoso'
 
-         Get all the UniFi Security Gateway (USG) Speed Test results, sorted by date
-
-         .EXAMPLE
-         PS C:\> Get-UnifiSpeedTestResult | Select-Object -Property *
-
-         Get the UniFi Security Gateway (USG) Speed Test results from the last 24 hours (default), returns all values
-
-         .EXAMPLE
-         PS C:\> Get-UnifiSpeedTestResult -UnifiSite 'Contoso'
-
-         Get the UniFi Security Gateway (USG) Speed Test results from the last 24 hours (default)
-
-         .EXAMPLE
-         PS C:\> Get-UnifiSpeedTestResult -Timeframe 48
-
-         Get the UniFi Security Gateway (USG) Speed Test results of the last 48 hours
-
-         .EXAMPLE
-         PS C:\> Get-UnifiSpeedTestResult -StartDate '1/16/2019 12:00 AM' -EndDate '1/16/2019 11:59:59 PM'
-
-         Get the UniFi Security Gateway (USG) Speed Test results for a given time/date
-         In the example, all results from 1/16/2019 (all day) will be returned
+         Reconnect a client device on Site 'Contoso' via the API of the UniFi Controller
 
          .NOTES
-         Initial version that makes it more human readable.
-         The filetring needs a few more tests
+         Initial version of the Ubiquiti UniFi Controller automation function
 
          .LINK
          Get-UniFiConfig
@@ -80,67 +37,40 @@
 
          .LINK
          Invoke-RestMethod
-
-         .LINK
-         ConvertFrom-UnixTimeStamp
-
-         .LINK
-         ConvertTo-UnixTimeStamp
    #>
-   [CmdletBinding(DefaultParameterSetName = 'DateSet',ConfirmImpact = 'None')]
-   [OutputType([psobject])]
+
+   [CmdletBinding(ConfirmImpact = 'None')]
+   [OutputType([bool])]
    param
    (
       [Parameter(ValueFromPipeline,
             ValueFromPipelineByPropertyName,
       Position = 0)]
-      [Alias('Start')]
-      [datetime]
-      $StartDate,
-      [Parameter(ParameterSetName = 'TimeFrameSet',
-            ValueFromPipeline,
-            ValueFromPipelineByPropertyName,
-      Position = 1)]
-      [Alias('hours')]
-      [int]
-      $Timeframe,
-      [Parameter(ParameterSetName = 'DateSet',
-            ValueFromPipeline,
-            ValueFromPipelineByPropertyName,
-      Position = 1)]
-      [ValidateNotNullOrEmpty()]
-      [datetime]
-      $EndDate = (Get-Date),
-      [Parameter(ValueFromPipeline,
-            ValueFromPipelineByPropertyName,
-      Position = 2)]
       [ValidateNotNullOrEmpty()]
       [Alias('Site')]
       [string]
       $UnifiSite = 'default',
-      [Parameter(ValueFromPipeline,
-            ValueFromPipelineByPropertyName,
-      Position = 3)]
-      [switch]
-      $all = $false,
-      [Parameter(ValueFromPipeline,
-            ValueFromPipelineByPropertyName,
-      Position = 4)]
-      [switch]
-      $UniFiValues = $false,
-      [Parameter(ValueFromPipeline,
-            ValueFromPipelineByPropertyName,
-      Position = 4)]
-      [switch]
-      $last = $false
+      [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
+            Position = 1,
+      HelpMessage = 'Client MAC address')]
+      [ValidateNotNullOrEmpty()]
+      [Alias('UniFiMac', 'MacAddress')]
+      [string]
+      $Mac
    )
 
    begin
    {
-      Write-Verbose -Message 'Start Get-UnifiSpeedTestResult'
+      Write-Verbose -Message 'Start Invoke-UnifiReconnectClient'
 
       # Cleanup
       $Session = $null
+
+      #region MacHandler
+      $Mac = $Mac.ToLower()
+      #endregion MacHandler
 
       #region SafeProgressPreference
       # Safe ProgressPreference and Setup SilentlyContinue for the function
@@ -168,7 +98,7 @@
                {
                   if (-not (Get-UniFiIsAlive))
                   {
-                     Throw
+                     throw
                   }
                }
                catch
@@ -212,7 +142,7 @@
                }
             }
          }
-         While ($RetryLoop -eq $false)
+         while ($RetryLoop -eq $false)
          #endregion LoginCheckLoop
       }
       #endregion CheckSession
@@ -230,61 +160,37 @@
       }
       #endregion ReCheckSession
 
-      #region ConfigureDefaultDisplaySet
-      $defaultDisplaySet = 'time', 'download', 'upload', 'latency'
-
-      # Create the default property display set
-      $defaultDisplayPropertySet = (New-Object -TypeName System.Management.Automation.PSPropertySet -ArgumentList ('DefaultDisplayPropertySet', [string[]]$defaultDisplaySet))
-      $PSStandardMembers = [Management.Automation.PSMemberInfo[]]@($defaultDisplayPropertySet)
-      #endregion ConfigureDefaultDisplaySet
-
-      #region Filtering
-      switch ($PsCmdlet.ParameterSetName)
+      #region MacHandler
+      <#
+            Make sure we have the right format
+      #>
+      $regex = '((\d|([a-f]|[A-F])){2}){6}'
+      [string]$Mac = $Mac.Trim().Replace(':', '').Replace('.', '').Replace('-', '')
+      if (($Mac.Length -eq 12) -and ($Mac -match $regex))
       {
-         'TimeFrameSet'
-         {
-            Write-Verbose -Message 'TimeFrameSet'
-            if (-not ($StartDate))
-            {
-               if ($Timeframe)
-               {
-                  $StartDate = ((Get-Date).AddHours(-$Timeframe))
-               }
-               else
-               {
-                  $StartDate = ((Get-Date).AddDays(-1))
-               }
-            }
-
-            if (-not ($EndDate))
-            {
-               $EndDate = (Get-Date)
-            }
-         }
-         'DateSet'
-         {
-            Write-Verbose -Message 'DateSet'
-            if (-not ($StartDate))
-            {
-               $StartDate = ((Get-Date).AddDays(-1))
-            }
-
-            if (-not ($EndDate))
-            {
-               $EndDate = (Get-Date)
-            }
-         }
+         [string]$Mac = ($Mac -replace '..(?!$)', '$&:')
       }
-
-      [string]$FilterStartDate = (ConvertTo-UnixTimestamp -Date $StartDate -Milliseconds)
-      [string]$FilterEndDate = (ConvertTo-UnixTimestamp -Date $EndDate -Milliseconds)
-
-      if (($all) -or ($last))
+      else
       {
-         $FilterStartDate = $null
-         $FilterEndDate = $null
+         # Verbose stuff
+         $Script:line = $_.InvocationInfo.ScriptLineNumber
+
+         Write-Verbose -Message ('Error was in Line {0}' -f $line)
+
+         # Error Message
+         Write-Error -Message ('Sorry, but {0} is a format that the UniFi Controller will nor understand' -f $Mac) -ErrorAction Stop
+
+         # Only here to catch a global ErrorAction overwrite
+         break
       }
-      #endregion Filtering
+      #endregion MacHandler
+
+      #region ApiRequestBodyInput
+      $Script:ApiRequestBodyInput = [PSCustomObject][ordered]@{
+         cmd = 'kick-sta'
+         mac = $Mac
+      }
+      #endregion ApiRequestBodyInput
    }
 
    process
@@ -314,23 +220,10 @@
          #region SetRequestURI
          Write-Verbose -Message 'Create the Request URI'
 
-         $ApiRequestUri = $ApiUri + 's/' + $UnifiSite + '/stat/report/archive.speedtest'
+         $ApiRequestUri = $ApiUri + 's/' + $UnifiSite + '/cmd/stamgr'
 
          Write-Verbose -Message ('URI: {0}' -f $ApiRequestUri)
          #endregion SetRequestURI
-
-         #region ApiRequestBodyInput
-         $Script:ApiRequestBodyInput = [PSCustomObject][ordered]@{
-            attrs = @(
-               'xput_download',
-               'xput_upload',
-               'latency',
-               'time'
-            )
-            start = $FilterStartDate
-            end   = $FilterEndDate
-         }
-         #endregion ApiRequestBodyInput
 
          #region ApiRequestBody
          $paramConvertToJson = @{
@@ -360,6 +253,7 @@
          $Session = (Invoke-RestMethod @paramInvokeRestMethod)
 
          Write-Verbose -Message "Session Meta: $(($Session.meta.rc | Out-String).Trim())"
+
          Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
          #endregion Request
       }
@@ -386,7 +280,7 @@
             Reason    = $e.CategoryInfo.Reason
             Target    = $e.CategoryInfo.TargetName
             Script    = $e.InvocationInfo.ScriptName
-            Line	  = $e.InvocationInfo.ScriptLineNumber
+            Line      = $e.InvocationInfo.ScriptLineNumber
             Column    = $e.InvocationInfo.OffsetInLine
          }
 
@@ -404,6 +298,10 @@
          # Reset the SSL Trust (make sure everything is back to default)
          [Net.ServicePointManager]::ServerCertificateValidationCallback = $null
          #endregion ResetSslTrust
+
+         #region RestoreProgressPreference
+         $ProgressPreference = $ExistingProgressPreference
+         #endregion RestoreProgressPreference
       }
 
       # check result
@@ -411,70 +309,26 @@
       {
          # Verbose stuff
          $Script:line = $_.InvocationInfo.ScriptLineNumber
+
          Write-Verbose -Message ('Error was in Line {0}' -f $line)
-         Write-Verbose -Message ('Error was {0}' -f $Session.meta.rc)
+
+         if ($Session.data)
+         {
+            Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+         }
 
          # Error Message
-         Write-Error -Message 'Unable to Login' -ErrorAction Stop
+         Write-Error -Message 'Unable to get the network list' -ErrorAction Stop
 
          # Only here to catch a global ErrorAction overwrite
          break
       }
-
-      $Result = @()
-
-      foreach ($item in $Session.data)
-      {
-         $Object = $null
-         $Object = [PSCustomObject][ordered]@{
-            id       = $item._id
-            latency  = $item.latency
-            oid      = $item.oid
-            time     = if ($UniFiValues)
-            {
-               $item.time
-            }
-            else
-            {
-               ConvertFrom-UnixTimeStamp -TimeStamp ($item.time) -Milliseconds
-            }
-            download = if ($UniFiValues)
-            {
-               $item.xput_download
-            }
-            else
-            {
-               [math]::Round($item.xput_download,1)
-            }
-            upload   = if ($UniFiValues)
-            {
-               $item.xput_upload
-            }
-            else
-            {
-               [math]::Round($item.xput_upload,1)
-            }
-         }
-         $Result = ($Result + $Object)
-      }
-
-      # Give this object a unique typename
-      $null = ($Result.PSObject.TypeNames.Insert(0,'Speedtest.Result'))
-      $null = ($Result | Add-Member MemberSet PSStandardMembers $PSStandardMembers)
-
-      #region IfLast
-      if ($last)
-      {
-         $Result = ($Result | Sort-Object -Property time | Select-Object -Last 1)
-      }
-      #endregion IfLast
-
    }
 
    end
    {
       # Dump the Result
-      $Result
+      Write-Output -InputObject $true
 
       # Cleanup
       $Session = $null
@@ -483,6 +337,6 @@
       $ProgressPreference = $ExistingProgressPreference
       #endregion RestoreProgressPreference
 
-      Write-Verbose -Message 'Start Get-UnifiSpeedTestResult'
+      Write-Verbose -Message 'Start Invoke-UnifiReconnectClient'
    }
 }

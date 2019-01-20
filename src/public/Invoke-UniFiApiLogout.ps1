@@ -86,7 +86,12 @@
          }
          $Session = (Invoke-RestMethod @paramInvokeRestMethod)
 
-         Write-Verbose -Message ('Session Info: {0}' -f $Session)
+         Write-Verbose -Message "Session Meta: $(($Session.meta.rc | Out-String).Trim())"
+
+         if ($Session.data)
+         {
+            Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+         }
          #region Request
       }
       catch
