@@ -78,7 +78,7 @@
       $Path = "$env:windir\System32\drivers\etc\hosts"
    )
    begin {
-      Write-Verbose -Message 'Start'
+      Write-Verbose -Message 'Start Add-HostsEntry'
    }
 
    process {
@@ -148,6 +148,6 @@
    }
 
    end {
-      Write-Verbose -Message 'Done'
+      Write-Verbose -Message 'Done Add-HostsEntry'
    }
 }

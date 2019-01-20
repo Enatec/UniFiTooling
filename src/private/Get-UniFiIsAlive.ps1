@@ -51,12 +51,16 @@
 
    begin
    {
+      Write-Verbose -Message 'Start Get-UniFiIsAlive'
+
       # Cleanup
       $Session = $null
 
+      #region SafeProgressPreference
       # Safe ProgressPreference and Setup SilentlyContinue for the function
       $ExistingProgressPreference = ($ProgressPreference)
       $ProgressPreference = 'SilentlyContinue'
+      #endregion SafeProgressPreference
 
       # Set the default to FALSE
       $SessionStatus = $false
@@ -66,28 +70,39 @@
    {
       try
       {
+         #region ReadConfig
          Write-Verbose -Message 'Read the Config'
 
          $null = (Get-UniFiConfig)
+         #endregion ReadConfig
 
+         #region CertificateHandler
          Write-Verbose -Message ('Certificate check - Should be {0}' -f $ApiSelfSignedCert)
 
          [Net.ServicePointManager]::ServerCertificateValidationCallback = {
             $ApiSelfSignedCert
          }
+         #endregion CertificateHandler
 
+         #region UniFiApiLogin
          $null = (Invoke-UniFiApiLogin -ErrorAction SilentlyContinue)
+         #endregion UniFiApiLogin
 
+         #region SetRequestHeader
          Write-Verbose -Message 'Set the API Call default Header'
 
          $null = (Set-UniFiDefaultRequestHeader)
+         #endregion SetRequestHeader
 
+         #region SetRequestURI
          Write-Verbose -Message 'Create the Request URI'
 
          $ApiRequestUri = $ApiUri + 's/' + $UnifiSite + '/self'
 
          Write-Verbose -Message ('URI: {0}' -f $ApiRequestUri)
+         #endregion SetRequestURI
 
+         #region Request
          Write-Verbose -Message 'Send the Request'
 
          $paramInvokeRestMethod = @{
@@ -103,6 +118,7 @@
          Write-Verbose -Message ('Session Info: {0}' -f $Session)
 
          $SessionStatus = $true
+         #endregion Request
       }
       catch
       {
@@ -148,13 +164,18 @@
       # Cleanup
       $Session = $null
 
-      # Restore ProgressPreference
-      $ProgressPreference = $ExistingProgressPreference
-
+      #region ResetSslTrust
       # Reset the SSL Trust (make sure everything is back to default)
       [Net.ServicePointManager]::ServerCertificateValidationCallback = $null
+      #endregion ResetSslTrust
+
+      #region RestoreProgressPreference
+      $ProgressPreference = $ExistingProgressPreference
+      #endregion RestoreProgressPreference
 
       # Dump the Result
-      Return $SessionStatus
+      $SessionStatus
+
+      Write-Verbose -Message 'Start Get-UniFiIsAlive'
    }
 }

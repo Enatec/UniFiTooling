@@ -8,7 +8,7 @@
     "FileList":  null,
     "TypesToProcess":  null,
     "DotNetFrameworkVersion":  null,
-    "LicenseUri":  "https://github.com/jhochwald/UniFiTooling/raw/master/LICENSE",
+    "LicenseUri":  "https://github.com/jhochwald/UniFiTooling/wiki/License",
     "RequireLicenseAcceptance":  false,
     "CompatiblePSEditions":  [
                                  "Core",
@@ -18,7 +18,7 @@
     "CLRVersion":  null,
     "PowerShellHostVersion":  null,
     "CmdletsToExport":  null,
-    "ReleaseNotes":  "Mainly a bugfix and refactoring release.",
+    "ReleaseNotes":  "Mainly a feature release with some bugfix and refactoring.",
     "Copyright":  "(c) 2019 by enabling Technology. All rights reserved.",
     "Tags":  [
                  "UniFi",
@@ -35,7 +35,7 @@
     "ExternalModuleDependencies":  null,
     "RequiredAssemblies":  null,
     "Prerelease":  null,
-    "ModuleVersion":  "1.0.8",
+    "ModuleVersion":  "1.0.9",
     "GUID":  "7fff91a0-02eb-4df2-84d5-c7d3cd7f7a5d",
     "PowerShellVersion":  "5.1",
     "CompanyName":  "enabling Technology",

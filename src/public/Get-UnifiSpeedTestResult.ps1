@@ -26,10 +26,23 @@
          .PARAMETER UniFiValues
          Show results without modifications, like the UniFi Controller creates them
 
+         .PARAMETER last
+         Only test latest Speed Test Result will be displayed
+
+         .EXAMPLE
+         PS C:\> Get-UnifiSpeedTestResult -last
+
+         Only test latest Speed Test Result will be displayed
+
          .EXAMPLE
          PS C:\> Get-UnifiSpeedTestResult -all
 
          Get all the UniFi Security Gateway (USG) Speed Test results
+
+         .EXAMPLE
+         PS C:\> Get-UnifiSpeedTestResult -all | Sort-Object -Property time
+
+         Get all the UniFi Security Gateway (USG) Speed Test results, sorted by date
 
          .EXAMPLE
          PS C:\> Get-UnifiSpeedTestResult | Select-Object -Property *
@@ -114,17 +127,26 @@
             ValueFromPipelineByPropertyName,
       Position = 4)]
       [switch]
-      $UniFiValues = $false
+      $UniFiValues = $false,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 4)]
+      [switch]
+      $last = $false
    )
 
    begin
    {
+      Write-Verbose -Message 'Start Get-UnifiSpeedTestResult'
+
       # Cleanup
       $Session = $null
 
+      #region SafeProgressPreference
       # Safe ProgressPreference and Setup SilentlyContinue for the function
       $ExistingProgressPreference = ($ProgressPreference)
       $ProgressPreference = 'SilentlyContinue'
+      #endregion SafeProgressPreference
 
       #region CheckSession
       if (-not (Get-UniFiIsAlive))
@@ -257,7 +279,7 @@
       [string]$FilterStartDate = (ConvertTo-UnixTimestamp -Date $StartDate -Milliseconds)
       [string]$FilterEndDate = (ConvertTo-UnixTimestamp -Date $EndDate -Milliseconds)
 
-      if ($all)
+      if (($all) -or ($last))
       {
          $FilterStartDate = $null
          $FilterEndDate = $null
@@ -269,21 +291,35 @@
    {
       try
       {
+         #region ReadConfig
          Write-Verbose -Message 'Read the Config'
-         $null = (Get-UniFiConfig)
 
+         $null = (Get-UniFiConfig)
+         #endregion ReadConfig
+
+         #region CertificateHandler
          Write-Verbose -Message ('Certificate check - Should be {0}' -f $ApiSelfSignedCert)
+
          [Net.ServicePointManager]::ServerCertificateValidationCallback = {
             $ApiSelfSignedCert
          }
+         #endregion CertificateHandler
 
+         #region SetRequestHeader
          Write-Verbose -Message 'Set the API Call default Header'
+
          $null = (Set-UniFiDefaultRequestHeader)
+         #endregion SetRequestHeader
 
+         #region SetRequestURI
          Write-Verbose -Message 'Create the Request URI'
-         $ApiRequestUri = $ApiUri + 's/' + $UnifiSite + '/stat/report/archive.speedtest'
-         Write-Verbose -Message ('URI: {0}' -f $ApiRequestUri)
 
+         $ApiRequestUri = $ApiUri + 's/' + $UnifiSite + '/stat/report/archive.speedtest'
+
+         Write-Verbose -Message ('URI: {0}' -f $ApiRequestUri)
+         #endregion SetRequestURI
+
+         #region ApiRequestBodyInput
          $Script:ApiRequestBodyInput = [PSCustomObject][ordered]@{
             attrs = @(
                'xput_download',
@@ -294,7 +330,9 @@
             start = $FilterStartDate
             end   = $FilterEndDate
          }
+         #endregion ApiRequestBodyInput
 
+         #region ApiRequestBody
          $paramConvertToJson = @{
             InputObject   = $ApiRequestBodyInput
             Depth         = 5
@@ -305,7 +343,9 @@
          $ApiRequestBodyInput = $null
 
          $Script:ApiRequestBody = (ConvertTo-Json @paramConvertToJson)
+         #endregion ApiRequestBody
 
+         #region Request
          Write-Verbose -Message 'Send the Request'
 
          $paramInvokeRestMethod = @{
@@ -319,7 +359,9 @@
          }
          $Session = (Invoke-RestMethod @paramInvokeRestMethod)
 
-         Write-Verbose -Message ('Session Info: {0}' -f $Session)
+         Write-Verbose -Message "Session Meta: $(($Session.meta.rc | Out-String).Trim())"
+         Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+         #endregion Request
       }
       catch
       {
@@ -334,21 +376,34 @@
             Write-Verbose -Message 'Logout failed'
          }
 
-         # Verbose stuff
-         $Script:line = $_.InvocationInfo.ScriptLineNumber
-         Write-Verbose -Message ('Error was in Line {0}' -f $line)
-         Write-Verbose -Message ('Error was {0}' -f $_)
+         #region ErrorHandler
+         # get error record
+         [Management.Automation.ErrorRecord]$e = $_
 
-         # Error Message
-         Write-Error -Message 'Unable to get Firewall Groups' -ErrorAction Stop
+         # retrieve information about runtime error
+         $info = [PSCustomObject]@{
+            Exception = $e.Exception.Message
+            Reason    = $e.CategoryInfo.Reason
+            Target    = $e.CategoryInfo.TargetName
+            Script    = $e.InvocationInfo.ScriptName
+            Line	  = $e.InvocationInfo.ScriptLineNumber
+            Column    = $e.InvocationInfo.OffsetInLine
+         }
+
+         Write-Verbose -Message $info
+
+         Write-Error -Message ($info.Exception) -ErrorAction Stop
 
          # Only here to catch a global ErrorAction overwrite
          break
+         #endregion ErrorHandler
       }
       finally
       {
+         #region ResetSslTrust
          # Reset the SSL Trust (make sure everything is back to default)
          [Net.ServicePointManager]::ServerCertificateValidationCallback = $null
+         #endregion ResetSslTrust
       }
 
       # check result
@@ -400,12 +455,20 @@
                [math]::Round($item.xput_upload,1)
             }
          }
-         $Result = $Result + $Object
+         $Result = ($Result + $Object)
       }
 
       # Give this object a unique typename
-      $Result.PSObject.TypeNames.Insert(0,'Speedtest.Result')
-      $Result | Add-Member MemberSet PSStandardMembers $PSStandardMembers
+      $null = ($Result.PSObject.TypeNames.Insert(0,'Speedtest.Result'))
+      $null = ($Result | Add-Member MemberSet PSStandardMembers $PSStandardMembers)
+
+      #region IfLast
+      if ($last)
+      {
+         $Result = ($Result | Sort-Object -Property time | Select-Object -Last 1)
+      }
+      #endregion IfLast
+
    }
 
    end
@@ -416,7 +479,10 @@
       # Cleanup
       $Session = $null
 
-      # Restore ProgressPreference
+      #region RestoreProgressPreference
       $ProgressPreference = $ExistingProgressPreference
+      #endregion RestoreProgressPreference
+
+      Write-Verbose -Message 'Start Get-UnifiSpeedTestResult'
    }
 }

@@ -56,7 +56,44 @@
 
    begin
    {
-      $HostsFileContent = Get-Content -Path $Path
+      Write-Verbose -Message 'Start Get-HostsFile'
+
+      try
+      {
+         # Get a clean (end of) file
+         $paramGetContent = @{
+            Path          = $Path
+            Raw           = $true
+            Force         = $true
+            ErrorAction   = 'Stop'
+            WarningAction = 'SilentlyContinue'
+         }
+         $HostsFileContent = (Get-Content @paramGetContent )
+      }
+      catch
+      {
+         #region ErrorHandler
+         # get error record
+         [Management.Automation.ErrorRecord]$e = $_
+
+         # retrieve information about runtime error
+         $info = [PSCustomObject]@{
+            Exception = $e.Exception.Message
+            Reason    = $e.CategoryInfo.Reason
+            Target    = $e.CategoryInfo.TargetName
+            Script    = $e.InvocationInfo.ScriptName
+            Line      = $e.InvocationInfo.ScriptLineNumber
+            Column    = $e.InvocationInfo.OffsetInLine
+         }
+
+         Write-Verbose -Message $info
+
+         Write-Error -Message ($info.Exception) -ErrorAction Stop
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+         #endregion ErrorHandler
+      }
    }
 
    process
@@ -81,5 +118,9 @@
             }
          }
       }
+   }
+
+   end {
+      Write-Verbose -Message 'Done Get-HostsFile'
    }
 }

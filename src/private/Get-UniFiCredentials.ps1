@@ -32,6 +32,8 @@
 
    begin
    {
+      Write-Verbose -Message 'Start Get-UniFiCredentials'
+
       # Cleanup
       $RawJson = $null
       $UnifiConfig = $null
@@ -49,15 +51,27 @@
       }
       catch
       {
-         # Verbose stuff
-         $Script:line = $_.InvocationInfo.ScriptLineNumber
-         Write-Verbose -Message ('Error was in Line {0}' -f $line)
+         #region ErrorHandler
+         # get error record
+         [Management.Automation.ErrorRecord]$e = $_
 
-         # Default error handling: Re-Throw the error
-         Write-Error -Message ('Error was {0}' -f $_) -ErrorAction Stop
+         # retrieve information about runtime error
+         $info = [PSCustomObject]@{
+            Exception = $e.Exception.Message
+            Reason    = $e.CategoryInfo.Reason
+            Target    = $e.CategoryInfo.TargetName
+            Script    = $e.InvocationInfo.ScriptName
+            Line	  = $e.InvocationInfo.ScriptLineNumber
+            Column    = $e.InvocationInfo.OffsetInLine
+         }
+
+         Write-Verbose -Message $info
+
+         Write-Error -Message ($info.Exception) -ErrorAction Stop
 
          # Only here to catch a global ErrorAction overwrite
          break
+         #endregion ErrorHandler
       }
 
       # Cleanup
@@ -92,5 +106,6 @@
       $RawJson = $null
       $UnifiConfig = $null
 
+      Write-Verbose -Message 'Start Get-UniFiCredentials'
    }
 }
