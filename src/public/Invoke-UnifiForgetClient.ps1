@@ -1,11 +1,11 @@
-﻿function Invoke-UnifiAuthorizeGuest
+﻿function Invoke-UnifiForgetClient
 {
    <#
          .SYNOPSIS
-         Authorize a client device via the API of the UniFi Controller
+         Forget one or more client devices via the API of the UniFi Controller
 
          .DESCRIPTION
-         Authorize a client device via the API of the Ubiquiti UniFi Controller
+         Forget one or more client devices via the API of the Ubiquiti UniFi Controller
 
          .PARAMETER UnifiSite
          UniFi Site as configured. The default is: default
@@ -13,51 +13,15 @@
          .PARAMETER Mac
          Client MAC address
 
-         .PARAMETER Minutes
-         Minutes (from now) until authorization expires, the default is 60 (1 hour)
+         .EXAMPLE
+         PS C:\> Invoke-UnifiForgetClient -Mac '84:3a:4b:cd:88:2D'
 
-         .PARAMETER Up
-         Upload speed limit in Kilobit per second (kbit/s)
-
-         .PARAMETER Down
-         Download speed limit in Kilobit per second (kbit/s)
-
-         .PARAMETER Limit
-         Data transfer limit in megabytes (MB), upload and download will be combined.
-         The default is unlimited
-
-         .PARAMETER AccessPoint
-         MAC address of the Access Point to which client is connected, should result in a much faster authorization
+         Forget one or more client devices via the API of the UniFi Controller
 
          .EXAMPLE
-         PS C:\> Invoke-UnifiAuthorizeGuest -Mac '84:3a:4b:cd:88:2D'
+         PS C:\> Invoke-UnifiForgetClient -Mac '84:3a:4b:cd:88:2D' -UnifiSite 'Contoso'
 
-         Authorize a client device via the API of the UniFi Controller
-
-         .EXAMPLE
-         PS C:\> Invoke-UnifiAuthorizeGuest -Mac '84:3a:4b:cd:88:2D' -AccessPoint '788a2059c699'
-
-         Authorize a client device via the API of the UniFi Controller, it used the AccessPoint with the Mac address 78:8a:20:59:c6:99 directly for a faster authorization
-
-         .EXAMPLE
-         PS C:\> Invoke-UnifiAuthorizeGuest -Mac '843a4bcd882D' -Minutes 180
-
-         Authorize a client device for 180 minutes via the API of the UniFi Controller
-
-         .EXAMPLE
-         PS C:\> Invoke-UnifiAuthorizeGuest -Mac '843a4bcd882D' -Up 1024 -Down 2048
-
-         Authorize a client device with a restriction of 1024 kbit/s upload rate and 2048 kbit/s download rate via the API of the UniFi Controller
-
-         .EXAMPLE
-         PS C:\> Invoke-UnifiAuthorizeGuest -Mac '843a4bcd882D' -Limit 102400
-
-         Authorize a client device with a limitation of  via 102400 megabytes of traffic (combined) the API of the UniFi Controller
-
-         .EXAMPLE
-         PS C:\> Invoke-UnifiAuthorizeGuest '84-3a-4b-cd-88-2D' -UnifiSite 'Contoso'
-
-         Authorize a client device on site 'Contoso' via the API of the UniFi Controller (The function will normalize the MAC Address for us)
+         Forget one or more client devices on Site 'Contoso' via the API of the UniFi Controller
 
          .NOTES
          Initial version of the Ubiquiti UniFi Controller automation function
@@ -93,98 +57,20 @@
       HelpMessage = 'Client MAC address')]
       [ValidateNotNullOrEmpty()]
       [Alias('UniFiMac', 'MacAddress')]
-      [string]
-      $Mac,
-      [Parameter(ValueFromPipeline,
-            ValueFromPipelineByPropertyName,
-      Position = 2)]
-      [Alias('UniFiMinutes')]
-      [int]
-      $Minutes = 60,
-      [Parameter(ValueFromPipeline,
-            ValueFromPipelineByPropertyName,
-      Position = 3)]
-      [Alias('UniFiUp')]
-      [int]
-      $Up = $null,
-      [Parameter(ValueFromPipeline,
-            ValueFromPipelineByPropertyName,
-      Position = 4)]
-      [int]
-      $Down = $null,
-      [Parameter(ValueFromPipeline,
-            ValueFromPipelineByPropertyName,
-      Position = 5)]
-      [Alias('MBytes', 'UniFiLimit', 'UniFiMBytes')]
-      [int]
-      $Limit = $null,
-      [Parameter(ValueFromPipeline,
-            ValueFromPipelineByPropertyName,
-      Position = 6)]
-      [Alias('UniFiAccessPoint', 'ApMac', 'UniFiApMac', 'ap_mac')]
-      [string]
-      $AccessPoint = $null
+      [string[]]
+      $Mac
    )
 
    begin
    {
-      Write-Verbose -Message 'Start Invoke-UnifiAuthorizeGuest'
+      Write-Verbose -Message 'Start Invoke-UnifiForgetClient'
 
       # Cleanup
       $Session = $null
 
       #region MacHandler
-      <#
-            Make sure we have the right format
-      #>
-      $regex = '((\d|([a-f]|[A-F])){2}){6}'
-      [string]$Mac = $Mac.Trim().Replace(':', '').Replace('.', '').Replace('-', '')
-      if (($Mac.Length -eq 12) -and ($Mac -match $regex))
-      {
-         [string]$Mac = ($Mac -replace '..(?!$)', '$&:')
-      }
-      else
-      {
-         # Verbose stuff
-         $Script:line = $_.InvocationInfo.ScriptLineNumber
-
-         Write-Verbose -Message ('Error was in Line {0}' -f $line)
-
-         # Error Message
-         Write-Error -Message ('Sorry, but {0} is a format that the UniFi Controller will nor understand' -f $Mac) -ErrorAction Stop
-
-         # Only here to catch a global ErrorAction overwrite
-         break
-      }
+      $Mac = $Mac.ToLower()
       #endregion MacHandler
-
-      #region AccessPointMacHandler
-      <#
-            Make sure we have the right format
-      #>
-      if ($AccessPoint)
-      {
-         $regex = '((\d|([a-f]|[A-F])){2}){6}'
-         [string]$AccessPoint = $AccessPoint.Trim().Replace(':', '').Replace('.', '').Replace('-', '')
-         if (($AccessPoint.Length -eq 12) -and ($AccessPoint -match $regex))
-         {
-            [string]$AccessPoint = ($AccessPoint -replace '..(?!$)', '$&:')
-         }
-         else
-         {
-            # Verbose stuff
-            $Script:line = $_.InvocationInfo.ScriptLineNumber
-
-            Write-Verbose -Message ('Error was in Line {0}' -f $line)
-
-            # Error Message
-            Write-Error -Message ('Sorry, but {0} is a format that the UniFi Controller will nor understand' -f $AccessPoint) -ErrorAction Stop
-
-            # Only here to catch a global ErrorAction overwrite
-            break
-         }
-      }
-      #endregion AccessPointMacHandler
 
       #region SafeProgressPreference
       # Safe ProgressPreference and Setup SilentlyContinue for the function
@@ -274,35 +160,35 @@
       }
       #endregion ReCheckSession
 
+      #region MacHandler
+      <#
+            Make sure we have the right format
+      #>
+      $regex = '((\d|([a-f]|[A-F])){2}){6}'
+      [string]$Mac = $Mac.Trim().Replace(':', '').Replace('.', '').Replace('-', '')
+      if (($Mac.Length -eq 12) -and ($Mac -match $regex))
+      {
+         [string]$Mac = ($Mac -replace '..(?!$)', '$&:')
+      }
+      else
+      {
+         # Verbose stuff
+         $Script:line = $_.InvocationInfo.ScriptLineNumber
+
+         Write-Verbose -Message ('Error was in Line {0}' -f $line)
+
+         # Error Message
+         Write-Error -Message ('Sorry, but {0} is a format that the UniFi Controller will nor understand' -f $Mac) -ErrorAction Stop
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+      }
+      #endregion MacHandler
+
       #region ApiRequestBodyInput
       $Script:ApiRequestBodyInput = [PSCustomObject][ordered]@{
-         cmd     = 'authorize-guest'
-         mac     = $Mac
-         minutes = $Minutes
-      }
-
-      if ($Up)
-      {
-         Write-Verbose -Message ('Add upload speed limit: {0}' -f $Up)
-         $ApiRequestBodyInput | Add-Member -MemberType NoteProperty -Name up -Value $Up -Force
-      }
-
-      if ($Down)
-      {
-         Write-Verbose -Message ('Add download speed limit: {0}' -f $Down)
-         $ApiRequestBodyInput | Add-Member -MemberType NoteProperty -Name down -Value $Down -Force
-      }
-
-      if ($Limit)
-      {
-         Write-Verbose -Message ('Add data transfer limit: {0}' -f $Limit)
-         $ApiRequestBodyInput | Add-Member -MemberType NoteProperty -Name bytes -Value $Limit -Force
-      }
-
-      if ($AccessPoint)
-      {
-         Write-Verbose -Message ('Use AP MAC address: {0}' -f $AccessPoint)
-         $ApiRequestBodyInput | Add-Member -MemberType NoteProperty -Name ap_mac -Value $AccessPoint -Force
+         cmd  = 'forget-sta'
+         macs = @($Mac)
       }
       #endregion ApiRequestBodyInput
    }
@@ -368,15 +254,7 @@
 
          Write-Verbose -Message "Session Meta: $(($Session.meta.rc | Out-String).Trim())"
 
-         if ($Session.data)
-         {
-            Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
-            $Result = $true
-         }
-         else
-         {
-            $Result = $false
-         }
+         Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
          #endregion Request
       }
       catch
@@ -433,7 +311,11 @@
          $Script:line = $_.InvocationInfo.ScriptLineNumber
 
          Write-Verbose -Message ('Error was in Line {0}' -f $line)
-         Write-Verbose -Message ('Error was {0}' -f $Session.meta.rc)
+
+         if ($Session.data)
+         {
+            Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+         }
 
          # Error Message
          Write-Error -Message 'Unable to get the network list' -ErrorAction Stop
@@ -455,6 +337,6 @@
       $ProgressPreference = $ExistingProgressPreference
       #endregion RestoreProgressPreference
 
-      Write-Verbose -Message 'Start Invoke-UnifiAuthorizeGuest'
+      Write-Verbose -Message 'Start Invoke-UnifiForgetClient'
    }
 }

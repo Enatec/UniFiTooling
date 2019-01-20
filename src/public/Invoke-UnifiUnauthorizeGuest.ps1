@@ -50,9 +50,9 @@
       [Alias('Site')]
       [string]
       $UnifiSite = 'default',
-      [Parameter(Mandatory = $true,
-            ValueFromPipeline = $true,
-            ValueFromPipelineByPropertyName = $true,
+      [Parameter(Mandatory,
+            ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
             Position = 1,
       HelpMessage = 'Client MAC address')]
       [ValidateNotNullOrEmpty()]
