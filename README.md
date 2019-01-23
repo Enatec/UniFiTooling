@@ -16,7 +16,7 @@ You will find some demo use cases within the [UseCases](https://github.com/Enate
 
 ### Version
 
-This document is based on UniFiTooling version 1.0.9
+This document is based on UniFiTooling version 1.0.10
 
 ### Status
 
