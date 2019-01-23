@@ -114,7 +114,7 @@ PrivateData = @{
         IconUri = 'https://github.com/Enatec/UniFiTooling/raw/master/src/other/powershell-project.png'
 
         # ReleaseNotes of this module
-        ReleaseNotes = 'A feature release. Transfer to a new home.'
+        ReleaseNotes = 'Project repository moved, URLs changed to the new home.'
 
         # Prerelease string of this module
         # Prerelease = ''
