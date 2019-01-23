@@ -22,7 +22,7 @@
 	Basic Installer for the UniFiTooling PowerShell Module
 
 	.EXAMPLE
-	PS C:\> iex (New-Object Net.WebClient).DownloadString("https://github.com/jhochwald/UniFiTooling/raw/master/Install.ps1")
+	PS C:\> iex (New-Object Net.WebClient).DownloadString("https://github.com/Enatec/UniFiTooling/raw/master/Install.ps1")
 
 	Basic Installer for the UniFiTooling PowerShell Module
 
@@ -39,7 +39,7 @@ begin
 {
 	# Variables
 	$ModuleName = 'UniFiTooling'
-	$DownloadURL = 'https://github.com/jhochwald/UniFiTooling/raw/master/release/UniFiTooling-current.zip'
+	$DownloadURL = 'https://github.com/Enatec/UniFiTooling/raw/master/release/UniFiTooling-current.zip'
 }
 
 process
