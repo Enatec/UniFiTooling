@@ -4,9 +4,9 @@ All notable changes to the **UniFiTooling** project will be documented in this f
 
 ---
 
-### 1.0.10 [Unreleased]
+### 1.0.10 - 2019-01-23
 
-A feature release.
+Repository moved, no real code changes.
 
 #### Deprecated
 
@@ -18,7 +18,7 @@ The folowing internal (private) commands will be removed in the next release (Ve
 
 - `Get-HostsFile`
 
-  They shouln't never be a part of this module. I just use them for some internal tests.
+  They should never be a part of this module. I just use them for some internal tests.
 
 ### 1.0.9 - 2019-01-20
 
