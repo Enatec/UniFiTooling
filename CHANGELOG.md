@@ -8,6 +8,14 @@ All notable changes to the **UniFiTooling** project will be documented in this f
 
 A feature release.
 
+#### Removed
+
+- `Get-HostsFile`
+
+- `Add-HostsEntry`
+
+- `Get-HostsFile`
+
 ### 1.0.10 - 2019-01-23
 
 Repository moved, no real code changes.
