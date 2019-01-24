@@ -4,6 +4,10 @@ All notable changes to the **UniFiTooling** project will be documented in this f
 
 ---
 
+### 1.0.11 [Unreleased]
+
+A feature release.
+
 ### 1.0.10 - 2019-01-23
 
 Repository moved, no real code changes.
