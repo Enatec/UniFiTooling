@@ -8,6 +8,10 @@ All notable changes to the **UniFiTooling** project will be documented in this f
 
 A feature release.
 
+#### Added
+
+- `CODEOWNERS` - Add GitHub code owners feature file
+
 #### Removed
 
 - `Get-HostsFile`
