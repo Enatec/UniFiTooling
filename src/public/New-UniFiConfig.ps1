@@ -119,6 +119,9 @@
    {
       Write-Verbose -Message 'Start New-UniFiConfig'
 
+      # Call meta function
+      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
+
       #region JsonInputData
       $JsonInputData = [PSCustomObject][ordered]@{
          Login          = [PSCustomObject][ordered]@{

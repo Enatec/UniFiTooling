@@ -65,6 +65,9 @@
    {
       Write-Verbose -Message 'Start Invoke-UnifiUnblockClient'
 
+      # Call meta function
+      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
+
       # Cleanup
       $Session = $null
 

@@ -130,6 +130,9 @@
    {
       Write-Verbose -Message 'Start Invoke-UnifiAuthorizeGuest'
 
+      # Call meta function
+      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
+
       # Cleanup
       $Session = $null
 

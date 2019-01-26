@@ -4,20 +4,23 @@ All notable changes to the **UniFiTooling** project will be documented in this f
 
 ---
 
-### 1.0.11 [Unreleased]
+### 1.0.11 - [Unreleased]
 
 A feature release.
 
 #### Added
 
 - `CODEOWNERS` - Add GitHub code owners feature file
+- `Get-CallerPreference` - Add private meta function
+
+#### Changed
+
+- `Get-CallerPreference` - Implemented private meta function usage to all (public/private) functions
 
 #### Removed
 
 - `Get-HostsFile`
-
 - `Add-HostsEntry`
-
 - `Get-HostsFile`
 
 ### 1.0.10 - 2019-01-23
@@ -29,9 +32,7 @@ Repository moved, no real code changes.
 The folowing internal (private) commands will be removed in the next release (Version 1.0.11):
 
 - `Get-HostsFile`
-
 - `Add-HostsEntry`
-
 - `Get-HostsFile`
 
   They should never be a part of this module. I just use them for some internal tests.
@@ -43,24 +44,18 @@ Mainly a feature release with some bugfixes and refactoring.
 #### Added
 
 - `Get-UnifiSpeedTestResult` has now a -last parameter to get only the latest result
-
 - `Invoke-UnifiAuthorizeGuest` - Authorize a client device via the API of the UniFi Controller
-
 - `Invoke-UnifiUnauthorizeGuest` - Unauthorize a client device via the API of the UniFi Controller
-
 - `Invoke-UnifiReconnectClient` - Reconnect a client device via the API of the UniFi Controller
-
 - `Invoke-UnifiBlockClient` - Block a client device via the API of the UniFi Controller
-
 - `Invoke-UnifiUnblockClient` - Unblock a client device via the API of the UniFi Controller
-
 - `Invoke-UnifiForgetClient` - Forget one or more client devices via the API of the UniFi Controller
 
-- #### Changed
+#### Changed
 
-  - Refactored a lot of code.
-  - Change the Verbose output (Detailed connection details)
-  - Change some links to the GitHub Wiki
+- Refactored a lot of code.
+- Change the Verbose output (Detailed connection details)
+- Change some links to the GitHub Wiki
 
 ### 1.0.8 - 2019-01-19
 
@@ -209,9 +204,37 @@ Initial internal Release
 - Migrated `Invoke-UBNTApiLogin` and `Invoke-UBNTApiLogout` from Invoke-WebRequest to Invoke-RestMethod
 - Better Session handling for `Invoke-UBNTApiRequest`
 
-### 0.9.0 - [Unreleased]
+### 0.8.0 - [YANKED]
 
-Initial internal Release
+Internal test release. Hard coded credentials!
+
+### 0.7.0 - [Unreleased]
+
+Internal test build
+
+### 0.6.0 - [Unreleased]
+
+Internal test build
+
+### 0.5.0 - [Unreleased]
+
+Internal test build
+
+### 0.4.0 - [Unreleased]
+
+Internal development release
+
+### 0.3.0 - [Unreleased]
+
+Internal test build
+
+### 0.2.0 - [Unreleased]
+
+Internal test release
+
+### 0.1.0 - [Unreleased]
+
+Initial internal release
 
 #### Added
 
@@ -232,11 +255,20 @@ We follow the [Semantic Versioning](https://semver.org/spec/v2.0.0.html) 2.0.0 g
 * `PATCH` version mostly backwards-compatible bug fixes and small changes.
 
 Sometimes, we use additional labels for pre-release and build metadata, e.g. `MAJOR.MINOR.PATCH-Beta`.
+
 If we run a special build, we also might append this to the regular format, e.g. `MAJOR.MINOR.PATCH.BUILD`.
+
+#### Update information
+
+- The patch number has changed (e.g. from 1.0.9 to 1.0.10) only minor changes are implemented or bugs are fixed. A patch version is mostly 100% backwards-compatible. Your script should work without any changes.
+
+- The Minor version has changed (e.g. from 1.0.32 to 1.1.0) bigger changes are implemented or bugs are fixed. A minor version should be 100% backwards-compatible. Your script should work without any changes.
+
+- The Major version has changed (e.g. from 1.9.99 to 2.0.0) major new functionality is introduced and it might not be fully backwards-compatible. That means that your existing script might not work without changing them. Please read this Release Notes very carefully.
 
 ---
 
-### Changelog Information
+### Information
 
 The format is mostly based on the idea of [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 

@@ -51,6 +51,9 @@
    {
       Write-Verbose -Message 'Start ConvertFrom-UnixTimeStamp'
 
+      # Call meta function
+      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
+
       # Set some defaults (Never change this!!!)
       $UnixStartTime = '1/1/1970'
 

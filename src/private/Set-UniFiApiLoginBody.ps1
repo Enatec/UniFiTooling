@@ -22,6 +22,9 @@
          {
             Write-Verbose -Message 'Start Set-UniFiApiLoginBody'
 
+            # Call meta function
+            $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
+
             # Cleanup
             $RestBody = $null
             $JsonBody = $null

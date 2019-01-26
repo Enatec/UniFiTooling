@@ -139,6 +139,9 @@
    {
       Write-Verbose -Message 'Start Get-UnifiSpeedTestResult'
 
+      # Call meta function
+      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
+
       # Cleanup
       $Session = $null
 
