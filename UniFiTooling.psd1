@@ -153,6 +153,7 @@ PrivateData = @{
 - Get-HostsFile should never be a part of this module. I just use them for some internal tests.
 
 ### Fixed
+- Fixed the Get-CallerPreference usage
 
 ### Security
 
