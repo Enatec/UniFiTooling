@@ -311,6 +311,93 @@ function ConvertFrom-UnixTimeStamp
    }
 }
 
+function ConvertTo-UniFiValidMacAddress
+{
+   <#
+         .SYNOPSIS
+         Check and transform the given Mac addess for UniFi API usage
+
+         .DESCRIPTION
+         Check and transform, if needed, the given Mac addess for UniFi API usage
+
+         .PARAMETER Mac
+         Client MAC address
+
+         .EXAMPLE
+         PS C:\> ConvertTo-UniFiValidMacAddress -Mac '84-3a-4b-cd-88-2D'
+
+         .NOTES
+         Helper to check and make sure we have the right format
+   #>
+
+   [CmdletBinding(ConfirmImpact = 'None')]
+   [OutputType([string])]
+   param
+   (
+      [Parameter(Mandatory,HelpMessage = 'Client MAC address',
+               ValueFromPipeline,
+               ValueFromPipelineByPropertyName,
+               Position = 0)]
+      [ValidateNotNullOrEmpty()]
+      [Alias('UniFiMac', 'MacAddress')]
+      [string]
+      $Mac
+   )
+
+   begin
+   {
+      Write-Verbose -Message 'Start ConvertTo-UniFiValidMacAddress'
+
+      # Call meta function
+      $paramGetCallerPreference = @{
+         Cmdlet        = $PSCmdlet
+         SessionState  = $ExecutionContext.SessionState
+         ErrorAction   = 'SilentlyContinue'
+         WarningAction = 'SilentlyContinue'
+      }
+      $null = (Get-CallerPreference @paramGetCallerPreference)
+   }
+
+   process
+   {
+      # Define the REGEX Filter
+      $regex = '((\d|([a-f]|[A-F])){2}){6}'
+
+      # Transform, if needed
+      [string]$Mac = $Mac.Trim().Replace(':', '').Replace('.', '').Replace('-', '')
+
+      # Mac everything lower case
+      $Mac = $Mac.ToLower()
+
+      # Do a check
+      if (($Mac.Length -eq 12) -and ($Mac -match $regex))
+      {
+         [string]$Mac = ($Mac -replace '..(?!$)', '$&:')
+      }
+      else
+      {
+         # Verbose stuff
+         $Script:line = $_.InvocationInfo.ScriptLineNumber
+
+         Write-Verbose -Message ('Error was in Line {0}' -f $line)
+
+         # Error Message
+         Write-Error -Message ('Sorry, but {0} is a format that the UniFi Controller will nor understand' -f $Mac) -ErrorAction Stop
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+      }
+   }
+
+   end
+   {
+      # Dump to the Console $Mac
+      $Mac
+
+      Write-Verbose -Message 'Start ConvertTo-UniFiValidMacAddress'
+   }
+}
+
 function ConvertTo-UnixTimeStamp
 {
    <#
@@ -1243,6 +1330,1030 @@ function Set-UniFiDefaultRequestHeader
 #endregion ModulePrivateFunctions
 
 #region ModulePublicFunctions
+function Get-Unifi5minutesApStats
+{
+   <#
+         .SYNOPSIS
+         5 minutes stats method for a single access point or all access points
+
+         .DESCRIPTION
+         5 minutes stats method for a single access point or all access points
+
+         .PARAMETER UnifiSite
+         ID of the client-device to be modified
+
+         .PARAMETER Start
+         Startpoint in UniFi Unix timestamp in milliseconds
+
+         .PARAMETER End
+         Endpoint in UniFi Unix timestamp in milliseconds
+
+         .EXAMPLE
+         PS C:\> Get-Unifi5minutesApStats
+
+         .NOTES
+         Defaults to the past 12 hours.
+         Make sure that the retention policy for 5 minutes stats is set to the correct value in the controller settings
+         TODO: Add missing MAC Parameter
+
+         .LINK
+         Get-UniFiConfig
+
+         .LINK
+         Set-UniFiDefaultRequestHeader
+
+         .LINK
+         Invoke-UniFiApiLogin
+
+         .LINK
+         Invoke-RestMethod
+   #>
+
+   [CmdletBinding(ConfirmImpact = 'None')]
+   param
+   (
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 0)]
+      [ValidateNotNullOrEmpty()]
+      [Alias('Site')]
+      [string]
+      $UnifiSite = 'default',
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 1)]
+      [Alias('Startpoint', 'StartTime')]
+      [String]
+      $Start,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 2)]
+      [Alias('EndPoint', 'EndTime')]
+      [string]
+      $End
+   )
+
+   begin
+   {
+      Write-Verbose -Message 'begin'
+   }
+
+   process
+   {
+      Write-Verbose -Message 'process'
+   }
+
+   end
+   {
+      Write-Verbose -Message 'end'
+   }
+}
+
+function Get-Unifi5minutesClientStats
+{
+   <#
+         .SYNOPSIS
+         5 minutes stats method for a single user/client device
+
+         .DESCRIPTION
+         5 minutes stats method for a single user/client device
+
+         .PARAMETER UnifiSite
+         ID of the client-device to be modified
+
+         .PARAMETER Start
+         Startpoint in UniFi Unix timestamp in milliseconds
+
+         .PARAMETER End
+         Endpoint in UniFi Unix timestamp in milliseconds
+
+         .EXAMPLE
+         PS C:\> Get-Unifi5minutesApStats
+
+         .NOTES
+         Defaults to the past 12 hours.
+         Make sure that the retention policy for 5 minutes stats is set to the correct value in the controller settings
+         TODO: Add missing MAC Parameter
+         TODO: Add missing attribs Parameter
+
+         .LINK
+         Get-UniFiConfig
+
+         .LINK
+         Set-UniFiDefaultRequestHeader
+
+         .LINK
+         Invoke-UniFiApiLogin
+
+         .LINK
+         Invoke-RestMethod
+   #>
+
+   [CmdletBinding(ConfirmImpact = 'None')]
+   param
+   (
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 0)]
+      [ValidateNotNullOrEmpty()]
+      [Alias('Site')]
+      [string]
+      $UnifiSite = 'default',
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 1)]
+      [Alias('Startpoint', 'StartTime')]
+      [String]
+      $Start,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 2)]
+      [Alias('EndPoint', 'EndTime')]
+      [string]
+      $End
+   )
+
+   begin
+   {
+      Write-Verbose -Message 'begin'
+   }
+
+   process
+   {
+      Write-Verbose -Message 'process'
+   }
+
+   end
+   {
+      Write-Verbose -Message 'end'
+   }
+}
+
+function Get-Unifi5minutesGatewayStats
+{
+   <#
+         .SYNOPSIS
+         5 minutes stats method for a single user/client device
+
+         .DESCRIPTION
+         5 minutes stats method for a single user/client device
+
+         .PARAMETER UnifiSite
+         ID of the client-device to be modified
+
+         .PARAMETER Start
+         Startpoint in UniFi Unix timestamp in milliseconds
+
+         .PARAMETER End
+         Endpoint in UniFi Unix timestamp in milliseconds
+
+         .EXAMPLE
+         PS C:\> Get-Unifi5minutesGatewayStats
+
+         .NOTES
+         Defaults to the past 12 hours.
+         Make sure that the retention policy for 5 minutes stats is set to the correct value in the controller settings
+         TODO: Add missing MAC Parameter
+         TODO: Add missing attribs Parameter
+
+         .LINK
+         Get-UniFiConfig
+
+         .LINK
+         Set-UniFiDefaultRequestHeader
+
+         .LINK
+         Invoke-UniFiApiLogin
+
+         .LINK
+         Invoke-RestMethod
+   #>
+
+   [CmdletBinding(ConfirmImpact = 'None')]
+   param
+   (
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 0)]
+      [ValidateNotNullOrEmpty()]
+      [Alias('Site')]
+      [string]
+      $UnifiSite = 'default',
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 1)]
+      [Alias('Startpoint', 'StartTime')]
+      [String]
+      $Start,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 2)]
+      [Alias('EndPoint', 'EndTime')]
+      [string]
+      $End
+   )
+
+   begin
+   {
+      Write-Verbose -Message 'begin'
+   }
+
+   process
+   {
+      Write-Verbose -Message 'process'
+   }
+
+   end
+   {
+      Write-Verbose -Message 'end'
+   }
+}
+
+function Get-Unifi5minutesSiteStats
+{
+   <#
+         .SYNOPSIS
+         5 minutes site stats method, defaults to the past 12 hours
+
+         .DESCRIPTION
+         5 minutes site stats method, defaults to the past 12 hours
+
+         .PARAMETER UnifiSite
+         ID of the client-device to be modified
+
+         .PARAMETER Start
+         Startpoint in UniFi Unix timestamp in milliseconds
+
+         .PARAMETER End
+         Endpoint in UniFi Unix timestamp in milliseconds
+
+         .EXAMPLE
+         PS C:\> Get-Unifi5minutesSiteStats
+
+         .NOTES
+         Defaults to the past 12 hours.
+         Make sure that the retention policy for 5 minutes stats is set to the correct value in the controller settings
+
+         .LINK
+         Get-UniFiConfig
+
+         .LINK
+         Set-UniFiDefaultRequestHeader
+
+         .LINK
+         Invoke-UniFiApiLogin
+
+         .LINK
+         Invoke-RestMethod
+   #>
+
+   [CmdletBinding(ConfirmImpact = 'None')]
+   param
+   (
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 0)]
+      [ValidateNotNullOrEmpty()]
+      [Alias('Site')]
+      [string]
+      $UnifiSite = 'default',
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 1)]
+      [Alias('Startpoint', 'StartTime')]
+      [String]
+      $Start,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 2)]
+      [Alias('EndPoint', 'EndTime')]
+      [string]
+      $End
+   )
+
+   begin
+   {
+      Write-Verbose -Message 'begin'
+   }
+
+   process
+   {
+      Write-Verbose -Message 'process'
+   }
+
+   end
+   {
+      Write-Verbose -Message 'end'
+   }
+}
+
+function Get-UnifiAllConnectedClients
+{
+<#
+	.SYNOPSIS
+		Method to fetch speed test results
+
+	.DESCRIPTION
+		Method to fetch speed test results
+
+	.PARAMETER UnifiSite
+		ID of the client-device to be modified
+
+	.PARAMETER Start
+		Startpoint in UniFi Unix timestamp in milliseconds
+
+	.PARAMETER End
+		Endpoint in UniFi Unix timestamp in milliseconds
+
+	.EXAMPLE
+		PS C:\> Get-UnifiAllConnectedClients
+
+	.NOTES
+TODO: Remove Start
+TODO: Remove End
+
+	.LINK
+		Get-UniFiConfig
+
+	.LINK
+		Set-UniFiDefaultRequestHeader
+
+	.LINK
+		Invoke-UniFiApiLogin
+
+	.LINK
+		Invoke-RestMethod
+#>
+
+	[CmdletBinding(ConfirmImpact = 'None')]
+	param
+	(
+		[Parameter(ValueFromPipeline,
+				   ValueFromPipelineByPropertyName,
+				   Position = 0)]
+		[ValidateNotNullOrEmpty()]
+		[Alias('Site')]
+		[string]
+		$UnifiSite = 'default',
+		[Parameter(ValueFromPipeline,
+				   ValueFromPipelineByPropertyName,
+				   Position = 1)]
+		[Alias('Startpoint', 'StartTime')]
+		[String]
+		$Start,
+		[Parameter(ValueFromPipeline,
+				   ValueFromPipelineByPropertyName,
+				   Position = 2)]
+		[Alias('EndPoint', 'EndTime')]
+		[string]
+		$End
+	)
+
+	begin
+	{
+		Write-Verbose -Message 'begin'
+	}
+
+	process
+	{
+		Write-Verbose -Message 'process'
+	}
+
+	end
+	{
+		Write-Verbose -Message 'end'
+	}
+}
+
+function Get-UnifiAllGuests
+{
+<#
+	.SYNOPSIS
+		Method to fetch speed test results
+
+	.DESCRIPTION
+		Method to fetch speed test results
+
+	.PARAMETER UnifiSite
+		ID of the client-device to be modified
+
+	.PARAMETER Start
+		Startpoint in UniFi Unix timestamp in milliseconds
+
+	.PARAMETER End
+		Endpoint in UniFi Unix timestamp in milliseconds
+
+	.EXAMPLE
+		PS C:\> Get-UnifiAllGuests
+
+	.NOTES
+TODO: Remove Start
+TODO: Remove End
+
+	.LINK
+		Get-UniFiConfig
+
+	.LINK
+		Set-UniFiDefaultRequestHeader
+
+	.LINK
+		Invoke-UniFiApiLogin
+
+	.LINK
+		Invoke-RestMethod
+#>
+
+	[CmdletBinding(ConfirmImpact = 'None')]
+	param
+	(
+		[Parameter(ValueFromPipeline,
+				   ValueFromPipelineByPropertyName,
+				   Position = 0)]
+		[ValidateNotNullOrEmpty()]
+		[Alias('Site')]
+		[string]
+		$UnifiSite = 'default',
+		[Parameter(ValueFromPipeline,
+				   ValueFromPipelineByPropertyName,
+				   Position = 1)]
+		[Alias('Startpoint', 'StartTime')]
+		[String]
+		$Start,
+		[Parameter(ValueFromPipeline,
+				   ValueFromPipelineByPropertyName,
+				   Position = 2)]
+		[Alias('EndPoint', 'EndTime')]
+		[string]
+		$End
+	)
+
+	begin
+	{
+		Write-Verbose -Message 'begin'
+	}
+
+	process
+	{
+		Write-Verbose -Message 'process'
+	}
+
+	end
+	{
+		Write-Verbose -Message 'end'
+	}
+}
+
+function Get-UnifiAuthorizations
+{
+<#
+	.SYNOPSIS
+		Method to fetch speed test results
+
+	.DESCRIPTION
+		Method to fetch speed test results
+
+	.PARAMETER UnifiSite
+		ID of the client-device to be modified
+
+	.PARAMETER Start
+		Startpoint in UniFi Unix timestamp in milliseconds
+
+	.PARAMETER End
+		Endpoint in UniFi Unix timestamp in milliseconds
+
+	.EXAMPLE
+		PS C:\> Get-UnifiAuthorizations
+
+	.NOTES
+
+	.LINK
+		Get-UniFiConfig
+
+	.LINK
+		Set-UniFiDefaultRequestHeader
+
+	.LINK
+		Invoke-UniFiApiLogin
+
+	.LINK
+		Invoke-RestMethod
+#>
+
+	[CmdletBinding(ConfirmImpact = 'None')]
+	param
+	(
+		[Parameter(ValueFromPipeline,
+				   ValueFromPipelineByPropertyName,
+				   Position = 0)]
+		[ValidateNotNullOrEmpty()]
+		[Alias('Site')]
+		[string]
+		$UnifiSite = 'default',
+		[Parameter(ValueFromPipeline,
+				   ValueFromPipelineByPropertyName,
+				   Position = 1)]
+		[Alias('Startpoint', 'StartTime')]
+		[String]
+		$Start,
+		[Parameter(ValueFromPipeline,
+				   ValueFromPipelineByPropertyName,
+				   Position = 2)]
+		[Alias('EndPoint', 'EndTime')]
+		[string]
+		$End
+	)
+
+	begin
+	{
+		Write-Verbose -Message 'begin'
+	}
+
+	process
+	{
+		Write-Verbose -Message 'process'
+	}
+
+	end
+	{
+		Write-Verbose -Message 'end'
+	}
+}
+
+function Get-UnifiClientDetails
+{
+<#
+	.SYNOPSIS
+		Method to fetch speed test results
+
+	.DESCRIPTION
+		Method to fetch speed test results
+
+	.PARAMETER UnifiSite
+		ID of the client-device to be modified
+
+	.PARAMETER Start
+		Startpoint in UniFi Unix timestamp in milliseconds
+
+	.PARAMETER End
+		Endpoint in UniFi Unix timestamp in milliseconds
+
+	.EXAMPLE
+		PS C:\> Get-UnifiClientDetails
+
+	.NOTES
+TODO: Remove Start
+TODO: Remove End
+TODO: Add client_mac client device MAC address
+
+	.LINK
+		Get-UniFiConfig
+
+	.LINK
+		Set-UniFiDefaultRequestHeader
+
+	.LINK
+		Invoke-UniFiApiLogin
+
+	.LINK
+		Invoke-RestMethod
+#>
+
+	[CmdletBinding(ConfirmImpact = 'None')]
+	param
+	(
+		[Parameter(ValueFromPipeline,
+				   ValueFromPipelineByPropertyName,
+				   Position = 0)]
+		[ValidateNotNullOrEmpty()]
+		[Alias('Site')]
+		[string]
+		$UnifiSite = 'default',
+		[Parameter(ValueFromPipeline,
+				   ValueFromPipelineByPropertyName,
+				   Position = 1)]
+		[Alias('Startpoint', 'StartTime')]
+		[String]
+		$Start,
+		[Parameter(ValueFromPipeline,
+				   ValueFromPipelineByPropertyName,
+				   Position = 2)]
+		[Alias('EndPoint', 'EndTime')]
+		[string]
+		$End
+	)
+
+	begin
+	{
+		Write-Verbose -Message 'begin'
+	}
+
+	process
+	{
+		Write-Verbose -Message 'process'
+	}
+
+	end
+	{
+		Write-Verbose -Message 'end'
+	}
+}
+
+function Get-UnifiClientLogins
+{
+<#
+	.SYNOPSIS
+		Method to fetch speed test results
+
+	.DESCRIPTION
+		Method to fetch speed test results
+
+	.PARAMETER UnifiSite
+		ID of the client-device to be modified
+
+	.PARAMETER Start
+		Startpoint in UniFi Unix timestamp in milliseconds
+
+	.PARAMETER End
+		Endpoint in UniFi Unix timestamp in milliseconds
+
+	.EXAMPLE
+		PS C:\> Get-UnifiClientLogins
+
+	.NOTES
+		TODO: mac = client MAC address
+      TODO: limit = maximum number of sessions to get (default value is 5)
+      TODO: Remove Start
+      TODO: Remove End
+
+	.LINK
+		Get-UniFiConfig
+
+	.LINK
+		Set-UniFiDefaultRequestHeader
+
+	.LINK
+		Invoke-UniFiApiLogin
+
+	.LINK
+		Invoke-RestMethod
+#>
+
+	[CmdletBinding(ConfirmImpact = 'None')]
+	param
+	(
+		[Parameter(ValueFromPipeline,
+				   ValueFromPipelineByPropertyName,
+				   Position = 0)]
+		[ValidateNotNullOrEmpty()]
+		[Alias('Site')]
+		[string]
+		$UnifiSite = 'default',
+		[Parameter(ValueFromPipeline,
+				   ValueFromPipelineByPropertyName,
+				   Position = 1)]
+		[Alias('Startpoint', 'StartTime')]
+		[String]
+		$Start,
+		[Parameter(ValueFromPipeline,
+				   ValueFromPipelineByPropertyName,
+				   Position = 2)]
+		[Alias('EndPoint', 'EndTime')]
+		[string]
+		$End
+	)
+
+	begin
+	{
+		Write-Verbose -Message 'begin'
+	}
+
+	process
+	{
+		Write-Verbose -Message 'process'
+	}
+
+	end
+	{
+		Write-Verbose -Message 'end'
+	}
+}
+
+function Get-UnifiDailyApStats
+{
+   <#
+         .SYNOPSIS
+         Daily stats method for a single access point or all access points
+
+         .DESCRIPTION
+         Daily stats method for a single access point or all access points
+
+         .PARAMETER UnifiSite
+         ID of the client-device to be modified
+
+         .PARAMETER Start
+         Startpoint in UniFi Unix timestamp in milliseconds
+
+         .PARAMETER End
+         Endpoint in UniFi Unix timestamp in milliseconds
+
+         .EXAMPLE
+         PS C:\> Get-UnifiDailyApStats
+
+         .NOTES
+         defaults to the past 7*24 hours
+         UniFi controller does not keep these stats longer than 5 hours with versions < 4.6.6
+         TODO: Add missing MAC Parameter
+
+         .LINK
+         Get-UniFiConfig
+
+         .LINK
+         Set-UniFiDefaultRequestHeader
+
+         .LINK
+         Invoke-UniFiApiLogin
+
+         .LINK
+         Invoke-RestMethod
+   #>
+
+   [CmdletBinding(ConfirmImpact = 'None')]
+   param
+   (
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 0)]
+      [ValidateNotNullOrEmpty()]
+      [Alias('Site')]
+      [string]
+      $UnifiSite = 'default',
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 1)]
+      [Alias('Startpoint', 'StartTime')]
+      [String]
+      $Start,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 2)]
+      [Alias('EndPoint', 'EndTime')]
+      [string]
+      $End
+   )
+
+   begin
+   {
+      Write-Verbose -Message 'begin'
+   }
+
+   process
+   {
+      Write-Verbose -Message 'process'
+   }
+
+   end
+   {
+      Write-Verbose -Message 'end'
+   }
+}
+
+function Get-UnifiDailyClientStats
+{
+   <#
+         .SYNOPSIS
+         Daily stats method for a single access point or all access points
+
+         .DESCRIPTION
+         Daily stats method for a single access point or all access points
+
+         .PARAMETER UnifiSite
+         ID of the client-device to be modified
+
+         .PARAMETER Start
+         Startpoint in UniFi Unix timestamp in milliseconds
+
+         .PARAMETER End
+         Endpoint in UniFi Unix timestamp in milliseconds
+
+         .EXAMPLE
+         PS C:\> Get-UnifiDailyClientStats
+
+         .NOTES
+         defaults to the past 7*24 hours
+         UniFi controller does not keep these stats longer than 5 hours with versions < 4.6.6
+         TODO: Add missing MAC Parameter
+         TODO: Add missing attribs Parameter
+
+         .LINK
+         Get-UniFiConfig
+
+         .LINK
+         Set-UniFiDefaultRequestHeader
+
+         .LINK
+         Invoke-UniFiApiLogin
+
+         .LINK
+         Invoke-RestMethod
+   #>
+
+   [CmdletBinding(ConfirmImpact = 'None')]
+   param
+   (
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 0)]
+      [ValidateNotNullOrEmpty()]
+      [Alias('Site')]
+      [string]
+      $UnifiSite = 'default',
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 1)]
+      [Alias('Startpoint', 'StartTime')]
+      [String]
+      $Start,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 2)]
+      [Alias('EndPoint', 'EndTime')]
+      [string]
+      $End
+   )
+
+   begin
+   {
+      Write-Verbose -Message 'begin'
+   }
+
+   process
+   {
+      Write-Verbose -Message 'process'
+   }
+
+   end
+   {
+      Write-Verbose -Message 'end'
+   }
+}
+
+function Get-UnifiDailyGatewayStats
+{
+   <#
+         .SYNOPSIS
+         Daily stats method for a single access point or all access points
+
+         .DESCRIPTION
+         Daily stats method for a single access point or all access points
+
+         .PARAMETER UnifiSite
+         ID of the client-device to be modified
+
+         .PARAMETER Start
+         Startpoint in UniFi Unix timestamp in milliseconds
+
+         .PARAMETER End
+         Endpoint in UniFi Unix timestamp in milliseconds
+
+         .EXAMPLE
+         PS C:\> Get-UnifiDailyGatewayStats
+
+         .NOTES
+         defaults to the past 7*24 hours
+         UniFi controller does not keep these stats longer than 5 hours with versions < 4.6.6
+         TODO: Add missing MAC Parameter
+         TODO: Add missing attribs Parameter
+
+         .LINK
+         Get-UniFiConfig
+
+         .LINK
+         Set-UniFiDefaultRequestHeader
+
+         .LINK
+         Invoke-UniFiApiLogin
+
+         .LINK
+         Invoke-RestMethod
+   #>
+
+   [CmdletBinding(ConfirmImpact = 'None')]
+   param
+   (
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 0)]
+      [ValidateNotNullOrEmpty()]
+      [Alias('Site')]
+      [string]
+      $UnifiSite = 'default',
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 1)]
+      [Alias('Startpoint', 'StartTime')]
+      [String]
+      $Start,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 2)]
+      [Alias('EndPoint', 'EndTime')]
+      [string]
+      $End
+   )
+
+   begin
+   {
+      Write-Verbose -Message 'begin'
+   }
+
+   process
+   {
+      Write-Verbose -Message 'process'
+   }
+
+   end
+   {
+      Write-Verbose -Message 'end'
+   }
+}
+
+function Get-UnifiDailySiteStats
+{
+   <#
+         .SYNOPSIS
+         Daily site stats method
+
+         .DESCRIPTION
+         Daily site stats method
+
+         .PARAMETER UnifiSite
+         ID of the client-device to be modified
+
+         .PARAMETER Start
+         Startpoint in UniFi Unix timestamp in milliseconds
+
+         .PARAMETER End
+         Endpoint in UniFi Unix timestamp in milliseconds
+
+         .EXAMPLE
+         PS C:\> Get-UnifiDailySiteStats
+
+         .NOTES
+         defaults to the past 52*7*24 hours
+
+         .LINK
+         Get-UniFiConfig
+
+         .LINK
+         Set-UniFiDefaultRequestHeader
+
+         .LINK
+         Invoke-UniFiApiLogin
+
+         .LINK
+         Invoke-RestMethod
+   #>
+
+   [CmdletBinding(ConfirmImpact = 'None')]
+   param
+   (
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 0)]
+      [ValidateNotNullOrEmpty()]
+      [Alias('Site')]
+      [string]
+      $UnifiSite = 'default',
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 1)]
+      [Alias('Startpoint', 'StartTime')]
+      [String]
+      $Start,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 2)]
+      [Alias('EndPoint', 'EndTime')]
+      [string]
+      $End
+   )
+
+   begin
+   {
+      Write-Verbose -Message 'begin'
+   }
+
+   process
+   {
+      Write-Verbose -Message 'process'
+   }
+
+   end
+   {
+      Write-Verbose -Message 'end'
+   }
+}
+
 function Get-UnifiFirewallGroupDetails
 {
    <#
@@ -1891,6 +3002,479 @@ function Get-UnifiFirewallGroups
 
       Write-Verbose -Message 'Done Get-UnifiFirewallGroups'
    }
+}
+
+function Get-UnifiHourlyApStats
+{
+   <#
+         .SYNOPSIS
+         Hourly stats method for a single access point or all access points
+
+         .DESCRIPTION
+         Hourly stats method for a single access point or all access points
+
+         .PARAMETER UnifiSite
+         ID of the client-device to be modified
+
+         .PARAMETER Start
+         Startpoint in UniFi Unix timestamp in milliseconds
+
+         .PARAMETER End
+         Endpoint in UniFi Unix timestamp in milliseconds
+
+         .EXAMPLE
+         PS C:\> Get-UnifiHourlyApStats
+
+         .NOTES
+         UniFi controller does not keep these stats longer than 5 hours with versions < 4.6.6
+         defaults to the past 7*24 hours
+         TODO: Add missing MAC Parameter
+
+         .LINK
+         Get-UniFiConfig
+
+         .LINK
+         Set-UniFiDefaultRequestHeader
+
+         .LINK
+         Invoke-UniFiApiLogin
+
+         .LINK
+         Invoke-RestMethod
+   #>
+
+   [CmdletBinding(ConfirmImpact = 'None')]
+   param
+   (
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 0)]
+      [ValidateNotNullOrEmpty()]
+      [Alias('Site')]
+      [string]
+      $UnifiSite = 'default',
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 1)]
+      [Alias('Startpoint', 'StartTime')]
+      [String]
+      $Start,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 2)]
+      [Alias('EndPoint', 'EndTime')]
+      [string]
+      $End
+   )
+
+   begin
+   {
+      Write-Verbose -Message 'begin'
+   }
+
+   process
+   {
+      Write-Verbose -Message 'process'
+   }
+
+   end
+   {
+      Write-Verbose -Message 'end'
+   }
+}
+
+function Get-UnifiHourlyClientStats
+{
+   <#
+         .SYNOPSIS
+         Hourly stats method for a single access point or all access points
+
+         .DESCRIPTION
+         Hourly stats method for a single access point or all access points
+
+         .PARAMETER UnifiSite
+         ID of the client-device to be modified
+
+         .PARAMETER Start
+         Startpoint in UniFi Unix timestamp in milliseconds
+
+         .PARAMETER End
+         Endpoint in UniFi Unix timestamp in milliseconds
+
+         .EXAMPLE
+         PS C:\> Get-UnifiHourlyClientStats
+
+         .NOTES
+         UniFi controller does not keep these stats longer than 5 hours with versions < 4.6.6
+         defaults to the past 7*24 hours
+         TODO: Add missing MAC Parameter
+         TODO: Add missing attribs Parameter
+
+         .LINK
+         Get-UniFiConfig
+
+         .LINK
+         Set-UniFiDefaultRequestHeader
+
+         .LINK
+         Invoke-UniFiApiLogin
+
+         .LINK
+         Invoke-RestMethod
+   #>
+
+   [CmdletBinding(ConfirmImpact = 'None')]
+   param
+   (
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 0)]
+      [ValidateNotNullOrEmpty()]
+      [Alias('Site')]
+      [string]
+      $UnifiSite = 'default',
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 1)]
+      [Alias('Startpoint', 'StartTime')]
+      [String]
+      $Start,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 2)]
+      [Alias('EndPoint', 'EndTime')]
+      [string]
+      $End
+   )
+
+   begin
+   {
+      Write-Verbose -Message 'begin'
+   }
+
+   process
+   {
+      Write-Verbose -Message 'process'
+   }
+
+   end
+   {
+      Write-Verbose -Message 'end'
+   }
+}
+
+function Get-UnifiHourlyGatewayStats
+{
+   <#
+         .SYNOPSIS
+         Hourly stats method for a single access point or all access points
+
+         .DESCRIPTION
+         Hourly stats method for a single access point or all access points
+
+         .PARAMETER UnifiSite
+         ID of the client-device to be modified
+
+         .PARAMETER Start
+         Startpoint in UniFi Unix timestamp in milliseconds
+
+         .PARAMETER End
+         Endpoint in UniFi Unix timestamp in milliseconds
+
+         .EXAMPLE
+         PS C:\> Get-UnifiHourlyGatewayStats
+
+         .NOTES
+         UniFi controller does not keep these stats longer than 5 hours with versions < 4.6.6
+         defaults to the past 7*24 hours
+         TODO: Add missing MAC Parameter
+         TODO: Add missing attribs Parameter
+
+         .LINK
+         Get-UniFiConfig
+
+         .LINK
+         Set-UniFiDefaultRequestHeader
+
+         .LINK
+         Invoke-UniFiApiLogin
+
+         .LINK
+         Invoke-RestMethod
+   #>
+
+   [CmdletBinding(ConfirmImpact = 'None')]
+   param
+   (
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 0)]
+      [ValidateNotNullOrEmpty()]
+      [Alias('Site')]
+      [string]
+      $UnifiSite = 'default',
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 1)]
+      [Alias('Startpoint', 'StartTime')]
+      [String]
+      $Start,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 2)]
+      [Alias('EndPoint', 'EndTime')]
+      [string]
+      $End
+   )
+
+   begin
+   {
+      Write-Verbose -Message 'begin'
+   }
+
+   process
+   {
+      Write-Verbose -Message 'process'
+   }
+
+   end
+   {
+      Write-Verbose -Message 'end'
+   }
+}
+
+function Get-UnifiHourlySiteStats
+{
+   <#
+         .SYNOPSIS
+         Hourly site stats method
+
+         .DESCRIPTION
+         Hourly site stats method
+
+         .PARAMETER UnifiSite
+         ID of the client-device to be modified
+
+         .PARAMETER Start
+         Startpoint in UniFi Unix timestamp in milliseconds
+
+         .PARAMETER End
+         Endpoint in UniFi Unix timestamp in milliseconds
+
+         .EXAMPLE
+         PS C:\> Get-UnifiHourlySiteStats
+
+         .NOTES
+         returns an array of hourly stats objects for the current site
+         defaults to the past 7*24 hours
+
+         .LINK
+         Get-UniFiConfig
+
+         .LINK
+         Set-UniFiDefaultRequestHeader
+
+         .LINK
+         Invoke-UniFiApiLogin
+
+         .LINK
+         Invoke-RestMethod
+   #>
+
+   [CmdletBinding(ConfirmImpact = 'None')]
+   param
+   (
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 0)]
+      [ValidateNotNullOrEmpty()]
+      [Alias('Site')]
+      [string]
+      $UnifiSite = 'default',
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 1)]
+      [Alias('Startpoint', 'StartTime')]
+      [String]
+      $Start,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 2)]
+      [Alias('EndPoint', 'EndTime')]
+      [string]
+      $End
+   )
+
+   begin
+   {
+      Write-Verbose -Message 'begin'
+   }
+
+   process
+   {
+      Write-Verbose -Message 'process'
+   }
+
+   end
+   {
+      Write-Verbose -Message 'end'
+   }
+}
+
+function Get-UnifiIdsIpsEvents
+{
+<#
+	.SYNOPSIS
+		Method to fetch speed test results
+
+	.DESCRIPTION
+		Method to fetch speed test results
+
+	.PARAMETER UnifiSite
+		ID of the client-device to be modified
+
+	.PARAMETER Start
+		Startpoint in UniFi Unix timestamp in milliseconds
+
+	.PARAMETER End
+		Endpoint in UniFi Unix timestamp in milliseconds
+
+	.EXAMPLE
+		PS C:\> Get-UnifiIdsIpsEvents
+
+	.NOTES
+		TODO: Add missing optinal limit Parameter (defaults to 10000)
+
+	.LINK
+		Get-UniFiConfig
+
+	.LINK
+		Set-UniFiDefaultRequestHeader
+
+	.LINK
+		Invoke-UniFiApiLogin
+
+	.LINK
+		Invoke-RestMethod
+#>
+
+	[CmdletBinding(ConfirmImpact = 'None')]
+	param
+	(
+		[Parameter(Mandatory = $false,
+				   ValueFromPipeline = $true,
+				   ValueFromPipelineByPropertyName = $true,
+				   Position = 0)]
+		[ValidateNotNullOrEmpty()]
+		[Alias('Site')]
+		[string]
+		$UnifiSite = 'default',
+		[Parameter(ValueFromPipeline = $true,
+				   ValueFromPipelineByPropertyName = $true,
+				   Position = 1)]
+		[Alias('Startpoint', 'StartTime')]
+		[String]
+		$Start,
+		[Parameter(ValueFromPipeline = $true,
+				   ValueFromPipelineByPropertyName = $true,
+				   Position = 2)]
+		[Alias('EndPoint', 'EndTime')]
+		[string]
+		$End
+	)
+
+	begin
+	{
+		Write-Verbose -Message 'begin'
+	}
+
+	process
+	{
+		Write-Verbose -Message 'process'
+	}
+
+	end
+	{
+		Write-Verbose -Message 'end'
+	}
+}
+
+function Get-UnifiLoginSessions
+{
+<#
+	.SYNOPSIS
+		Method to fetch speed test results
+
+	.DESCRIPTION
+		Method to fetch speed test results
+
+	.PARAMETER UnifiSite
+		ID of the client-device to be modified
+
+	.PARAMETER Start
+		Startpoint in UniFi Unix timestamp in milliseconds
+
+	.PARAMETER End
+		Endpoint in UniFi Unix timestamp in milliseconds
+
+	.EXAMPLE
+		PS C:\> Get-UnifiLoginSessions
+
+	.NOTES
+		TODO: mac = client MAC address to return sessions for (can only be used when start and end are also provided)
+      TODO: type = client type to return sessions for, can be 'all', 'guest' or 'user'; default value is 'all'
+
+	.LINK
+		Get-UniFiConfig
+
+	.LINK
+		Set-UniFiDefaultRequestHeader
+
+	.LINK
+		Invoke-UniFiApiLogin
+
+	.LINK
+		Invoke-RestMethod
+#>
+
+	[CmdletBinding(ConfirmImpact = 'None')]
+	param
+	(
+		[Parameter(ValueFromPipeline,
+				   ValueFromPipelineByPropertyName,
+				   Position = 0)]
+		[ValidateNotNullOrEmpty()]
+		[Alias('Site')]
+		[string]
+		$UnifiSite = 'default',
+		[Parameter(ValueFromPipeline,
+				   ValueFromPipelineByPropertyName,
+				   Position = 1)]
+		[Alias('Startpoint', 'StartTime')]
+		[String]
+		$Start,
+		[Parameter(ValueFromPipeline,
+				   ValueFromPipelineByPropertyName,
+				   Position = 2)]
+		[Alias('EndPoint', 'EndTime')]
+		[string]
+		$End
+	)
+
+	begin
+	{
+		Write-Verbose -Message 'begin'
+	}
+
+	process
+	{
+		Write-Verbose -Message 'process'
+	}
+
+	end
+	{
+		Write-Verbose -Message 'end'
+	}
 }
 
 function Get-UnifiNetworkDetails
@@ -3543,35 +5127,11 @@ function Invoke-UnifiAuthorizeGuest
    {
       Write-Verbose -Message 'Start Invoke-UnifiAuthorizeGuest'
 
-      # Call meta function
-      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
-
       # Cleanup
       $Session = $null
 
       #region MacHandler
-      <#
-            Make sure we have the right format
-      #>
-      $regex = '((\d|([a-f]|[A-F])){2}){6}'
-      [string]$Mac = $Mac.Trim().Replace(':', '').Replace('.', '').Replace('-', '')
-      if (($Mac.Length -eq 12) -and ($Mac -match $regex))
-      {
-         [string]$Mac = ($Mac -replace '..(?!$)', '$&:')
-      }
-      else
-      {
-         # Verbose stuff
-         $Script:line = $_.InvocationInfo.ScriptLineNumber
-
-         Write-Verbose -Message ('Error was in Line {0}' -f $line)
-
-         # Error Message
-         Write-Error -Message ('Sorry, but {0} is a format that the UniFi Controller will nor understand' -f $Mac) -ErrorAction Stop
-
-         # Only here to catch a global ErrorAction overwrite
-         break
-      }
+      [string]$Mac = (ConvertTo-UniFiValidMacAddress -Mac $Mac)
       #endregion MacHandler
 
       #region AccessPointMacHandler
@@ -3721,6 +5281,15 @@ function Invoke-UnifiAuthorizeGuest
          $ApiRequestBodyInput | Add-Member -MemberType NoteProperty -Name ap_mac -Value $AccessPoint -Force
       }
       #endregion ApiRequestBodyInput
+
+      # Call meta function
+		$paramGetCallerPreference = @{
+			Cmdlet	     = $PSCmdlet
+			SessionState = $ExecutionContext.SessionState
+			ErrorAction  = 'SilentlyContinue'
+			WarningAction = 'SilentlyContinue'
+		}
+		$null = (Get-CallerPreference @paramGetCallerPreference)
    }
 
    process
@@ -3942,15 +5511,8 @@ function Invoke-UnifiBlockClient
    {
       Write-Verbose -Message 'Start Invoke-UnifiBlockClient'
 
-      # Call meta function
-      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
-
       # Cleanup
       $Session = $null
-
-      #region MacHandler
-      $Mac = $Mac.ToLower()
-      #endregion MacHandler
 
       #region SafeProgressPreference
       # Safe ProgressPreference and Setup SilentlyContinue for the function
@@ -4041,28 +5603,7 @@ function Invoke-UnifiBlockClient
       #endregion ReCheckSession
 
       #region MacHandler
-      <#
-            Make sure we have the right format
-      #>
-      $regex = '((\d|([a-f]|[A-F])){2}){6}'
-      [string]$Mac = $Mac.Trim().Replace(':', '').Replace('.', '').Replace('-', '')
-      if (($Mac.Length -eq 12) -and ($Mac -match $regex))
-      {
-         [string]$Mac = ($Mac -replace '..(?!$)', '$&:')
-      }
-      else
-      {
-         # Verbose stuff
-         $Script:line = $_.InvocationInfo.ScriptLineNumber
-
-         Write-Verbose -Message ('Error was in Line {0}' -f $line)
-
-         # Error Message
-         Write-Error -Message ('Sorry, but {0} is a format that the UniFi Controller will nor understand' -f $Mac) -ErrorAction Stop
-
-         # Only here to catch a global ErrorAction overwrite
-         break
-      }
+      [string]$Mac = (ConvertTo-UniFiValidMacAddress -Mac $Mac)
       #endregion MacHandler
 
       #region ApiRequestBodyInput
@@ -4071,6 +5612,15 @@ function Invoke-UnifiBlockClient
          mac = $Mac
       }
       #endregion ApiRequestBodyInput
+
+      # Call meta function
+		$paramGetCallerPreference = @{
+			Cmdlet	     = $PSCmdlet
+			SessionState = $ExecutionContext.SessionState
+			ErrorAction  = 'SilentlyContinue'
+			WarningAction = 'SilentlyContinue'
+		}
+		$null = (Get-CallerPreference @paramGetCallerPreference)
    }
 
    process
@@ -4288,15 +5838,8 @@ function Invoke-UnifiForgetClient
    {
       Write-Verbose -Message 'Start Invoke-UnifiForgetClient'
 
-      # Call meta function
-      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
-
       # Cleanup
       $Session = $null
-
-      #region MacHandler
-      $Mac = $Mac.ToLower()
-      #endregion MacHandler
 
       #region SafeProgressPreference
       # Safe ProgressPreference and Setup SilentlyContinue for the function
@@ -4387,28 +5930,7 @@ function Invoke-UnifiForgetClient
       #endregion ReCheckSession
 
       #region MacHandler
-      <#
-            Make sure we have the right format
-      #>
-      $regex = '((\d|([a-f]|[A-F])){2}){6}'
-      [string]$Mac = $Mac.Trim().Replace(':', '').Replace('.', '').Replace('-', '')
-      if (($Mac.Length -eq 12) -and ($Mac -match $regex))
-      {
-         [string]$Mac = ($Mac -replace '..(?!$)', '$&:')
-      }
-      else
-      {
-         # Verbose stuff
-         $Script:line = $_.InvocationInfo.ScriptLineNumber
-
-         Write-Verbose -Message ('Error was in Line {0}' -f $line)
-
-         # Error Message
-         Write-Error -Message ('Sorry, but {0} is a format that the UniFi Controller will nor understand' -f $Mac) -ErrorAction Stop
-
-         # Only here to catch a global ErrorAction overwrite
-         break
-      }
+      [string]$Mac = (ConvertTo-UniFiValidMacAddress -Mac $Mac)
       #endregion MacHandler
 
       #region ApiRequestBodyInput
@@ -4417,6 +5939,15 @@ function Invoke-UnifiForgetClient
          macs = @($Mac)
       }
       #endregion ApiRequestBodyInput
+
+      # Call meta function
+		$paramGetCallerPreference = @{
+			Cmdlet	     = $PSCmdlet
+			SessionState = $ExecutionContext.SessionState
+			ErrorAction  = 'SilentlyContinue'
+			WarningAction = 'SilentlyContinue'
+		}
+		$null = (Get-CallerPreference @paramGetCallerPreference)
    }
 
    process
@@ -4634,15 +6165,8 @@ function Invoke-UnifiReconnectClient
    {
       Write-Verbose -Message 'Start Invoke-UnifiReconnectClient'
 
-      # Call meta function
-      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
-
       # Cleanup
       $Session = $null
-
-      #region MacHandler
-      $Mac = $Mac.ToLower()
-      #endregion MacHandler
 
       #region SafeProgressPreference
       # Safe ProgressPreference and Setup SilentlyContinue for the function
@@ -4733,28 +6257,7 @@ function Invoke-UnifiReconnectClient
       #endregion ReCheckSession
 
       #region MacHandler
-      <#
-            Make sure we have the right format
-      #>
-      $regex = '((\d|([a-f]|[A-F])){2}){6}'
-      [string]$Mac = $Mac.Trim().Replace(':', '').Replace('.', '').Replace('-', '')
-      if (($Mac.Length -eq 12) -and ($Mac -match $regex))
-      {
-         [string]$Mac = ($Mac -replace '..(?!$)', '$&:')
-      }
-      else
-      {
-         # Verbose stuff
-         $Script:line = $_.InvocationInfo.ScriptLineNumber
-
-         Write-Verbose -Message ('Error was in Line {0}' -f $line)
-
-         # Error Message
-         Write-Error -Message ('Sorry, but {0} is a format that the UniFi Controller will nor understand' -f $Mac) -ErrorAction Stop
-
-         # Only here to catch a global ErrorAction overwrite
-         break
-      }
+      [string]$Mac = (ConvertTo-UniFiValidMacAddress -Mac $Mac)
       #endregion MacHandler
 
       #region ApiRequestBodyInput
@@ -4763,6 +6266,15 @@ function Invoke-UnifiReconnectClient
          mac = $Mac
       }
       #endregion ApiRequestBodyInput
+
+      # Call meta function
+		$paramGetCallerPreference = @{
+			Cmdlet	     = $PSCmdlet
+			SessionState = $ExecutionContext.SessionState
+			ErrorAction  = 'SilentlyContinue'
+			WarningAction = 'SilentlyContinue'
+		}
+		$null = (Get-CallerPreference @paramGetCallerPreference)
    }
 
    process
@@ -4980,15 +6492,8 @@ function Invoke-UnifiUnauthorizeGuest
    {
       Write-Verbose -Message 'Start Invoke-UnifiUnauthorizeGuest'
 
-      # Call meta function
-      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
-
       # Cleanup
       $Session = $null
-
-      #region MacHandler
-      $Mac = $Mac.ToLower()
-      #endregion MacHandler
 
       #region SafeProgressPreference
       # Safe ProgressPreference and Setup SilentlyContinue for the function
@@ -5079,28 +6584,7 @@ function Invoke-UnifiUnauthorizeGuest
       #endregion ReCheckSession
 
       #region MacHandler
-      <#
-            Make sure we have the right format
-      #>
-      $regex = '((\d|([a-f]|[A-F])){2}){6}'
-      [string]$Mac = $Mac.Trim().Replace(':', '').Replace('.', '').Replace('-', '')
-      if (($Mac.Length -eq 12) -and ($Mac -match $regex))
-      {
-         [string]$Mac = ($Mac -replace '..(?!$)', '$&:')
-      }
-      else
-      {
-         # Verbose stuff
-         $Script:line = $_.InvocationInfo.ScriptLineNumber
-
-         Write-Verbose -Message ('Error was in Line {0}' -f $line)
-
-         # Error Message
-         Write-Error -Message ('Sorry, but {0} is a format that the UniFi Controller will nor understand' -f $Mac) -ErrorAction Stop
-
-         # Only here to catch a global ErrorAction overwrite
-         break
-      }
+      [string]$Mac = (ConvertTo-UniFiValidMacAddress -Mac $Mac)
       #endregion MacHandler
 
       #region ApiRequestBodyInput
@@ -5109,6 +6593,15 @@ function Invoke-UnifiUnauthorizeGuest
          mac = $Mac
       }
       #endregion ApiRequestBodyInput
+
+      # Call meta function
+		$paramGetCallerPreference = @{
+			Cmdlet	     = $PSCmdlet
+			SessionState = $ExecutionContext.SessionState
+			ErrorAction  = 'SilentlyContinue'
+			WarningAction = 'SilentlyContinue'
+		}
+		$null = (Get-CallerPreference @paramGetCallerPreference)
    }
 
    process
@@ -5331,15 +6824,8 @@ function Invoke-UnifiUnblockClient
    {
       Write-Verbose -Message 'Start Invoke-UnifiUnblockClient'
 
-      # Call meta function
-      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
-
       # Cleanup
       $Session = $null
-
-      #region MacHandler
-      $Mac = $Mac.ToLower()
-      #endregion MacHandler
 
       #region SafeProgressPreference
       # Safe ProgressPreference and Setup SilentlyContinue for the function
@@ -5430,28 +6916,7 @@ function Invoke-UnifiUnblockClient
       #endregion ReCheckSession
 
       #region MacHandler
-      <#
-            Make sure we have the right format
-      #>
-      $regex = '((\d|([a-f]|[A-F])){2}){6}'
-      [string]$Mac = $Mac.Trim().Replace(':', '').Replace('.', '').Replace('-', '')
-      if (($Mac.Length -eq 12) -and ($Mac -match $regex))
-      {
-         [string]$Mac = ($Mac -replace '..(?!$)', '$&:')
-      }
-      else
-      {
-         # Verbose stuff
-         $Script:line = $_.InvocationInfo.ScriptLineNumber
-
-         Write-Verbose -Message ('Error was in Line {0}' -f $line)
-
-         # Error Message
-         Write-Error -Message ('Sorry, but {0} is a format that the UniFi Controller will nor understand' -f $Mac) -ErrorAction Stop
-
-         # Only here to catch a global ErrorAction overwrite
-         break
-      }
+      [string]$Mac = (ConvertTo-UniFiValidMacAddress -Mac $Mac)
       #endregion MacHandler
 
       #region ApiRequestBodyInput
@@ -5460,6 +6925,15 @@ function Invoke-UnifiUnblockClient
          mac = $Mac
       }
       #endregion ApiRequestBodyInput
+
+      # Call meta function
+		$paramGetCallerPreference = @{
+			Cmdlet	     = $PSCmdlet
+			SessionState = $ExecutionContext.SessionState
+			ErrorAction  = 'SilentlyContinue'
+			WarningAction = 'SilentlyContinue'
+		}
+		$null = (Get-CallerPreference @paramGetCallerPreference)
    }
 
    process
@@ -5607,6 +7081,378 @@ function Invoke-UnifiUnblockClient
       #endregion RestoreProgressPreference
 
       Write-Verbose -Message 'Start Invoke-UnifiUnblockClient'
+   }
+}
+
+function New-UnifiClientDevice
+{
+   <#
+         .SYNOPSIS
+         Create a new user/client-device via the API of the UniFi Controller
+
+         .DESCRIPTION
+         Create a new user/client-device via the API of the Ubiquiti UniFi Controller
+
+         .PARAMETER UnifiSite
+         UniFi Site as configured. The default is: default
+
+         .PARAMETER Mac
+         Client MAC address
+
+         .PARAMETER Group
+         Value for the user group the new user/client-device should belong to which can be obtained from the output of XXX
+
+         .PARAMETER Name
+         Name to be given to the new user/client-device (optional)
+
+         .PARAMETER Note
+         Note to be applied to the new user/client-device (optional)
+
+         .EXAMPLE
+         PS C:\> New-UnifiClientDevice -Mac '84:3a:4b:cd:88:2D' -Group 'Value2'
+
+         Create a new user/client-device
+
+         .EXAMPLE
+         PS C:\> New-UnifiClientDevice -Mac '84:3a:4b:cd:88:2D' -Group 'Value2' -UnifiSite 'Contoso'
+
+         Create a new user/client-device on Site 'Contoso'
+
+         .NOTES
+         Initial version of the Ubiquiti UniFi Controller automation function
+
+         .LINK
+         Get-UniFiConfig
+
+         .LINK
+         Set-UniFiDefaultRequestHeader
+
+         .LINK
+         Invoke-UniFiApiLogin
+
+         .LINK
+         Invoke-RestMethod
+   #>
+
+   [CmdletBinding(ConfirmImpact = 'Low',
+   SupportsShouldProcess)]
+   [OutputType([psobject])]
+   param
+   (
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 0)]
+      [ValidateNotNullOrEmpty()]
+      [Alias('Site')]
+      [string]
+      $UnifiSite = 'default',
+      [Parameter(Mandatory,
+            ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+            Position = 1,
+      HelpMessage = 'Client MAC address')]
+      [ValidateNotNullOrEmpty()]
+      [Alias('UniFiMac', 'MacAddress')]
+      [string]
+      $Mac,
+      [Parameter(Mandatory,
+            ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+            Position = 2,
+      HelpMessage = 'Value for the user group the new user/client-device should belong to')]
+      [ValidateNotNullOrEmpty()]
+      [Alias('UniFiGroup', 'ClientGroup', 'UserGroup')]
+      [string]
+      $Group,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 3)]
+      [Alias('UniFiName', 'ClientName', 'UserName')]
+      [string]
+      $Name = $null,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 4)]
+      [Alias('UnifiNote', 'UserNote', 'ClientNote')]
+      [string]
+      $Note = $null
+   )
+
+   begin
+   {
+      Write-Verbose -Message 'Start New-UnifiClientDevice'
+
+      # Cleanup
+      $Session = $null
+
+      #region SafeProgressPreference
+      # Safe ProgressPreference and Setup SilentlyContinue for the function
+      $ExistingProgressPreference = ($ProgressPreference)
+      $ProgressPreference = 'SilentlyContinue'
+      #endregion SafeProgressPreference
+
+      #region CheckSession
+      if (-not (Get-UniFiIsAlive))
+      {
+         #region LoginCheckLoop
+         # TODO: Move to config
+         [int]$NumberOfRetries = '3'
+         [int]$RetryTimer = '5'
+         # Setup the Loop itself
+         $RetryLoop = $false
+         [int]$RetryCounter = '0'
+         # Original code/idea was by Thomas Maurer
+         do
+         {
+            try
+            {
+               # Try to Logout
+               try
+               {
+                  if (-not (Get-UniFiIsAlive))
+                  {
+                     throw
+                  }
+               }
+               catch
+               {
+                  # We don't care about that
+                  Write-Verbose -Message 'Logout failed'
+               }
+
+               # Try a Session check (login is inherited here within the helper function)
+               if (-not (Get-UniFiIsAlive -ErrorAction Stop -WarningAction SilentlyContinue))
+               {
+                  Write-Error -Message 'Login failed' -ErrorAction Stop -Category AuthenticationError
+               }
+
+               # End the Loop
+               $RetryLoop = $true
+            }
+            catch
+            {
+               if ($RetryCounter -gt $NumberOfRetries)
+               {
+                  Write-Warning -Message ('Could still not login, after {0} retries.' -f $NumberOfRetries)
+
+                  # Stay in the Loop
+                  $RetryLoop = $true
+               }
+               else
+               {
+                  if ($RetryCounter -eq 0)
+                  {
+                     Write-Warning -Message ('Could not login! Retrying in {0} seconds.' -f $RetryTimer)
+                  }
+                  else
+                  {
+                     Write-Warning -Message ('Retry {0} of {1} failed. Retrying in {2} seconds.' -f $RetryCounter, $NumberOfRetries, $RetryTimer)
+                  }
+
+                  $null = (Start-Sleep -Seconds $RetryTimer)
+
+                  $RetryCounter = $RetryCounter + 1
+               }
+            }
+         }
+         while ($RetryLoop -eq $false)
+         #endregion LoginCheckLoop
+      }
+      #endregion CheckSession
+
+      #region ReCheckSession
+      if (-not ($RestSession))
+      {
+         # Restore ProgressPreference
+         $ProgressPreference = $ExistingProgressPreference
+
+         Write-Error -Message 'Unable to login! Check the connection to the controller, SSL certificates, and your credentials!' -ErrorAction Stop -Category AuthenticationError
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+      }
+      #endregion ReCheckSession
+
+      #region MacHandler
+      [string]$Mac = (ConvertTo-UniFiValidMacAddress -Mac $Mac)
+      #endregion MacHandler
+
+      #region ApiRequestBodyInput
+      $Script:ApiRequestBodyInput = [PSCustomObject][ordered]@{
+         mac          = $Mac
+         usergroup_id = $Group
+      }
+
+      if ($Name)
+      {
+         $ApiRequestBodyInput.name = $Name
+      }
+
+      if ($Note)
+      {
+         $ApiRequestBodyInput.note = $Note
+         $ApiRequestBodyInput.noted = $true
+      }
+      #endregion ApiRequestBodyInput
+
+      # Call meta function
+		$paramGetCallerPreference = @{
+			Cmdlet	     = $PSCmdlet
+			SessionState = $ExecutionContext.SessionState
+			ErrorAction  = 'SilentlyContinue'
+			WarningAction = 'SilentlyContinue'
+		}
+		$null = (Get-CallerPreference @paramGetCallerPreference)
+   }
+
+   process
+   {
+      if ($PSCmdlet.ShouldProcess('user/client-device', 'Create'))
+      {
+         try
+         {
+            #region ReadConfig
+            Write-Verbose -Message 'Read the Config'
+
+            $null = (Get-UniFiConfig)
+            #endregion ReadConfig
+
+            #region CertificateHandler
+            Write-Verbose -Message ('Certificate check - Should be {0}' -f $ApiSelfSignedCert)
+
+            [Net.ServicePointManager]::ServerCertificateValidationCallback = {
+               $ApiSelfSignedCert
+            }
+            #endregion CertificateHandler
+
+            #region SetRequestHeader
+            Write-Verbose -Message 'Set the API Call default Header'
+
+            $null = (Set-UniFiDefaultRequestHeader)
+            #endregion SetRequestHeader
+
+            #region SetRequestURI
+            Write-Verbose -Message 'Create the Request URI'
+
+            $ApiRequestUri = $ApiUri + 's/' + $UnifiSite + '/group/user'
+
+            Write-Verbose -Message ('URI: {0}' -f $ApiRequestUri)
+            #endregion SetRequestURI
+
+            #region ApiRequestBody
+            $paramConvertToJson = @{
+               InputObject   = $ApiRequestBodyInput
+               Depth         = 5
+               ErrorAction   = 'Stop'
+               WarningAction = 'SilentlyContinue'
+            }
+
+            $ApiRequestBodyInput = $null
+
+            $Script:ApiRequestBody = (ConvertTo-Json @paramConvertToJson)
+            #endregion ApiRequestBody
+
+            #region Request
+            Write-Verbose -Message 'Send the Request'
+
+            $paramInvokeRestMethod = @{
+               Method        = 'Post'
+               Uri           = $ApiRequestUri
+               Headers       = $RestHeader
+               Body          = $ApiRequestBody
+               ErrorAction   = 'SilentlyContinue'
+               WarningAction = 'SilentlyContinue'
+               WebSession    = $RestSession
+            }
+            $Session = (Invoke-RestMethod @paramInvokeRestMethod)
+
+            Write-Verbose -Message "Session Meta: $(($Session.meta.rc | Out-String).Trim())"
+
+            Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+            #endregion Request
+         }
+         catch
+         {
+            # Try to Logout
+            try
+            {
+               $null = (Invoke-UniFiApiLogout -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
+            }
+            catch
+            {
+               # We don't care about that
+               Write-Verbose -Message 'Logout failed'
+            }
+
+            #region ErrorHandler
+            # get error record
+            [Management.Automation.ErrorRecord]$e = $_
+
+            # retrieve information about runtime error
+            $info = [PSCustomObject]@{
+               Exception = $e.Exception.Message
+               Reason    = $e.CategoryInfo.Reason
+               Target    = $e.CategoryInfo.TargetName
+               Script    = $e.InvocationInfo.ScriptName
+               Line      = $e.InvocationInfo.ScriptLineNumber
+               Column    = $e.InvocationInfo.OffsetInLine
+            }
+
+            Write-Verbose -Message $info
+
+            Write-Error -Message ($info.Exception) -ErrorAction Stop
+
+            # Only here to catch a global ErrorAction overwrite
+            break
+            #endregion ErrorHandler
+         }
+         finally
+         {
+            #region ResetSslTrust
+            # Reset the SSL Trust (make sure everything is back to default)
+            [Net.ServicePointManager]::ServerCertificateValidationCallback = $null
+            #endregion ResetSslTrust
+
+            #region RestoreProgressPreference
+            $ProgressPreference = $ExistingProgressPreference
+            #endregion RestoreProgressPreference
+         }
+
+         # check result
+         if ($Session.meta.rc -ne 'ok')
+         {
+            # Verbose stuff
+            $Script:line = $_.InvocationInfo.ScriptLineNumber
+
+            Write-Verbose -Message ('Error was in Line {0}' -f $line)
+
+            if ($Session.data)
+            {
+               Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+            }
+
+            # Error Message
+            Write-Error -Message 'Unable to get the network list' -ErrorAction Stop
+
+            # Only here to catch a global ErrorAction overwrite
+            break
+         }
+      }
+   }
+
+   end
+   {
+      # Dump the Result
+      Write-Output -InputObject $true
+
+      # Cleanup
+      $Session = $null
+
+      #region RestoreProgressPreference
+      $ProgressPreference = $ExistingProgressPreference
+      #endregion RestoreProgressPreference
+
+      Write-Verbose -Message 'Start New-UnifiClientDevice'
    }
 }
 
@@ -5809,6 +7655,364 @@ function New-UniFiConfig
 
       Write-Verbose -Message 'Done New-UniFiConfig'
    }
+}
+
+function Set-UnifiClientDeviceName
+{
+   <#
+         .SYNOPSIS
+         Add/modify/remove a client device name
+
+         .DESCRIPTION
+         Add/modify/remove a client device name
+
+         .PARAMETER Site
+         UniFi Site as configured. The default is: default
+
+         .PARAMETER Client
+         ID of the client device to be modified
+
+         .PARAMETER Name
+         Name to be applied to the client device
+
+         .EXAMPLE
+         PS C:\> Set-UnifiClientDeviceName -Client 'Value1'
+
+         .NOTES
+         Initial version of the Ubiquiti UniFi Controller automation function
+
+         .LINK
+         Get-UniFiConfig
+
+         .LINK
+         Set-UniFiDefaultRequestHeader
+
+         .LINK
+         Invoke-UniFiApiLogin
+
+         .LINK
+         Invoke-RestMethod
+   #>
+
+   [CmdletBinding(ConfirmImpact = 'Low',
+   SupportsShouldProcess)]
+   param
+   (
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 0)]
+      [ValidateNotNullOrEmpty()]
+      [Alias('Site')]
+      [string]
+      $UnifiSite = 'default',
+      [Parameter(Mandatory,
+            ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+            Position = 1,
+      HelpMessage = 'ID of the client-device to be modified')]
+      [ValidateNotNullOrEmpty()]
+      [Alias('UniFiClient', 'UniFiUser', 'UniFiID')]
+      [string]
+      $Client,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 2)]
+      [Alias('UniFiName', 'UniFiClientName', 'UniFiUserName')]
+      [string]
+      $Name
+   )
+
+   begin
+   {
+		Write-Verbose -Message 'begin'
+   }
+
+   process
+   {
+      if ($pscmdlet.ShouldProcess('client-device', 'Add/modify/remove'))
+      {
+         Write-Verbose -Message 'process'
+      }
+   }
+
+   end
+   {
+		Write-Verbose -Message 'end'
+   }
+}
+
+function Set-UnifiClientDeviceNote
+{
+<#
+	.SYNOPSIS
+		Add/modify/remove a client-device note
+
+	.DESCRIPTION
+		Add/modify/remove a client-device note
+
+	.PARAMETER UnifiSite
+		A description of the UnifiSite parameter.
+
+	.PARAMETER Client
+		ID of the client-device to be modified
+
+	.PARAMETER Note
+		Note to be applied to the client-device (optional)
+
+	.EXAMPLE
+		PS C:\> Set-UnifiClientDeviceNote -Client 'Value1'
+
+	.NOTES
+		Initial version of the Ubiquiti UniFi Controller automation function
+
+         .LINK
+         Get-UniFiConfig
+
+         .LINK
+         Set-UniFiDefaultRequestHeader
+
+         .LINK
+         Invoke-UniFiApiLogin
+
+         .LINK
+         Invoke-RestMethod
+#>
+
+	[CmdletBinding(ConfirmImpact = 'Low',
+				   SupportsShouldProcess)]
+	param
+	(
+		[Parameter(ValueFromPipeline,
+				   ValueFromPipelineByPropertyName,
+				   Position = 0)]
+		[ValidateNotNullOrEmpty()]
+		[Alias('Site')]
+		[string]
+		$UnifiSite = 'default',
+		[Parameter(Mandatory,
+				   ValueFromPipeline,
+				   ValueFromPipelineByPropertyName,
+				   Position = 1,
+				   HelpMessage = 'ID of the client-device to be modified')]
+		[ValidateNotNullOrEmpty()]
+		[Alias('UniFiClient', 'UniFiUser', 'UniFiID')]
+		[string]
+		$Client,
+		[Parameter(ValueFromPipeline,
+				   ValueFromPipelineByPropertyName,
+				   Position = 2)]
+		[Alias('UniFiNote', 'UniFiClientNote', 'UniFiUserNote')]
+		[string]
+		$Note = $null
+	)
+
+	begin
+	{
+
+	}
+
+	process
+	{
+		if ($pscmdlet.ShouldProcess("client-device", "Add/modify/remove"))
+		{
+			#TODO: Place script here
+		}
+	}
+
+	end
+	{
+
+	}
+}
+
+function Set-UniFiClientGroup
+{
+<#
+	.SYNOPSIS
+		Assign client device to another group
+
+	.DESCRIPTION
+		Assign client device to another group
+
+	.PARAMETER UnifiSite
+		ID of the client-device to be modified
+
+	.PARAMETER Client
+		id of the user device to be modified
+
+	.PARAMETER Group
+		id of the user group to assign user to
+
+	.EXAMPLE
+		PS C:\> Set-UniFiClientGroup
+
+	.NOTES
+		TBD
+
+	.LINK
+		Get-UniFiConfig
+
+	.LINK
+		Set-UniFiDefaultRequestHeader
+
+	.LINK
+		Invoke-UniFiApiLogin
+
+	.LINK
+		Invoke-RestMethod
+#>
+
+	[CmdletBinding(ConfirmImpact = 'None',
+				   SupportsShouldProcess)]
+	param
+	(
+		[Parameter(ValueFromPipeline,
+				   ValueFromPipelineByPropertyName,
+				   Position = 0)]
+		[ValidateNotNullOrEmpty()]
+		[Alias('Site')]
+		[string]
+		$UnifiSite = 'default',
+		[Parameter(Mandatory,
+				   ValueFromPipeline,
+				   ValueFromPipelineByPropertyName,
+				   Position = 1,
+				   HelpMessage = 'id of the user device to be modified')]
+		[ValidateNotNullOrEmpty()]
+		[Alias('ClientID', 'UniFiClient')]
+		[string]
+		$Client,
+		[Parameter(Mandatory,
+				   ValueFromPipeline,
+				   ValueFromPipelineByPropertyName,
+				   Position = 2,
+				   HelpMessage = 'id of the user group to assign user to')]
+		[ValidateNotNullOrEmpty()]
+		[Alias('GroupId', 'UniFiGroup')]
+		[string]
+		$Group
+	)
+
+	begin
+	{
+		Write-Verbose -Message 'begin'
+	}
+
+	process
+	{
+		if ($pscmdlet.ShouldProcess('client-device', 'Move to Group_ID'))
+		{
+			Write-Verbose -Message 'process'
+		}
+	}
+
+	end
+	{
+		Write-Verbose -Message 'end'
+	}
+}
+
+function Set-UniFiClientIpAddress
+{
+<#
+	.SYNOPSIS
+		Update client fixedip
+
+	.DESCRIPTION
+		Update client fixedip
+
+	.PARAMETER UnifiSite
+		ID of the client-device to be modified
+
+	.PARAMETER Client
+		id of the user device to be modified
+
+	.PARAMETER UseFixedIp
+		boolean defining whether if use_fixedip is true or false
+
+	.PARAMETER Network
+		network id where the ip belongs to
+
+	.PARAMETER FixedIp
+		value of client fixed_ip field
+
+	.EXAMPLE
+		PS C:\> Set-UniFiClientGroup
+
+	.NOTES
+		TBD
+
+	.LINK
+		Get-UniFiConfig
+
+	.LINK
+		Set-UniFiDefaultRequestHeader
+
+	.LINK
+		Invoke-UniFiApiLogin
+
+	.LINK
+		Invoke-RestMethod
+#>
+
+	[CmdletBinding(ConfirmImpact = 'None',
+				   SupportsShouldProcess = $true)]
+	param
+	(
+		[Parameter(Mandatory = $false,
+				   ValueFromPipeline = $true,
+				   ValueFromPipelineByPropertyName = $true,
+				   Position = 0)]
+		[ValidateNotNullOrEmpty()]
+		[Alias('Site')]
+		[string]
+		$UnifiSite = 'default',
+		[Parameter(Mandatory = $true,
+				   ValueFromPipeline = $true,
+				   ValueFromPipelineByPropertyName = $true,
+				   Position = 1,
+				   HelpMessage = 'id of the user device to be modified')]
+		[ValidateNotNullOrEmpty()]
+		[Alias('ClientID', 'UniFiClient')]
+		[string]
+		$Client,
+		[Parameter(ValueFromPipeline = $true,
+				   ValueFromPipelineByPropertyName = $true,
+				   Position = 2)]
+		[Alias('UniFiUseFixedIp')]
+		[switch]
+		$UseFixedIp = $false,
+		[Parameter(ValueFromPipeline = $true,
+				   ValueFromPipelineByPropertyName = $true,
+				   Position = 3)]
+		[Alias('UniFiNetwork')]
+		[string]
+		$Network,
+		[Parameter(ValueFromPipeline = $true,
+				   ValueFromPipelineByPropertyName = $true,
+				   Position = 4)]
+		[Alias('UniFiFixedIp')]
+		[ipaddress]
+		$FixedIp
+	)
+
+	begin
+	{
+		Write-Verbose -Message 'begin'
+	}
+
+	process
+	{
+		if ($pscmdlet.ShouldProcess('client-device', 'Move to Group_ID'))
+		{
+			Write-Verbose -Message 'process'
+		}
+	}
+
+	end
+	{
+		Write-Verbose -Message 'end'
+	}
 }
 
 function Set-UnifiFirewallGroup

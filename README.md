@@ -23,20 +23,20 @@ Beta version - Work still in progress.
 ### Requirements
 
 - PowerShell 5.1, or later.
-- Desktop and Core are full supported.
+- Desktop and Core are both supported.
 - Tested on:
   - *Windows 10, with PowerShell Desktop Version 5.1*
   - *Windows Server 2016, with PowerShell Desktop Version 5.1*
-  - *Windows 10, with PowerShell Core Version 6.1.1*
+  - *Windows 10, with PowerShell Core Version 6.1.2*
   - *macOS 10.14.3, with PowerShell Core Version 6.1.2*
   - *CentOS Linux release 7.6, with PowerShell Core Version 6.1.2*
-- Ubiquiti [UBNT SDN Controller](https://unifi-sdn.ui.com/), Version 5.9.32
+- Ubiquiti [UBNT SDN Controller](https://unifi-sdn.ui.com/), Version 5.10.10
   - *This is the only tested version*
-  - *Olders Ubiquiti [UBNT SDN Controller](https://unifi-sdn.ui.com/) Versions might work*
+  - *Other (older, or newer) Ubiquiti [UBNT SDN Controller](https://unifi-sdn.ui.com/) Versions might work*
 
 #### Dependencies
 
-UniFiTooling has no dependencies and it was designed to work on any operation system that runns PowerShell Desktop 5.1, or newer, or PowerShell Core Version 6.1, or newer.
+UniFiTooling has no dependencies and it was designed to work on any operation system that runs PowerShell Desktop 5.1, or newer, or PowerShell Core Version 6.1, or newer.
 
 ### Installation
 

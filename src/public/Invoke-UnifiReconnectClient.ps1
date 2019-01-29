@@ -65,15 +65,8 @@
    {
       Write-Verbose -Message 'Start Invoke-UnifiReconnectClient'
 
-      # Call meta function
-      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
-
       # Cleanup
       $Session = $null
-
-      #region MacHandler
-      $Mac = $Mac.ToLower()
-      #endregion MacHandler
 
       #region SafeProgressPreference
       # Safe ProgressPreference and Setup SilentlyContinue for the function
@@ -164,28 +157,7 @@
       #endregion ReCheckSession
 
       #region MacHandler
-      <#
-            Make sure we have the right format
-      #>
-      $regex = '((\d|([a-f]|[A-F])){2}){6}'
-      [string]$Mac = $Mac.Trim().Replace(':', '').Replace('.', '').Replace('-', '')
-      if (($Mac.Length -eq 12) -and ($Mac -match $regex))
-      {
-         [string]$Mac = ($Mac -replace '..(?!$)', '$&:')
-      }
-      else
-      {
-         # Verbose stuff
-         $Script:line = $_.InvocationInfo.ScriptLineNumber
-
-         Write-Verbose -Message ('Error was in Line {0}' -f $line)
-
-         # Error Message
-         Write-Error -Message ('Sorry, but {0} is a format that the UniFi Controller will nor understand' -f $Mac) -ErrorAction Stop
-
-         # Only here to catch a global ErrorAction overwrite
-         break
-      }
+      [string]$Mac = (ConvertTo-UniFiValidMacAddress -Mac $Mac)
       #endregion MacHandler
 
       #region ApiRequestBodyInput
@@ -194,6 +166,15 @@
          mac = $Mac
       }
       #endregion ApiRequestBodyInput
+
+      # Call meta function
+		$paramGetCallerPreference = @{
+			Cmdlet	     = $PSCmdlet
+			SessionState = $ExecutionContext.SessionState
+			ErrorAction  = 'SilentlyContinue'
+			WarningAction = 'SilentlyContinue'
+		}
+		$null = (Get-CallerPreference @paramGetCallerPreference)
    }
 
    process
