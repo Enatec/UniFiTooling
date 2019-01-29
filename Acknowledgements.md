@@ -4,12 +4,13 @@ This project owes some acknowlegement to others. Here are some other authors, pr
 
 If you believe you or a project should be included in this list please let us know.
 
-### Idea
+## Idea
 
 This project is based on the idea of the [PHP API client class](https://github.com/Art-of-WiFi/UniFi-API-client) implementation from [Art of WiFi](http://artofwifi.net/). If you want to implement a PHP based solution, take a look at the GitHub project of the [PHP API client class](https://github.com/Art-of-WiFi/UniFi-API-client) implementation from [Art of WiFi](http://artofwifi.net/).
 
-### PowerShell
+## PowerShell
 
+- [ChangelogManagement](https://github.com/natescherer/ChangelogManagement) - A PowerShell module for reading and manipulating changelog files in Keep a Changelog 1.0.0 format.
 - [BuildHelpers](https://github.com/RamblingCookieMonster/BuildHelpers) - Helper functions for PowerShell CI/CD scenarios
 - [Pester](https://github.com/pester/Pester) - Pester is the ubiquitous test and mock framework for PowerShell. All my automated tests are based on Pester
 - [platyPS](https://github.com/PowerShell/platyPS) - Write PowerShell External Help in Markdown
@@ -19,7 +20,7 @@ This project is based on the idea of the [PHP API client class](https://github.c
 - [PSScriptAnalyzer](https://github.com/PowerShell/PSScriptAnalyzer) - PSScriptAnalyzer is a static code checker for Windows PowerShell modules and scripts.
 - [PowerShell](https://github.com/PowerShell/PowerShell) - The Community is awesome! *And: Thank you Microsoft for make it Open Source*
 
-### General
+## General
 
 - [Visual Studio Code](https://code.visualstudio.com/) - Cross platform and very extensible code editor. *And: Thank you Microsoft for make it Open Source*
 - [Advanced Installer](http://www.advancedinstaller.com/) - For a free [Advanced Installer Professional](https://www.advancedinstaller.com/top-professional-features.html) license
@@ -27,11 +28,12 @@ This project is based on the idea of the [PHP API client class](https://github.c
 - [Mark Text](https://marktext.github.io/website/) - Cross platform visual markdown editor. Free and Open Source.
 - [MacDown](https://macdown.uranusjr.com) - A great macOS visual markdown editor. Free and Open Source.
 
-### Services
+## Services
 
 - [GitHub](https://github.com) - Well you see it :-)
+- [Microsoft Teams](https://products.office.com/en-us/microsoft-teams/group-chat-software) - Team Collaboration and notification
 
-### Style and Guide
+## Style and Guide
 
 - [PowerShell Practice and Style](https://poshcode.gitbooks.io/powershell-practice-and-style/) - The Unofficial PowerShell Best Practices and Style Guide and a great starting point.
 - [Semantic Versioning](https://semver.org/spec/v2.0.0.html) - The source of the `MAJOR.MINOR.PATCH` guidance
