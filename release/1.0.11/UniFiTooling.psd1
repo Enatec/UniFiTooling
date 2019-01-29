@@ -159,11 +159,17 @@ PrivateData = @{
 
 '
 
+        # Prerelease string of this module
+        # Prerelease = ''
+
+        # Flag to indicate whether the module requires explicit user acceptance for install/update
+        # RequireLicenseAcceptance = $false
+
         # External dependent modules of this module
-        # ExternalModuleDependencies = ''
+        # ExternalModuleDependencies = @()
 
     } # End of PSData hashtable
-    
+
  } # End of PrivateData hashtable
 
 # HelpInfo URI of this module
