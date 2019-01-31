@@ -81,8 +81,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Moved `Get-UnifiFirewallGroupBody` from Public to Private (No longer exported as command)
 - Add -name parameter to Get-UnifiNetworkDetails - Related to #9
-- `Get-UnifiNetworkDetails`: For the parameter `-UnifiNetworkName` an ID (
-etwork_id) must be used, necessary to make it a non breaking change
+- `Get-UnifiNetworkDetails`: For the parameter `-UnifiNetworkName` an ID (Network_id) must be used, necessary to make it a non breaking change
 - `Get-UnifiNetworkDetails`: `-UnifiNetworkName` is now a legacy alias, necessary to make it a non breaking change
 - Add `-Id` parameter to `Get-UnifiNetworkDetails`. This replaced the `-UnifiNetworkName` parameter - Related to #9
 - Add Multi valued inputs to `Get-UnifiNetworkDetails`
