@@ -57,7 +57,7 @@ Get the details about one Firewall Group via the API of the UniFi Controller
 Get a List Firewall Groups via the API of the UniFi Controller
 
 ### [Get-UnifiHourlyApStats](Get-UnifiHourlyApStats.md)
-Hourly stats method for a single access point or all access points
+Get hourly stats Access Point stats
 
 ### [Get-UnifiHourlyClientStats](Get-UnifiHourlyClientStats.md)
 Hourly stats method for a single access point or all access points

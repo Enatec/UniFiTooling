@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- `Get-UnifiDailyApStats` - Get daily stats for all or just one access points in a given UniFi site
 - `Get-UnifiHourlyApStats` - Get hourly stats for all or just one access points in a given UniFi site
 - `Get-Unifi5minutesApStats` - Get the stats in 5 minute segments for all or just one access points in a given UniFi site
 - `ConvertTo-UniFiValidMacAddress` - Helper to check and make sure we have the right format (private function)

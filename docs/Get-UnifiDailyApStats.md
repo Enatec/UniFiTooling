@@ -11,16 +11,17 @@ schema: 2.0.0
 # Get-UnifiDailyApStats
 
 ## SYNOPSIS
-Daily stats method for a single access point or all access points
+Get daily stats Access Point stats
 
 ## SYNTAX
 
 ```
-Get-UnifiDailyApStats [[-UnifiSite] <String>] [[-Start] <String>] [[-End] <String>] [<CommonParameters>]
+Get-UnifiDailyApStats [[-UnifiSite] <String>] [[-Mac] <String>] [[-Start] <String>] [[-End] <String>]
+ [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Daily stats method for a single access point or all access points
+Get daily stats for all or just one access points in a given UniFi site
 
 ## EXAMPLES
 
@@ -28,6 +29,36 @@ Daily stats method for a single access point or all access points
 ```
 Get-UnifiDailyApStats
 ```
+
+Get daily stats for all or just one access points in the default site
+
+### EXAMPLE 2
+```
+Get-UnifiDailyApStats -Mac '78:8a:20:59:e6:88'
+```
+
+Get daily stats for a given (78:8a:20:59:e6:88) access point in the default site
+
+### EXAMPLE 3
+```
+(Get-UnifiDailyApStats -Start '1548971935421' -End '1548975579019')
+```
+
+Get the statistics for a given time period.
+
+### EXAMPLE 4
+```
+Get-UnifiDailyApStats -UnifiSite 'contoso' | Where-Object { ($_.ConnectedClients -ne '0') -and ($_.Traffic -ne '0.00') }
+```
+
+Get daily stats for all access points in the site 'contoso', results are filtered and display only if clients are connected and traffic is generated.
+
+### EXAMPLE 5
+```
+(Get-UnifiDailyApStats -UnifiSite 'contoso')[-1]
+```
+
+Get daily stats for all access points in the site 'contoso'
 
 ## PARAMETERS
 
@@ -46,6 +77,21 @@ Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False
 ```
 
+### -Mac
+Client MAC address
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases: UniFiMac, MacAddress
+
+Required: False
+Position: 2
+Default value: None
+Accept pipeline input: True (ByPropertyName, ByValue)
+Accept wildcard characters: False
+```
+
 ### -Start
 Startpoint in UniFi Unix timestamp in milliseconds
 
@@ -55,7 +101,7 @@ Parameter Sets: (All)
 Aliases: Startpoint, StartTime
 
 Required: False
-Position: 2
+Position: 3
 Default value: None
 Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False
@@ -70,7 +116,7 @@ Parameter Sets: (All)
 Aliases: EndPoint, EndTime
 
 Required: False
-Position: 3
+Position: 4
 Default value: None
 Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False
@@ -84,10 +130,11 @@ For more information, see about_CommonParameters (http://go.microsoft.com/fwlink
 
 ## OUTPUTS
 
+### System.Management.Automation.PSObject
 ## NOTES
-defaults to the past 7*24 hours
-UniFi controller does not keep these stats longer than 5 hours with versions \< 4.6.6
-TODO: Add missing MAC Parameter
+Defaults to the past 7 days (7*24 hours)
+UniFi controller older then 4.6.6 keeps the statistics only for 5 hours.
+And it depends on your controller settings (Setup in "Settings/Maintenance" in the "DATA RETENTION" Block)
 
 ## RELATED LINKS
 
@@ -98,4 +145,8 @@ TODO: Add missing MAC Parameter
 [Invoke-UniFiApiLogin]()
 
 [Invoke-RestMethod]()
+
+[ConvertFrom-UnixTimeStamp]()
+
+[ConvertTo-UnixTimeStamp]()
 
