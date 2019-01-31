@@ -12,7 +12,7 @@ Ubiquiti UniFi Security Gateway automation via the API of the Ubiquiti UniFi Con
 
 ## UniFiTooling Cmdlets
 ### [Get-Unifi5minutesApStats](Get-Unifi5minutesApStats.md)
-5 minutes stats method for a single access point or all access points
+Get Access Point stats in 5 minute segments
 
 ### [Get-Unifi5minutesClientStats](Get-Unifi5minutesClientStats.md)
 5 minutes stats method for a single user/client device

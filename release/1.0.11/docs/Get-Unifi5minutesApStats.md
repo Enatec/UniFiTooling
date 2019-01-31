@@ -11,16 +11,17 @@ schema: 2.0.0
 # Get-Unifi5minutesApStats
 
 ## SYNOPSIS
-5 minutes stats method for a single access point or all access points
+Get Access Point stats in 5 minute segments
 
 ## SYNTAX
 
 ```
-Get-Unifi5minutesApStats [[-UnifiSite] <String>] [[-Start] <String>] [[-End] <String>] [<CommonParameters>]
+Get-Unifi5minutesApStats [[-UnifiSite] <String>] [[-Mac] <String>] [[-Start] <String>] [[-End] <String>]
+ [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-5 minutes stats method for a single access point or all access points
+Get the stats in 5 minute segments for all or just one access points in a given UniFi site
 
 ## EXAMPLES
 
@@ -28,6 +29,43 @@ Get-Unifi5minutesApStats [[-UnifiSite] <String>] [[-Start] <String>] [[-End] <St
 ```
 Get-Unifi5minutesApStats
 ```
+
+Get the stats in 5 minute segments for all access points in the default site
+
+### EXAMPLE 2
+```
+Get-Unifi5minutesApStats -Mac '78:8a:20:59:e6:88'
+```
+
+Get the stats in 5 minute segments for a given (78:8a:20:59:e6:88) access point in the default site
+
+### EXAMPLE 3
+```
+(Get-Unifi5minutesApStats -Start '1548971935421' -End '1548975579019')
+```
+
+Get the statistics for a given time period.
+
+### EXAMPLE 4
+```
+(Get-Unifi5minutesApStats -Start '1548971935421')
+```
+
+Get the statistics for the last 60 minutes (was the timestamp while the sample was created)
+
+### EXAMPLE 5
+```
+Get-Unifi5minutesApStats -UnifiSite 'contoso' | Where-Object { ($_.ConnectedClients -ne '0') -and ($_.Traffic -ne '0.00') }
+```
+
+Get the stats in 5 minute segments for all access points in the site 'contoso', results are filtered and display only if clients are connected and traffic is generated.
+
+### EXAMPLE 6
+```
+(Get-Unifi5minutesApStats -UnifiSite 'contoso')[-1]
+```
+
+Get the last stats in 5 minute segments for all access points in the site 'contoso'
 
 ## PARAMETERS
 
@@ -46,6 +84,21 @@ Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False
 ```
 
+### -Mac
+Client MAC address
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases: UniFiMac, MacAddress
+
+Required: False
+Position: 2
+Default value: None
+Accept pipeline input: True (ByPropertyName, ByValue)
+Accept wildcard characters: False
+```
+
 ### -Start
 Startpoint in UniFi Unix timestamp in milliseconds
 
@@ -55,7 +108,7 @@ Parameter Sets: (All)
 Aliases: Startpoint, StartTime
 
 Required: False
-Position: 2
+Position: 3
 Default value: None
 Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False
@@ -70,7 +123,7 @@ Parameter Sets: (All)
 Aliases: EndPoint, EndTime
 
 Required: False
-Position: 3
+Position: 4
 Default value: None
 Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False
@@ -84,10 +137,11 @@ For more information, see about_CommonParameters (http://go.microsoft.com/fwlink
 
 ## OUTPUTS
 
+### System.Management.Automation.PSObject
 ## NOTES
 Defaults to the past 12 hours.
 Make sure that the retention policy for 5 minutes stats is set to the correct value in the controller settings
-TODO: Add missing MAC Parameter
+Ubiquiti announced this with the Controller version 5.5 - It will not work on older versions!
 
 ## RELATED LINKS
 
@@ -98,4 +152,8 @@ TODO: Add missing MAC Parameter
 [Invoke-UniFiApiLogin]()
 
 [Invoke-RestMethod]()
+
+[ConvertFrom-UnixTimeStamp]()
+
+[ConvertTo-UnixTimeStamp]()
 

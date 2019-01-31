@@ -6,11 +6,11 @@
       <command:verb>Get</command:verb>
       <command:noun>Unifi5minutesApStats</command:noun>
       <maml:description>
-        <maml:para>5 minutes stats method for a single access point or all access points</maml:para>
+        <maml:para>Get Access Point stats in 5 minute segments</maml:para>
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>5 minutes stats method for a single access point or all access points</maml:para>
+      <maml:para>Get the stats in 5 minute segments for all or just one access points in a given UniFi site</maml:para>
     </maml:description>
     <command:syntax>
       <command:syntaxItem>
@@ -27,7 +27,19 @@
           </dev:type>
           <dev:defaultValue>Default</dev:defaultValue>
         </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="2" aliases="Startpoint, StartTime">
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="2" aliases="UniFiMac, MacAddress">
+          <maml:name>Mac</maml:name>
+          <maml:Description>
+            <maml:para>Client MAC address</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="3" aliases="Startpoint, StartTime">
           <maml:name>Start</maml:name>
           <maml:Description>
             <maml:para>Startpoint in UniFi Unix timestamp in milliseconds</maml:para>
@@ -39,7 +51,7 @@
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="3" aliases="EndPoint, EndTime">
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="4" aliases="EndPoint, EndTime">
           <maml:name>End</maml:name>
           <maml:Description>
             <maml:para>Endpoint in UniFi Unix timestamp in milliseconds</maml:para>
@@ -66,7 +78,19 @@
         </dev:type>
         <dev:defaultValue>Default</dev:defaultValue>
       </command:parameter>
-      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="2" aliases="Startpoint, StartTime">
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="2" aliases="UniFiMac, MacAddress">
+        <maml:name>Mac</maml:name>
+        <maml:Description>
+          <maml:para>Client MAC address</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="3" aliases="Startpoint, StartTime">
         <maml:name>Start</maml:name>
         <maml:Description>
           <maml:para>Startpoint in UniFi Unix timestamp in milliseconds</maml:para>
@@ -78,7 +102,7 @@
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
-      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="3" aliases="EndPoint, EndTime">
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="4" aliases="EndPoint, EndTime">
         <maml:name>End</maml:name>
         <maml:Description>
           <maml:para>Endpoint in UniFi Unix timestamp in milliseconds</maml:para>
@@ -92,10 +116,19 @@
       </command:parameter>
     </command:parameters>
     <command:inputTypes />
-    <command:returnValues />
+    <command:returnValues>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>System.Management.Automation.PSObject</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+    </command:returnValues>
     <maml:alertSet>
       <maml:alert>
-        <maml:para>Defaults to the past 12 hours. Make sure that the retention policy for 5 minutes stats is set to the correct value in the controller settings TODO: Add missing MAC Parameter</maml:para>
+        <maml:para>Defaults to the past 12 hours. Make sure that the retention policy for 5 minutes stats is set to the correct value in the controller settings Ubiquiti announced this with the Controller version 5.5 - It will not work on older versions!</maml:para>
       </maml:alert>
     </maml:alertSet>
     <command:examples>
@@ -103,7 +136,42 @@
         <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
         <dev:code>Get-Unifi5minutesApStats</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>Get the stats in 5 minute segments for all access points in the default site</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 2 --------------------------</maml:title>
+        <dev:code>Get-Unifi5minutesApStats -Mac '78:8a:20:59:e6:88'</dev:code>
+        <dev:remarks>
+          <maml:para>Get the stats in 5 minute segments for a given (78:8a:20:59:e6:88) access point in the default site</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 3 --------------------------</maml:title>
+        <dev:code>(Get-Unifi5minutesApStats -Start '1548971935421' -End '1548975579019')</dev:code>
+        <dev:remarks>
+          <maml:para>Get the statistics for a given time period.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 4 --------------------------</maml:title>
+        <dev:code>(Get-Unifi5minutesApStats -Start '1548971935421')</dev:code>
+        <dev:remarks>
+          <maml:para>Get the statistics for the last 60 minutes (was the timestamp while the sample was created)</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 5 --------------------------</maml:title>
+        <dev:code>Get-Unifi5minutesApStats -UnifiSite 'contoso' | Where-Object { ($_.ConnectedClients -ne '0') -and ($_.Traffic -ne '0.00') }</dev:code>
+        <dev:remarks>
+          <maml:para>Get the stats in 5 minute segments for all access points in the site 'contoso', results are filtered and display only if clients are connected and traffic is generated.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 6 --------------------------</maml:title>
+        <dev:code>(Get-Unifi5minutesApStats -UnifiSite 'contoso')[-1]</dev:code>
+        <dev:remarks>
+          <maml:para>Get the last stats in 5 minute segments for all access points in the site 'contoso'</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>
@@ -126,6 +194,14 @@
       </maml:navigationLink>
       <maml:navigationLink>
         <maml:linkText>Invoke-RestMethod</maml:linkText>
+        <maml:uri></maml:uri>
+      </maml:navigationLink>
+      <maml:navigationLink>
+        <maml:linkText>ConvertFrom-UnixTimeStamp</maml:linkText>
+        <maml:uri></maml:uri>
+      </maml:navigationLink>
+      <maml:navigationLink>
+        <maml:linkText>ConvertTo-UnixTimeStamp</maml:linkText>
         <maml:uri></maml:uri>
       </maml:navigationLink>
     </command:relatedLinks>
