@@ -8820,9 +8820,6 @@ function Set-UnifiNetworkDetails
       - Invoke-UBNTApiLogout - With harcoded Controller info
       - Invoke-UBNTApiRequest - Universal Invoke-RestMethod wrapper, tweaked for UBNT Equipment
       - Invoke-UBNTApiLogin - With harcoded credentials and Controller info
-      
-      
-
 #>
 #endregion CHANGELOG
 
