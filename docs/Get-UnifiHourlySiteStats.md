@@ -1,6 +1,6 @@
 ﻿---
 external help file: UniFiTooling-help.xml
-HelpVersion: 1.0.8
+HelpVersion: 1.1.0
 Locale: en-US
 Module Guid: 7fff91a0-02eb-4df2-84d5-c7d3cd7f7a5d
 Module Name: UniFiTooling
