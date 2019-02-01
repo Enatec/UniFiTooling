@@ -34,6 +34,9 @@
    {
       Write-Verbose -Message 'Start Invoke-UniFiApiLogin'
 
+      ## Call meta function
+      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
+
       # Cleanup
       $RestSession = $null
       $Session = $null

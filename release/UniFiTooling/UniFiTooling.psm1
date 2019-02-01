@@ -1,164 +1,197 @@
 ﻿#region ModulePreLoaded
 <#
-   This is an early beta version! I can't recommend using it in production.
+      This is an early beta version! I can't recommend using it in production.
 #>
+
+function Get-CallerPreference
+{
+   <#
+         .Synopsis
+         Fetches "Preference" variable values from the caller's scope.
+
+         .DESCRIPTION
+         Script module functions do not automatically inherit their caller's variables, but they can be obtained through the $PSCmdlet variable in Advanced Functions.
+         This function is a helper function for any script module Advanced Function; by passing in the values of $ExecutionContext.SessionState and $PSCmdlet, Get-CallerPreference will set the caller's preference variables locally.
+
+         .PARAMETER Cmdlet
+         The $PSCmdlet object from a script module Advanced Function.
+
+         .PARAMETER SessionState
+         The $ExecutionContext.SessionState object from a script module Advanced Function.
+         This is how the Get-CallerPreference function sets variables in its callers' scope, even if that caller is in a different script module.
+
+         .PARAMETER Name
+         Optional array of parameter names to retrieve from the caller's scope.
+         Default is to retrieve all Preference variables as defined in the about_Preference_Variables help file (as of PowerShell 4.0)
+         This parameter may also specify names of variables that are not in the about_Preference_Variables help file, and the function will retrieve and set those as well.
+
+         .EXAMPLE
+         Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
+
+         Imports the default PowerShell preference variables from the caller into the local scope.
+
+         .EXAMPLE
+         Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -Name 'ErrorActionPreference','SomeOtherVariable'
+
+         Imports only the ErrorActionPreference and SomeOtherVariable variables into the local scope.
+
+         .EXAMPLE
+         'ErrorActionPreference','SomeOtherVariable' | Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
+
+         Same as Example 2, but sends variable names to the Name parameter via pipeline input.
+
+         .INPUTS
+         String
+
+         .OUTPUTS
+         None.  This function does not produce pipeline output.
+
+         .LINK
+         about_Preference_Variables
+
+         .LINK
+         about_CommonParameters
+
+         .LINK
+         https://gallery.technet.microsoft.com/scriptcenter/Inherit-Preference-82343b9d
+
+         .LINK
+         http://powershell.org/wp/2014/01/13/getting-your-script-module-functions-to-inherit-preference-variables-from-the-caller/
+
+         .NOTE
+         Original Script by David Wyatt
+   #>
+
+   [CmdletBinding(DefaultParameterSetName = 'AllVariables')]
+   param (
+      [Parameter(Mandatory,HelpMessage = 'The PSCmdlet object from a script module Advanced Function.')]
+      [ValidateScript({
+               $_.GetType().FullName -eq 'System.Management.Automation.PSScriptCmdlet'
+      })]
+      $Cmdlet,
+      [Parameter(Mandatory,HelpMessage = ' The ExecutionContext.SessionState object from a script module Advanced Function.')]
+      [Management.Automation.SessionState]
+      $SessionState,
+      [Parameter(ParameterSetName = 'Filtered', ValueFromPipeline)]
+      [string[]]
+      $Name
+   )
+
+   begin
+   {
+      $filterHash = @{}
+   }
+
+   process
+   {
+      if ($null -ne $Name)
+      {
+         foreach ($string in $Name)
+         {
+            $filterHash[$string] = $true
+         }
+      }
+   }
+
+   end
+   {
+      # List of preference variables taken from the about_Preference_Variables help file in PowerShell version 4.0
+      $vars = @{
+         'ErrorView'                   = $null
+         'FormatEnumerationLimit'      = $null
+         'LogCommandHealthEvent'       = $null
+         'LogCommandLifecycleEvent'    = $null
+         'LogEngineHealthEvent'        = $null
+         'LogEngineLifecycleEvent'     = $null
+         'LogProviderHealthEvent'      = $null
+         'LogProviderLifecycleEvent'   = $null
+         'MaximumAliasCount'           = $null
+         'MaximumDriveCount'           = $null
+         'MaximumErrorCount'           = $null
+         'MaximumFunctionCount'        = $null
+         'MaximumHistoryCount'         = $null
+         'MaximumVariableCount'        = $null
+         'OFS'                         = $null
+         'OutputEncoding'              = $null
+         'ProgressPreference'          = $null
+         'PSDefaultParameterValues'    = $null
+         'PSEmailServer'               = $null
+         'PSModuleAutoLoadingPreference' = $null
+         'PSSessionApplicationName'    = $null
+         'PSSessionConfigurationName'  = $null
+         'PSSessionOption'             = $null
+         'ErrorActionPreference'       = 'ErrorAction'
+         'DebugPreference'             = 'Debug'
+         'ConfirmPreference'           = 'Confirm'
+         'WhatIfPreference'            = 'WhatIf'
+         'VerbosePreference'           = 'Verbose'
+         'WarningPreference'           = 'WarningAction'
+      }
+
+
+      foreach ($entry in $vars.GetEnumerator())
+      {
+         if (([string]::IsNullOrEmpty($entry.Value) -or -not $Cmdlet.MyInvocation.BoundParameters.ContainsKey($entry.Value)) -and ($PSCmdlet.ParameterSetName -eq 'AllVariables' -or $filterHash.ContainsKey($entry.Name)))
+         {
+            $variable = $Cmdlet.SessionState.PSVariable.Get($entry.Key)
+
+            if ($null -ne $variable)
+            {
+               if ($SessionState -eq $ExecutionContext.SessionState)
+               {
+                  $paramSetVariable = @{
+                     Scope   = 1
+                     Name    = $variable.Name
+                     Value   = $variable.Value
+                     Force   = $true
+                     Confirm = $false
+                     WhatIf  = $false
+                  }
+                  $null = (Set-Variable @paramSetVariable)
+               }
+               else
+               {
+                  $SessionState.PSVariable.Set($variable.Name, $variable.Value)
+               }
+            }
+         }
+      }
+
+      if ($PSCmdlet.ParameterSetName -eq 'Filtered')
+      {
+         foreach ($varName in $filterHash.Keys)
+         {
+            if (-not $vars.ContainsKey($varName))
+            {
+               $variable = $Cmdlet.SessionState.PSVariable.Get($varName)
+
+               if ($null -ne $variable)
+               {
+                  if ($SessionState -eq $ExecutionContext.SessionState)
+                  {
+                     $paramSetVariable = @{
+                        Scope   = 1
+                        Name    = $variable.Name
+                        Value   = $variable.Value
+                        Force   = $true
+                        Confirm = $false
+                        WhatIf  = $false
+                     }
+                     $null = (Set-Variable @paramSetVariable)
+                  }
+                  else
+                  {
+                     $SessionState.PSVariable.Set($variable.Name, $variable.Value)
+                  }
+               }
+            }
+         }
+      }
+   }
+}
 #endregion ModulePreLoaded
 
 #region ModulePrivateFunctions
-function Add-HostsEntry
-{
-   <#
-         .SYNOPSIS
-         Add a single Hosts Entry to the HOSTS File
-
-         .DESCRIPTION
-         Add a single Hosts Entry to the HOSTS File, multiple are not supported yet!
-
-         .PARAMETER Path
-         The path to the hosts file where the entry should be set. Defaults to the local computer's hosts file.
-
-         .PARAMETER Address
-         The Address address for the hosts entry.
-
-         .PARAMETER HostName
-         The hostname for the hosts entry.
-
-         .PARAMETER force
-         Force (replace)
-
-         .EXAMPLE
-         PS C:\> Add-HostsEntry -Address '0.0.0.0' -HostName 'badhost'
-
-         Add the host 'badhost' with the Adress '0.0.0.0' (blackhole) wo the Hosts.
-         If an Entry for 'badhost' exists, the new one will be appended anyway (You end up with two entries)
-
-         .EXAMPLE
-         PS C:\> Add-HostsEntry -Address '0.0.0.0' -HostName 'badhost' -force
-
-         Add the host 'badhost' with the Adress '0.0.0.0' (blackhole) wo the Hosts.
-         If an Entry for 'badhost' exists, the new one will replace the existing one.
-
-         .NOTES
-         Internal Helper, inspired by an old GIST I found
-
-         .LINK
-         Get-HostsFile
-
-         .LINK
-         Remove-HostsEntry
-
-         .LINK
-         https://gist.github.com/markembling/173887/1824b370be3fe468faceaed5f39b12bad010a417
-   #>
-
-   [CmdletBinding(ConfirmImpact = 'Medium',
-   SupportsShouldProcess)]
-   param
-   (
-      [Parameter(Mandatory,
-            Position = 0,
-      HelpMessage = 'The IP address for the hosts entry.')]
-      [ValidateNotNullOrEmpty()]
-      [Alias('ipaddress', 'ip')]
-      [string]
-      $Address,
-      [Parameter(Mandatory,
-            ValueFromPipeline,
-            ValueFromPipelineByPropertyName,
-            Position = 1,
-      HelpMessage = 'The hostname for the hosts entry.')]
-      [ValidateNotNullOrEmpty()]
-      [Alias('Host', 'Name')]
-      [string]
-      $HostName,
-      [Parameter(ValueFromPipeline,
-            ValueFromPipelineByPropertyName,
-      Position = 3)]
-      [switch]
-      $force = $false,
-      [Parameter(ValueFromPipeline,
-            ValueFromPipelineByPropertyName,
-      Position = 2)]
-      [ValidateNotNullOrEmpty()]
-      [Alias('filename', 'Hosts', 'hostsfile', 'file')]
-      [string]
-      $Path = "$env:windir\System32\drivers\etc\hosts"
-   )
-   begin {
-      Write-Verbose -Message 'Start Add-HostsEntry'
-   }
-
-   process {
-      if ($force)
-      {
-         try
-         {
-            $null = (Remove-HostsEntry -HostName $HostName -Path $Path -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
-         }
-         catch
-         {
-            Write-Verbose -Message 'Looks like the entry was not there before'
-         }
-      }
-
-      try
-      {
-         if ($pscmdlet.ShouldProcess('Target', 'Operation'))
-         {
-            # Get a clean (end of) file
-            $paramGetContent = @{
-               Path          = $Path
-               Raw           = $true
-               Force         = $true
-               ErrorAction   = 'Stop'
-               WarningAction = 'SilentlyContinue'
-            }
-            $HostsFileContent = (((Get-Content @paramGetContent ).TrimEnd()).ToString())
-
-            $NewValue = "`n" + $Address + "`t`t" + $HostName
-            $NewHostsFileContent = $HostsFileContent + $NewValue
-
-            $paramSetContent = @{
-               Path          = $Path
-               Value         = $NewHostsFileContent
-               Force         = $true
-               Confirm       = $false
-               Encoding      = 'UTF8'
-               ErrorAction   = 'Stop'
-               WarningAction = 'SilentlyContinue'
-            }
-            $null = (Set-Content @paramSetContent)
-         }
-      }
-      catch
-      {
-         # get error record
-         [Management.Automation.ErrorRecord]$e = $_
-
-         # retrieve information about runtime error
-         $info = [PSCustomObject]@{
-            Exception = $e.Exception.Message
-            Reason    = $e.CategoryInfo.Reason
-            Target    = $e.CategoryInfo.TargetName
-            Script    = $e.InvocationInfo.ScriptName
-            Line      = $e.InvocationInfo.ScriptLineNumber
-            Column    = $e.InvocationInfo.OffsetInLine
-         }
-
-         Write-Verbose -Message $info
-
-         Write-Error -Message ($info.Exception) -ErrorAction Stop
-
-         # Only here to catch a global ErrorAction overwrite
-         break
-      }
-   }
-
-   end {
-      Write-Verbose -Message 'Done Add-HostsEntry'
-   }
-}
-
 function ConvertFrom-UnixTimeStamp
 {
    <#
@@ -211,6 +244,9 @@ function ConvertFrom-UnixTimeStamp
    begin
    {
       Write-Verbose -Message 'Start ConvertFrom-UnixTimeStamp'
+
+      # Call meta function
+      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
 
       # Set some defaults (Never change this!!!)
       $UnixStartTime = '1/1/1970'
@@ -272,6 +308,93 @@ function ConvertFrom-UnixTimeStamp
       $Result
 
       Write-Verbose -Message 'Done ConvertFrom-UnixTimeStamp'
+   }
+}
+
+function ConvertTo-UniFiValidMacAddress
+{
+   <#
+         .SYNOPSIS
+         Check and transform the given Mac addess for UniFi API usage
+
+         .DESCRIPTION
+         Check and transform, if needed, the given Mac addess for UniFi API usage
+
+         .PARAMETER Mac
+         Client MAC address
+
+         .EXAMPLE
+         PS C:\> ConvertTo-UniFiValidMacAddress -Mac '84-3a-4b-cd-88-2D'
+
+         .NOTES
+         Helper to check and make sure we have the right format
+   #>
+
+   [CmdletBinding(ConfirmImpact = 'None')]
+   [OutputType([string])]
+   param
+   (
+      [Parameter(Mandatory,HelpMessage = 'Client MAC address',
+               ValueFromPipeline,
+               ValueFromPipelineByPropertyName,
+               Position = 0)]
+      [ValidateNotNullOrEmpty()]
+      [Alias('UniFiMac', 'MacAddress')]
+      [string]
+      $Mac
+   )
+
+   begin
+   {
+      Write-Verbose -Message 'Start ConvertTo-UniFiValidMacAddress'
+
+      # Call meta function
+      $paramGetCallerPreference = @{
+         Cmdlet        = $PSCmdlet
+         SessionState  = $ExecutionContext.SessionState
+         ErrorAction   = 'SilentlyContinue'
+         WarningAction = 'SilentlyContinue'
+      }
+      $null = (Get-CallerPreference @paramGetCallerPreference)
+   }
+
+   process
+   {
+      # Define the REGEX Filter
+      $regex = '((\d|([a-f]|[A-F])){2}){6}'
+
+      # Transform, if needed
+      [string]$Mac = $Mac.Trim().Replace(':', '').Replace('.', '').Replace('-', '')
+
+      # Mac everything lower case
+      $Mac = $Mac.ToLower()
+
+      # Do a check
+      if (($Mac.Length -eq 12) -and ($Mac -match $regex))
+      {
+         [string]$Mac = ($Mac -replace '..(?!$)', '$&:')
+      }
+      else
+      {
+         # Verbose stuff
+         $Script:line = $_.InvocationInfo.ScriptLineNumber
+
+         Write-Verbose -Message ('Error was in Line {0}' -f $line)
+
+         # Error Message
+         Write-Error -Message ('Sorry, but {0} is a format that the UniFi Controller will nor understand' -f $Mac) -ErrorAction Stop
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+      }
+   }
+
+   end
+   {
+      # Dump to the Console $Mac
+      $Mac
+
+      Write-Verbose -Message 'Start ConvertTo-UniFiValidMacAddress'
    }
 }
 
@@ -337,6 +460,9 @@ function ConvertTo-UnixTimeStamp
    {
       Write-Verbose -Message 'Start ConvertTo-UnixTimeStamp'
 
+      # Call meta function
+      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
+
       # Set some defaults (Never change this!!!)
       $UnixStartTime = '1/1/1970'
 
@@ -392,133 +518,6 @@ function ConvertTo-UnixTimeStamp
    }
 }
 
-function Get-HostsFile
-{
-   <#
-         .SYNOPSIS
-         Print the HOSTS File in a more clean format
-
-         .DESCRIPTION
-         Print the HOSTS File in a more clean format
-
-         .PARAMETER Path
-         The path to the hosts file where the entry should be set. Defaults to the local computer's hosts file.
-
-         .PARAMETER raw
-         Print raw Hosts File
-
-         .EXAMPLE
-         PS C:\> Get-HostsFile
-
-         Print the HOSTS File in a more clean format
-
-         .EXAMPLE
-         PS C:\> Get-HostsFile -raw
-
-         Print the HOSTS File in the regular format
-
-         .NOTES
-         Internal Helper, inspired by an old GIST I found
-
-         .LINK
-         Add-HostsEntry
-
-         .LINK
-         Remove-HostsEntry
-
-         .LINK
-         https://gist.github.com/markembling/173887/1824b370be3fe468faceaed5f39b12bad010a417
-   #>
-
-   [CmdletBinding(ConfirmImpact = 'None')]
-   param
-   (
-      [Parameter(ValueFromPipeline,
-            ValueFromPipelineByPropertyName,
-      Position = 0)]
-      [ValidateNotNullOrEmpty()]
-      [Alias('Hosts', 'hostsfile', 'file', 'filename')]
-      [string]
-      $Path = "$env:windir\System32\drivers\etc\hosts",
-      [Parameter(ValueFromPipeline,
-            ValueFromPipelineByPropertyName,
-      Position = 1)]
-      [Alias('plain')]
-      [switch]
-      $raw = $false
-   )
-
-   begin
-   {
-      Write-Verbose -Message 'Start Get-HostsFile'
-
-      try
-      {
-         # Get a clean (end of) file
-         $paramGetContent = @{
-            Path          = $Path
-            Raw           = $true
-            Force         = $true
-            ErrorAction   = 'Stop'
-            WarningAction = 'SilentlyContinue'
-         }
-         $HostsFileContent = (Get-Content @paramGetContent )
-      }
-      catch
-      {
-         #region ErrorHandler
-         # get error record
-         [Management.Automation.ErrorRecord]$e = $_
-
-         # retrieve information about runtime error
-         $info = [PSCustomObject]@{
-            Exception = $e.Exception.Message
-            Reason    = $e.CategoryInfo.Reason
-            Target    = $e.CategoryInfo.TargetName
-            Script    = $e.InvocationInfo.ScriptName
-            Line      = $e.InvocationInfo.ScriptLineNumber
-            Column    = $e.InvocationInfo.OffsetInLine
-         }
-
-         Write-Verbose -Message $info
-
-         Write-Error -Message ($info.Exception) -ErrorAction Stop
-
-         # Only here to catch a global ErrorAction overwrite
-         break
-         #endregion ErrorHandler
-      }
-   }
-
-   process
-   {
-      foreach ($line in $HostsFileContent)
-      {
-         if ($raw)
-         {
-            Write-Output -InputObject $line
-         }
-         else
-         {
-            $bits = [regex]::Split($line, '\t+')
-            if ($bits.count -eq 2)
-            {
-               [string]$HostsFileLine = $bits
-
-               if (-not ($HostsFileLine.StartsWith('#')))
-               {
-                  Write-Output -InputObject $HostsFileLine
-               }
-            }
-         }
-      }
-   }
-
-   end {
-      Write-Verbose -Message 'Done Get-HostsFile'
-   }
-}
-
 function Get-UniFiConfig
 {
    <#
@@ -557,6 +556,9 @@ function Get-UniFiConfig
    begin
    {
       Write-Verbose -Message 'Start Get-UniFiConfig'
+
+      # Call meta function
+      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
 
       # Cleanup
       $RawJson = $null
@@ -671,6 +673,9 @@ function Get-UniFiCredentials
    begin
    {
       Write-Verbose -Message 'Start Get-UniFiCredentials'
+
+      # Call meta function
+      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
 
       # Cleanup
       $RawJson = $null
@@ -803,6 +808,9 @@ function Get-UnifiFirewallGroupBody
    {
       Write-Verbose -Message 'Start Get-UnifiFirewallGroupBody'
 
+      # Call meta function
+      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
+
       Write-Verbose -Message 'Cleanup exitsing Group'
       Write-Verbose -Message "Old Values: $UnfiFirewallGroup.group_members"
 
@@ -932,6 +940,9 @@ function Get-UniFiIsAlive
    begin
    {
       Write-Verbose -Message 'Start Get-UniFiIsAlive'
+
+      # Call meta function
+      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
 
       # Cleanup
       $Session = $null
@@ -1127,6 +1138,9 @@ function Invoke-UniFiCidrWorkaround
    {
       Write-Verbose -Message 'Start Invoke-UniFiCidrWorkaround'
 
+      # Call meta function
+      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
+
       # Cleanup
       $AddItem = @()
    }
@@ -1170,173 +1184,6 @@ function Invoke-UniFiCidrWorkaround
    }
 }
 
-function Remove-HostsEntry
-{
-   <#
-         .SYNOPSIS
-         Removes a single Hosts Entry from the HOSTS File
-
-         .DESCRIPTION
-         Removes a single Hosts Entry from the HOSTS File, multiple are not supported yet!
-
-         .PARAMETER Path
-         The path to the hosts file where the entry should be set. Defaults to the local computer's hosts file.
-
-         .PARAMETER HostName
-         The hostname for the hosts entry.
-
-         .EXAMPLE
-         PS C:\> Remove-HostsEntry -HostName 'Dummy'
-
-         Remove the entry for the host 'Dummy' from the HOSTS File
-
-         .NOTES
-         Internal Helper, inspired by an old GIST I found
-
-         .LINK
-         Get-HostsFile
-
-         .LINK
-         Add-HostsEntry
-
-         .LINK
-         https://gist.github.com/markembling/173887/1824b370be3fe468faceaed5f39b12bad010a417
-   #>
-
-   [CmdletBinding(ConfirmImpact = 'Medium',
-   SupportsShouldProcess)]
-   param
-   (
-      [Parameter(Mandatory,
-            ValueFromPipeline,
-            ValueFromPipelineByPropertyName,
-            Position = 0,
-      HelpMessage = 'The hostname for the hosts entry.')]
-      [ValidateNotNullOrEmpty()]
-      [Alias('Host', 'Name')]
-      [string]
-      $HostName,
-      [Parameter(ValueFromPipeline,
-            ValueFromPipelineByPropertyName,
-      Position = 1)]
-      [ValidateNotNullOrEmpty()]
-      [Alias('Hosts', 'hostsfile', 'file', 'Filename')]
-      [string]
-      $Path = "$env:windir\System32\drivers\etc\hosts"
-   )
-
-   begin {
-      Write-Verbose -Message 'Start Remove-HostsEntry'
-
-      try
-      {
-         $paramGetContent = @{
-            Path          = $Path
-            Raw           = $true
-            Force         = $true
-            ErrorAction   = 'Stop'
-            WarningAction = 'SilentlyContinue'
-         }
-         $HostsFileContent = (((Get-Content @paramGetContent ).TrimEnd()).ToString())
-      }
-      catch
-      {
-         # get error record
-         [Management.Automation.ErrorRecord]$e = $_
-
-         # retrieve information about runtime error
-         $info = [PSCustomObject]@{
-            Exception = $e.Exception.Message
-            Reason    = $e.CategoryInfo.Reason
-            Target    = $e.CategoryInfo.TargetName
-            Script    = $e.InvocationInfo.ScriptName
-            Line      = $e.InvocationInfo.ScriptLineNumber
-            Column    = $e.InvocationInfo.OffsetInLine
-         }
-
-         Write-Verbose -Message $info
-
-         Write-Error -Message ($info.Exception) -ErrorAction Stop
-
-         # Only here to catch a global ErrorAction overwrite
-         break
-      }
-
-      $newLines = @()
-   }
-
-   process {
-      foreach ($line in $HostsFileContent)
-      {
-         $bits = [regex]::Split($line, '\t+')
-         if ($bits.count -eq 2)
-         {
-            if ($bits[1] -ne $HostName)
-            {
-               $newLines += $line
-            }
-         }
-         else
-         {
-            $newLines += $line
-         }
-      }
-
-      # Write file
-      try
-      {
-         if ($pscmdlet.ShouldProcess('Target', 'Operation'))
-         {
-            $paramClearContent = @{
-               Path          = $Path
-               Force         = $true
-               Confirm       = $false
-               ErrorAction   = 'Stop'
-               WarningAction = 'SilentlyContinue'
-            }
-            $null = (Clear-Content @paramClearContent)
-
-            $paramSetContent = @{
-               Path          = $Path
-               Value         = $newLines
-               Force         = $true
-               Confirm       = $false
-               Encoding      = 'UTF8'
-               ErrorAction   = 'Stop'
-               WarningAction = 'SilentlyContinue'
-            }
-            $null = (Set-Content @paramSetContent)
-         }
-      }
-      catch
-      {
-         # get error record
-         [Management.Automation.ErrorRecord]$e = $_
-
-         # retrieve information about runtime error
-         $info = [PSCustomObject]@{
-            Exception = $e.Exception.Message
-            Reason    = $e.CategoryInfo.Reason
-            Target    = $e.CategoryInfo.TargetName
-            Script    = $e.InvocationInfo.ScriptName
-            Line      = $e.InvocationInfo.ScriptLineNumber
-            Column    = $e.InvocationInfo.OffsetInLine
-         }
-
-         Write-Verbose -Message $info
-
-         Write-Error -Message ($info.Exception) -ErrorAction Stop
-
-         # Only here to catch a global ErrorAction overwrite
-         break
-      }
-   }
-
-   end {
-      Write-Verbose -Message 'Donw Remove-HostsEntry'
-   }
-}
-
 function Set-UniFiApiLoginBody
       {
          <#
@@ -1360,6 +1207,9 @@ function Set-UniFiApiLoginBody
          begin
          {
             Write-Verbose -Message 'Start Set-UniFiApiLoginBody'
+
+            # Call meta function
+            $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
 
             # Cleanup
             $RestBody = $null
@@ -1454,6 +1304,9 @@ function Set-UniFiDefaultRequestHeader
    {
       Write-Verbose -Message 'Start Set-UniFiDefaultRequestHeader'
 
+      # Call meta function
+      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
+
       # Cleanup
       $RestHeader = $null
    }
@@ -1477,6 +1330,4404 @@ function Set-UniFiDefaultRequestHeader
 #endregion ModulePrivateFunctions
 
 #region ModulePublicFunctions
+function Get-Unifi5minutesApStats
+{
+   <#
+         .SYNOPSIS
+         Get Access Point stats in 5 minute segments
+
+         .DESCRIPTION
+         Get the stats in 5 minute segments for all or just one access points in a given UniFi site
+         For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).
+         We also return real timestamps instead of the unix timestaps that the UniFi returns
+
+         .PARAMETER UnifiSite
+         ID of the client-device to be modified
+
+         .PARAMETER Mac
+         Client MAC address
+
+         .PARAMETER Start
+         Startpoint in UniFi Unix timestamp in milliseconds
+
+         .PARAMETER End
+         Endpoint in UniFi Unix timestamp in milliseconds
+
+         .EXAMPLE
+         PS C:\> Get-Unifi5minutesApStats
+
+         Get the stats in 5 minute segments for all access points in the default site
+
+         .EXAMPLE
+         PS C:\> Get-Unifi5minutesApStats -Mac '78:8a:20:59:e6:88'
+
+         Get the stats in 5 minute segments for a given (78:8a:20:59:e6:88) access point in the default site
+
+         .EXAMPLE
+         (Get-Unifi5minutesApStats -Start '1548971935421' -End '1548975579019')
+
+         Get the statistics for a given time period.
+
+         .EXAMPLE
+         (Get-Unifi5minutesApStats -Start '1548971935421')
+
+         Get the statistics for the last 60 minutes (was the timestamp while the sample was created)
+
+         .EXAMPLE
+         PS C:\> Get-Unifi5minutesApStats -UnifiSite 'contoso' | Where-Object { $_.Traffic -ne '0.00' }
+
+         Get the stats in 5 minute segments for all access points in the site 'contoso', if traffic is generated.
+
+         .EXAMPLE
+         PS C:\> (Get-Unifi5minutesApStats -UnifiSite 'contoso')[-1]
+
+         Get the last stats in 5 minute segments for all access points in the site 'contoso'
+
+         .NOTES
+         Defaults to the past 12 hours.
+         Make sure that the retention policy for 5 minutes stats is set to the correct value in the controller settings
+         Ubiquiti announced this with the Controller version 5.5 - It will not work on older versions!
+
+         .LINK
+         Get-UniFiConfig
+
+         .LINK
+         Set-UniFiDefaultRequestHeader
+
+         .LINK
+         Invoke-UniFiApiLogin
+
+         .LINK
+         Invoke-RestMethod
+
+         .LINK
+         ConvertFrom-UnixTimeStamp
+
+         .LINK
+         ConvertTo-UnixTimeStamp
+   #>
+
+   [CmdletBinding(ConfirmImpact = 'None')]
+   [OutputType([psobject])]
+   param
+   (
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 0)]
+      [ValidateNotNullOrEmpty()]
+      [Alias('Site')]
+      [string]
+      $UnifiSite = 'default',
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 1)]
+      [ValidateNotNullOrEmpty()]
+      [Alias('UniFiMac', 'MacAddress')]
+      [string]
+      $Mac,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 2)]
+      [Alias('Startpoint', 'StartTime')]
+      [String]
+      $Start,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 3)]
+      [Alias('EndPoint', 'EndTime')]
+      [string]
+      $End
+   )
+
+   begin
+   {
+      Write-Verbose -Message 'Start Get-Unifi5minutesApStats'
+
+      # Save Datestring to keep everything consitant
+      $now = (Get-Date)
+
+      if (-not ($Start))
+      {
+         $Start = (ConvertTo-UnixTimeStamp -Date ($now.AddHours(-12)) -Milliseconds)
+      }
+
+      if (-not ($End))
+      {
+         $End = (ConvertTo-UnixTimeStamp -Date $now -Milliseconds)
+      }
+
+      # Cleanup
+      $Session = $null
+
+      #region SafeProgressPreference
+      # Safe ProgressPreference and Setup SilentlyContinue for the function
+      $ExistingProgressPreference = ($ProgressPreference)
+      $ProgressPreference = 'SilentlyContinue'
+      #endregion SafeProgressPreference
+
+      #region CheckSession
+      if (-not (Get-UniFiIsAlive))
+      {
+         #region LoginCheckLoop
+         # TODO: Move to config
+         [int]$NumberOfRetries = '3'
+         [int]$RetryTimer = '5'
+         # Setup the Loop itself
+         $RetryLoop = $false
+         [int]$RetryCounter = '0'
+         # Original code/idea was by Thomas Maurer
+         do
+         {
+            try
+            {
+               # Try to Logout
+               try
+               {
+                  if (-not (Get-UniFiIsAlive))
+                  {
+                     Throw
+                  }
+               }
+               catch
+               {
+                  # We don't care about that
+                  Write-Verbose -Message 'Logout failed'
+               }
+
+               # Try a Session check (login is inherited here within the helper function)
+               if (-not (Get-UniFiIsAlive -ErrorAction Stop -WarningAction SilentlyContinue))
+               {
+                  Write-Error -Message 'Login failed' -ErrorAction Stop -Category AuthenticationError
+               }
+
+               # End the Loop
+               $RetryLoop = $true
+            }
+            catch
+            {
+               if ($RetryCounter -gt $NumberOfRetries)
+               {
+                  Write-Warning -Message ('Could still not login, after {0} retries.' -f $NumberOfRetries)
+
+                  # Stay in the Loop
+                  $RetryLoop = $true
+               }
+               else
+               {
+                  if ($RetryCounter -eq 0)
+                  {
+                     Write-Warning -Message ('Could not login! Retrying in {0} seconds.' -f $RetryTimer)
+                  }
+                  else
+                  {
+                     Write-Warning -Message ('Retry {0} of {1} failed. Retrying in {2} seconds.' -f $RetryCounter, $NumberOfRetries, $RetryTimer)
+                  }
+
+                  $null = (Start-Sleep -Seconds $RetryTimer)
+
+                  $RetryCounter = $RetryCounter + 1
+               }
+            }
+         }
+         While ($RetryLoop -eq $false)
+         #endregion LoginCheckLoop
+      }
+      #endregion CheckSession
+
+      #region ReCheckSession
+      if (-not ($RestSession))
+      {
+         # Restore ProgressPreference
+         $ProgressPreference = $ExistingProgressPreference
+
+         Write-Error -Message 'Unable to login! Check the connection to the controller, SSL certificates, and your credentials!' -ErrorAction Stop -Category AuthenticationError
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+      }
+      #endregion ReCheckSession
+
+      #region MacHandler
+      if ($Mac)
+      {
+         [string]$Mac = (ConvertTo-UniFiValidMacAddress -Mac $Mac)
+      }
+      #endregion MacHandler
+
+      #region ApiRequestBodyInput
+      $Script:ApiRequestBodyInput = [PSCustomObject][ordered]@{
+         attrs = 'bytes', 'num_sta', 'time'
+         start = $Start
+         end   = $End
+      }
+
+      if ($Mac)
+      {
+         $ApiRequestBodyInput | Add-Member -MemberType NoteProperty -Name mac -Value $Mac
+      }
+      #endregion ApiRequestBodyInput
+
+      # Call meta function
+      $paramGetCallerPreference = @{
+         Cmdlet        = $PSCmdlet
+         SessionState  = $ExecutionContext.SessionState
+         ErrorAction   = 'SilentlyContinue'
+         WarningAction = 'SilentlyContinue'
+      }
+      $null = (Get-CallerPreference @paramGetCallerPreference)
+   }
+
+   process
+   {
+      try
+      {
+         #region ReadConfig
+         Write-Verbose -Message 'Read the Config'
+
+         $null = (Get-UniFiConfig)
+         #endregion ReadConfig
+
+         #region CertificateHandler
+         Write-Verbose -Message ('Certificate check - Should be {0}' -f $ApiSelfSignedCert)
+
+         [Net.ServicePointManager]::ServerCertificateValidationCallback = {
+            $ApiSelfSignedCert
+         }
+         #endregion CertificateHandler
+
+         #region SetRequestHeader
+         Write-Verbose -Message 'Set the API Call default Header'
+
+         $null = (Set-UniFiDefaultRequestHeader)
+         #endregion SetRequestHeader
+
+         #region SetRequestURI
+         Write-Verbose -Message 'Create the Request URI'
+         $ApiRequestUri = $ApiUri + 's/' + $UnifiSite + '/stat/report/5minutes.ap'
+         Write-Verbose -Message ('URI: {0}' -f $ApiRequestUri)
+         #endregion SetRequestURI
+
+         #region ApiRequestBody
+         $paramConvertToJson = @{
+            InputObject   = $ApiRequestBodyInput
+            Depth         = 5
+            ErrorAction   = 'Stop'
+            WarningAction = 'SilentlyContinue'
+         }
+
+         $ApiRequestBodyInput = $null
+
+         $Script:ApiRequestBody = (ConvertTo-Json @paramConvertToJson)
+         #endregion ApiRequestBody
+
+         #region Request
+         Write-Verbose -Message 'Send the Request'
+
+         $paramInvokeRestMethod = @{
+            Method        = 'Post'
+            Uri           = $ApiRequestUri
+            Headers       = $RestHeader
+            Body          = $ApiRequestBody
+            ErrorAction   = 'SilentlyContinue'
+            WarningAction = 'SilentlyContinue'
+            WebSession    = $RestSession
+         }
+         $Session = (Invoke-RestMethod @paramInvokeRestMethod)
+
+         Write-Verbose -Message "Session Meta: $(($Session.meta.rc | Out-String).Trim())"
+
+         Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+         #endregion Request
+
+         #region CreateOutput
+         $output = @()
+
+         foreach($item in $Session.data)
+         {
+            $outputAppend = [PSCustomObject][ordered]@{
+               AccesPoint = $item.ap
+               Time       = ((ConvertFrom-UnixTimeStamp -TimeStamp ($item.time) -Milliseconds).ToLocalTime())
+               Clients    = $item.num_sta
+               Traffic    = ([math]::round($item.bytes / 1MB, 2))
+            }
+            # Sppend to the output
+            $output += $outputAppend
+
+            # Cleanup
+            $outputAppend = $null
+         }
+
+         # Resort to make sure everything is in the right order :)
+         $output = $output | Sort-Object Time
+         #endregion CreateOutput
+      }
+      catch
+      {
+         # Try to Logout
+         try
+         {
+            $null = (Invoke-UniFiApiLogout -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
+         }
+         catch
+         {
+            # We don't care about that
+            Write-Verbose -Message 'Logout failed'
+         }
+
+         #region ErrorHandler
+         # get error record
+         [Management.Automation.ErrorRecord]$e = $_
+
+         # retrieve information about runtime error
+         $info = [PSCustomObject]@{
+            Exception = $e.Exception.Message
+            Reason    = $e.CategoryInfo.Reason
+            Target    = $e.CategoryInfo.TargetName
+            Script    = $e.InvocationInfo.ScriptName
+            Line      = $e.InvocationInfo.ScriptLineNumber
+            Column    = $e.InvocationInfo.OffsetInLine
+         }
+
+         Write-Verbose -Message $info
+
+         Write-Error -Message ($info.Exception) -ErrorAction Stop
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+         #endregion ErrorHandler
+      }
+      finally
+      {
+         #region ResetSslTrust
+         # Reset the SSL Trust (make sure everything is back to default)
+         [Net.ServicePointManager]::ServerCertificateValidationCallback = $null
+         #endregion ResetSslTrust
+
+         #region RestoreProgressPreference
+         $ProgressPreference = $ExistingProgressPreference
+         #endregion RestoreProgressPreference
+      }
+
+      # check result
+      if ($Session.meta.rc -ne 'ok')
+      {
+         # Verbose stuff
+         $Script:line = $_.InvocationInfo.ScriptLineNumber
+         Write-Verbose -Message ('Error was in Line {0}' -f $line)
+         Write-Verbose -Message ('Error was {0}' -f $Session.meta.rc)
+
+         # Error Message
+         Write-Error -Message 'Unable to Login' -ErrorAction Stop
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+      }
+   }
+
+   end
+   {
+      # Dump the Result
+      $output
+
+      # Cleanup
+      $Session = $null
+      $output = $null
+
+      #region RestoreProgressPreference
+      $ProgressPreference = $ExistingProgressPreference
+      #endregion RestoreProgressPreference
+
+      Write-Verbose -Message 'Done Get-Unifi5minutesApStats'
+   }
+}
+
+function Get-Unifi5minutesClientStats
+{
+   <#
+         .SYNOPSIS
+         Get user/client statistics in 5 minute segments
+
+         .DESCRIPTION
+         Get user/client statistics in 5 minute segments for a given client
+
+         For convenience, we return the a bit more then the API, e.g. everything in KB, MB, GB, and TB instead of just bytes
+         We also return real timestamps instead of the unix timestaps in miliseconds that the UniFi returns
+
+         Sample output:
+         Time          : 2/1/2019 3:45:00 PM
+         rx_bytes      : 105.0
+         rx_kb         : 0.10
+         rx_mb         : 0.00
+         rx_gb         : 0.00
+         rx_tb         : 0.00
+         rx_rate       : 650000.0
+         rx_rate_mbps  : 634.77
+         rx_retries    : 0
+         rx_packets    : 2.5
+         tx_bytes      : 213.0
+         tx_kb         : 0.21
+         tx_mb         : 0.00
+         tx_gb         : 0.00
+         tx_tb         : 0.00
+         tx_rate       : 650000.0
+         tx_rate_mbps  : 634.77
+         tx_retries    : 1
+         tx_packets    : 4.5
+         Traffic_bytes : 318
+         Traffic_kb    : 0.31
+         Traffic_mb    : 0.00
+         Traffic_gb    : 0.00
+         Traffic_tb    : 0.00
+         Signal        : -65
+         Signal_plain  : -65.0
+
+         In reality, we filter out all 0.00 values (e.g. tx_mb above)
+         You can Filter for whatever parameter you like (e.g. with Select-Object)
+
+         .PARAMETER UnifiSite
+         ID of the client-device to be modified
+
+         .PARAMETER Mac
+         Client MAC address (required)
+
+         .PARAMETER Start
+         Startpoint in UniFi Unix timestamp in milliseconds
+
+         .PARAMETER End
+         Endpoint in UniFi Unix timestamp in milliseconds
+
+         .PARAMETER Attributes
+         array containing attributes (strings) to be returned, defaults to rx_bytes and tx_bytes
+
+         .EXAMPLE
+         PS C:\> Get-Unifi5minutesClientStats -Mac '78:8a:20:59:e6:88'
+
+         Get user/client statistics in 5 minute segments for a given (78:8a:20:59:e6:88) user/client in the default site
+
+         .EXAMPLE
+         (Get-Unifi5minutesClientStats -Mac '78:8a:20:59:e6:88' -Start '1548971935421' -End '1548975579019')
+
+         Get user/client statistics in 5 minute segments for a given (78:8a:20:59:e6:88) user/client in the default site for a given time period.
+
+         .EXAMPLE
+         (Get-Unifi5minutesClientStats -Mac '78:8a:20:59:e6:88' -Start '1548980058135')
+
+         Get user/client statistics in 5 minute segments for a given (78:8a:20:59:e6:88) user/client in the default site for the last 60 minutes (was the timestamp while the sample was created)
+
+         .EXAMPLE
+         PS C:\> (Get-Unifi5minutesClientStats -Mac '78:8a:20:59:e6:88' -UnifiSite 'contoso')[-1]
+
+         Get user/client statistics in 5 minute segments for a given (78:8a:20:59:e6:88) user/client in the site 'contoso'
+
+         .EXAMPLE
+         PS C:\> Get-Unifi5minutesClientStats -Mac '78:8a:20:59:e6:88' -Attributes 'rx_bytes', 'tx_bytes', 'signal', 'rx_rate', 'tx_rate', 'rx_retries', 'tx_retries', 'rx_packets', 'tx_packets')
+
+         Get all Values from the API
+
+         .NOTES
+         Defaults to the past 12 hours.
+         Make sure that the retention policy for 5 minutes stats is set to the correct value in the controller settings
+         Ubiquiti announced this with the Controller version 5.8 - It will not work on older versions!
+         Make sure that "Clients Historical Data" (Collect clients' historical data) has been enabled in the UniFi controller in "Settings/Maintenance"
+
+         .LINK
+         Get-UniFiConfig
+
+         .LINK
+         Set-UniFiDefaultRequestHeader
+
+         .LINK
+         Invoke-UniFiApiLogin
+
+         .LINK
+         Invoke-RestMethod
+
+         .LINK
+         ConvertFrom-UnixTimeStamp
+
+         .LINK
+         ConvertTo-UnixTimeStamp
+   #>
+
+   [CmdletBinding(ConfirmImpact = 'None')]
+   [OutputType([psobject])]
+   param
+   (
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 0)]
+      [ValidateNotNullOrEmpty()]
+      [Alias('Site')]
+      [string]
+      $UnifiSite = 'default',
+      [Parameter(Mandatory,
+            ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 1)]
+      [ValidateNotNullOrEmpty()]
+      [Alias('UniFiMac', 'MacAddress')]
+      [string]
+      $Mac,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 2)]
+      [Alias('Startpoint', 'StartTime')]
+      [String]
+      $Start,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 3)]
+      [Alias('EndPoint', 'EndTime')]
+      [string]
+      $End,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 4)]
+      [ValidateSet('rx_bytes', 'tx_bytes', 'signal', 'rx_rate', 'tx_rate', 'rx_retries', 'tx_retries', 'rx_packets', 'tx_packets', IgnoreCase = $true)]
+      [Alias('attribs', 'UniFiAttributes')]
+      [string[]]
+      $Attributes
+   )
+
+   begin
+   {
+      Write-Verbose -Message 'Start Get-Unifi5minutesClientStats'
+
+      # Set the defaults, if needed
+      if (-not ($Attributes))
+      {
+         [string[]]$Attributes = 'rx_bytes', 'tx_bytes'
+      }
+      # ensure the attributes are lowercase (we ignore the case on the input for the user covinience)
+      [string[]]$Attributes = ($Attributes).ToLower()
+
+      # Save Datestring to keep everything consitant
+      $now = (Get-Date)
+
+      if (-not ($Start))
+      {
+         $Start = (ConvertTo-UnixTimeStamp -Date ($now.AddHours(-12)) -Milliseconds)
+      }
+
+      if (-not ($End))
+      {
+         $End = (ConvertTo-UnixTimeStamp -Date $now -Milliseconds)
+      }
+
+      # Cleanup
+      $Session = $null
+
+      #region SafeProgressPreference
+      # Safe ProgressPreference and Setup SilentlyContinue for the function
+      $ExistingProgressPreference = ($ProgressPreference)
+      $ProgressPreference = 'SilentlyContinue'
+      #endregion SafeProgressPreference
+
+      #region CheckSession
+      if (-not (Get-UniFiIsAlive))
+      {
+         #region LoginCheckLoop
+         # TODO: Move to config
+         [int]$NumberOfRetries = '3'
+         [int]$RetryTimer = '5'
+         # Setup the Loop itself
+         $RetryLoop = $false
+         [int]$RetryCounter = '0'
+         # Original code/idea was by Thomas Maurer
+         do
+         {
+            try
+            {
+               # Try to Logout
+               try
+               {
+                  if (-not (Get-UniFiIsAlive))
+                  {
+                     throw
+                  }
+               }
+               catch
+               {
+                  # We don't care about that
+                  Write-Verbose -Message 'Logout failed'
+               }
+
+               # Try a Session check (login is inherited here within the helper function)
+               if (-not (Get-UniFiIsAlive -ErrorAction Stop -WarningAction SilentlyContinue))
+               {
+                  Write-Error -Message 'Login failed' -ErrorAction Stop -Category AuthenticationError
+               }
+
+               # End the Loop
+               $RetryLoop = $true
+            }
+            catch
+            {
+               if ($RetryCounter -gt $NumberOfRetries)
+               {
+                  Write-Warning -Message ('Could still not login, after {0} retries.' -f $NumberOfRetries)
+
+                  # Stay in the Loop
+                  $RetryLoop = $true
+               }
+               else
+               {
+                  if ($RetryCounter -eq 0)
+                  {
+                     Write-Warning -Message ('Could not login! Retrying in {0} seconds.' -f $RetryTimer)
+                  }
+                  else
+                  {
+                     Write-Warning -Message ('Retry {0} of {1} failed. Retrying in {2} seconds.' -f $RetryCounter, $NumberOfRetries, $RetryTimer)
+                  }
+
+                  $null = (Start-Sleep -Seconds $RetryTimer)
+
+                  $RetryCounter = $RetryCounter + 1
+               }
+            }
+         }
+         while ($RetryLoop -eq $false)
+         #endregion LoginCheckLoop
+      }
+      #endregion CheckSession
+
+      #region ReCheckSession
+      if (-not ($RestSession))
+      {
+         # Restore ProgressPreference
+         $ProgressPreference = $ExistingProgressPreference
+
+         Write-Error -Message 'Unable to login! Check the connection to the controller, SSL certificates, and your credentials!' -ErrorAction Stop -Category AuthenticationError
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+      }
+      #endregion ReCheckSession
+
+      #region MacHandler
+      if ($Mac)
+      {
+         [string]$Mac = (ConvertTo-UniFiValidMacAddress -Mac $Mac)
+      }
+      #endregion MacHandler
+
+      #region ApiRequestBodyInput
+      $Script:ApiRequestBodyInput = [PSCustomObject][ordered]@{
+         attrs = ($Attributes + 'time')
+         start = $Start
+         end   = $End
+         mac   = $Mac
+      }
+      #endregion ApiRequestBodyInput
+
+      # Call meta function
+      $paramGetCallerPreference = @{
+         Cmdlet        = $PSCmdlet
+         SessionState  = $ExecutionContext.SessionState
+         ErrorAction   = 'SilentlyContinue'
+         WarningAction = 'SilentlyContinue'
+      }
+      $null = (Get-CallerPreference @paramGetCallerPreference)
+   }
+
+   process
+   {
+      try
+      {
+         #region ReadConfig
+         Write-Verbose -Message 'Read the Config'
+
+         $null = (Get-UniFiConfig)
+         #endregion ReadConfig
+
+         #region CertificateHandler
+         Write-Verbose -Message ('Certificate check - Should be {0}' -f $ApiSelfSignedCert)
+
+         [Net.ServicePointManager]::ServerCertificateValidationCallback = {
+            $ApiSelfSignedCert
+         }
+         #endregion CertificateHandler
+
+         #region SetRequestHeader
+         Write-Verbose -Message 'Set the API Call default Header'
+
+         $null = (Set-UniFiDefaultRequestHeader)
+         #endregion SetRequestHeader
+
+         #region SetRequestURI
+         Write-Verbose -Message 'Create the Request URI'
+         $ApiRequestUri = $ApiUri + 's/' + $UnifiSite + '/stat/report/5minutes.user'
+         Write-Verbose -Message ('URI: {0}' -f $ApiRequestUri)
+         #endregion SetRequestURI
+
+         #region ApiRequestBody
+         $paramConvertToJson = @{
+            InputObject   = $ApiRequestBodyInput
+            Depth         = 5
+            ErrorAction   = 'Stop'
+            WarningAction = 'SilentlyContinue'
+         }
+
+         $ApiRequestBodyInput = $null
+
+         $Script:ApiRequestBody = (ConvertTo-Json @paramConvertToJson)
+         #endregion ApiRequestBody
+
+         #region Request
+         Write-Verbose -Message 'Send the Request'
+
+         $paramInvokeRestMethod = @{
+            Method        = 'Post'
+            Uri           = $ApiRequestUri
+            Headers       = $RestHeader
+            Body          = $ApiRequestBody
+            ErrorAction   = 'SilentlyContinue'
+            WarningAction = 'SilentlyContinue'
+            WebSession    = $RestSession
+         }
+         $Session = (Invoke-RestMethod @paramInvokeRestMethod)
+
+         Write-Verbose -Message "Session Meta: $(($Session.meta.rc | Out-String).Trim())"
+
+         Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+         #endregion Request
+
+         #region CreateOutput
+         $output = @()
+
+         foreach ($item in $Session.data)
+         {
+            $outputAppend = [PSCustomObject][ordered]@{
+               Time = ((ConvertFrom-UnixTimeStamp -TimeStamp ($item.time) -Milliseconds).ToLocalTime())
+            }
+
+            #region RX
+            if ($item.rx_bytes)
+            {
+               $outputAppend | Add-Member -NotePropertyName rx_bytes -NotePropertyValue $item.rx_bytes
+
+               if ((([math]::round($item.rx_bytes / 1KB, 2)) -ne '0.0') -or (([math]::round($item.rx_bytes / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName rx_kb -NotePropertyValue ([math]::round($item.rx_bytes / 1KB, 2))
+
+                  if ((([math]::round($item.rx_bytes / 1MB, 2)) -ne '0.0') -or (([math]::round($item.rx_bytes / 1MB, 2)) -ne '0.00'))
+                  {
+                     $outputAppend | Add-Member -NotePropertyName rx_mb -NotePropertyValue ([math]::round($item.rx_bytes / 1MB, 2))
+
+                     if ((([math]::round($item.rx_bytes / 1GB, 2)) -ne '0.0') -or (([math]::round($item.rx_bytes / 1GB, 2)) -ne '0.00'))
+                     {
+                        $outputAppend | Add-Member -NotePropertyName rx_gb -NotePropertyValue ([math]::round($item.rx_bytes / 1GB, 2))
+
+                        if ((([math]::round($item.rx_bytes / 1TB, 2)) -ne '0.0') -or (([math]::round($item.rx_bytes / 1TB, 2)) -ne '0.00'))
+                        {
+                           $outputAppend | Add-Member -NotePropertyName rx_tb -NotePropertyValue ([math]::round($item.rx_bytes / 1TB, 2))
+                        }
+                     }
+                  }
+               }
+            }
+
+            if ($item.rx_rate)
+            {
+               $outputAppend | Add-Member -NotePropertyName rx_rate -NotePropertyValue $item.rx_rate
+
+               if ((([math]::round($item.rx_rate / 1KB, 2)) -ne '0.0') -or (([math]::round($item.rx_rate / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName rx_rate_mbps -NotePropertyValue ([math]::round($item.rx_rate / 1KB, 2))
+               }
+            }
+
+            # If 0.0 handler added
+            if (($item.rx_retries) -or ($item.rx_retries -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName rx_retries -NotePropertyValue ([INT]$item.rx_retries)
+            }
+
+            if ($item.rx_packets)
+            {
+               $outputAppend | Add-Member -NotePropertyName rx_packets -NotePropertyValue $item.rx_packets
+            }
+            #endregion RX
+
+            #region TX
+            if ($item.tx_bytes)
+            {
+               $outputAppend | Add-Member -NotePropertyName tx_bytes -NotePropertyValue $item.tx_bytes
+
+               if ((([math]::round($item.tx_bytes / 1KB, 2)) -ne '0.0') -or (([math]::round($item.tx_bytes / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName tx_kb -NotePropertyValue ([math]::round($item.tx_bytes / 1KB, 2))
+
+                  if ((([math]::round($item.tx_bytes / 1MB, 2)) -ne '0.0') -or (([math]::round($item.tx_bytes / 1MB, 2)) -ne '0.00'))
+                  {
+                     $outputAppend | Add-Member -NotePropertyName tx_mb -NotePropertyValue ([math]::round($item.tx_bytes / 1MB, 2))
+
+                     if ((([math]::round($item.tx_bytes / 1GB, 2)) -ne '0.0') -or (([math]::round($item.tx_bytes / 1GB, 2)) -ne '0.00'))
+                     {
+                        $outputAppend | Add-Member -NotePropertyName tx_gb -NotePropertyValue ([math]::round($item.tx_bytes / 1GB, 2))
+
+                        if ((([math]::round($item.tx_bytes / 1TB, 2)) -ne '0.0') -or (([math]::round($item.tx_bytes / 1TB, 2)) -ne '0.00'))
+                        {
+                           $outputAppend | Add-Member -NotePropertyName tx_tb -NotePropertyValue ([math]::round($item.tx_bytes / 1TB, 2))
+                        }
+                     }
+                  }
+               }
+            }
+
+            if ($item.tx_rate)
+            {
+               $outputAppend | Add-Member -NotePropertyName tx_rate -NotePropertyValue $item.tx_rate
+               if ((([math]::round($item.tx_rate / 1KB, 2)) -ne '0.0') -or (([math]::round($item.tx_rate / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName tx_rate_mbps -NotePropertyValue ([math]::round($item.tx_rate / 1KB, 2))
+               }
+            }
+
+            # If 0.0 handler added
+            if (($item.tx_retries) -or ($item.tx_retries -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName tx_retries -NotePropertyValue ([INT]$item.tx_retries)
+            }
+
+            if ($item.tx_packets)
+            {
+               $outputAppend | Add-Member -NotePropertyName tx_packets -NotePropertyValue $item.tx_packets
+            }
+            #endregion TX
+
+            #region Traffic
+            if (($item.rx_bytes) -and ($item.tx_bytes))
+            {
+               $outputAppend | Add-Member -NotePropertyName Traffic_bytes -NotePropertyValue ([math]::round(($item.rx_bytes + $item.tx_bytes)))
+
+               if ((([math]::round(($item.rx_bytes + $item.tx_bytes) / 1KB, 2)) -ne '0.0') -or (([math]::round(($item.rx_bytes + $item.tx_bytes) / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName Traffic_kb -NotePropertyValue ([math]::round(($item.rx_bytes + $item.tx_bytes) / 1KB, 2))
+
+                  if ((([math]::round(($item.rx_bytes + $item.tx_bytes) / 1MB, 2)) -ne '0.0') -or (([math]::round(($item.rx_bytes + $item.tx_bytes) / 1MB, 2)) -ne '0.00'))
+                  {
+                     $outputAppend | Add-Member -NotePropertyName Traffic_mb -NotePropertyValue ([math]::round(($item.rx_bytes + $item.tx_bytes) / 1MB, 2))
+
+                     if ((([math]::round(($item.rx_bytes + $item.tx_bytes) / 1GB, 2)) -ne '0.0') -or (([math]::round(($item.rx_bytes + $item.tx_bytes) / 1GB, 2)) -ne '0.00'))
+                     {
+                        $outputAppend | Add-Member -NotePropertyName Traffic_gb -NotePropertyValue ([math]::round(($item.rx_bytes + $item.tx_bytes) / 1GB, 2))
+
+                        if ((([math]::round(($item.rx_bytes + $item.tx_bytes) / 1TB, 2)) -ne '0.0') -or (([math]::round(($item.rx_bytes + $item.tx_bytes) / 1TB, 2)) -ne '0.00'))
+                        {
+                           $outputAppend | Add-Member -NotePropertyName Traffic_tb -NotePropertyValue ([math]::round(($item.rx_bytes + $item.tx_bytes) / 1TB, 2))
+                        }
+                     }
+                  }
+               }
+            }
+            #endregion Traffic
+
+            #region Signal
+            if ($item.signal)
+            {
+               $outputAppend | Add-Member -NotePropertyName Signal -NotePropertyValue ([math]::Truncate($item.signal))
+               $outputAppend | Add-Member -NotePropertyName Signal_plain -NotePropertyValue $item.signal
+            }
+            #endregion Signal
+
+            # Sppend to the output
+            $output += $outputAppend
+
+            # Cleanup
+            $outputAppend = $null
+         }
+
+         # Resort to make sure everything is in the right order :)
+         $output = $output | Sort-Object Time
+         #endregion CreateOutput
+      }
+      catch
+      {
+         # Try to Logout
+         try
+         {
+            $null = (Invoke-UniFiApiLogout -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
+         }
+         catch
+         {
+            # We don't care about that
+            Write-Verbose -Message 'Logout failed'
+         }
+
+         #region ErrorHandler
+         # get error record
+         [Management.Automation.ErrorRecord]$e = $_
+
+         # retrieve information about runtime error
+         $info = [PSCustomObject]@{
+            Exception = $e.Exception.Message
+            Reason    = $e.CategoryInfo.Reason
+            Target    = $e.CategoryInfo.TargetName
+            Script    = $e.InvocationInfo.ScriptName
+            Line      = $e.InvocationInfo.ScriptLineNumber
+            Column    = $e.InvocationInfo.OffsetInLine
+         }
+
+         Write-Verbose -Message $info
+
+         Write-Error -Message ($info.Exception) -ErrorAction Stop
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+         #endregion ErrorHandler
+      }
+      finally
+      {
+         #region ResetSslTrust
+         # Reset the SSL Trust (make sure everything is back to default)
+         [Net.ServicePointManager]::ServerCertificateValidationCallback = $null
+         #endregion ResetSslTrust
+
+         #region RestoreProgressPreference
+         $ProgressPreference = $ExistingProgressPreference
+         #endregion RestoreProgressPreference
+      }
+
+      # check result
+      if ($Session.meta.rc -ne 'ok')
+      {
+         # Verbose stuff
+         $Script:line = $_.InvocationInfo.ScriptLineNumber
+         Write-Verbose -Message ('Error was in Line {0}' -f $line)
+         Write-Verbose -Message ('Error was {0}' -f $Session.meta.rc)
+
+         # Error Message
+         Write-Error -Message 'Unable to Login' -ErrorAction Stop
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+      }
+   }
+
+   end
+   {
+      # Dump the Result
+      $output
+
+      # Cleanup
+      $Session = $null
+      $output = $null
+
+      #region RestoreProgressPreference
+      $ProgressPreference = $ExistingProgressPreference
+      #endregion RestoreProgressPreference
+
+      Write-Verbose -Message 'Done Get-Unifi5minutesClientStats'
+   }
+}
+
+function Get-Unifi5minutesGatewayStats
+{
+   <#
+         .SYNOPSIS
+         Get statistics in 5 minute segments for the USG
+
+         .DESCRIPTION
+         Get statistics in 5 minute segments for the USG (UniFi Secure Gateway)
+
+         For convenience, we return the a bit more then the API, e.g. everything in KB, MB, GB, and TB instead of just bytes
+         We also return real timestamps instead of the unix timestaps in miliseconds that the UniFi returns
+
+         Sample output:
+         Time           : 2/1/2019 6:20:00 PM
+         gateway        : 78:8a:20:59:e6:88
+         mem            : 33.00
+         cpu            : 0.13
+         lan-rx_errors  : 0
+         lan-rx_bytes   : 1373037.08
+         lan-rx_kb      : 1340.86
+         lan-rx_mb      : 1.31
+         lan-rx_packets : 8410.58
+         lan-rx_dropped : 0
+         wan-rx_errors  : 0
+         wan-rx_packets : 1413.88
+         wan-rx_dropped : 0
+         lan-tx_errors  : 0
+         lan-tx_bytes   : 1908328.2
+         lan-tx_kb      : 1863.60
+         lan-tx_mb      : 1.82
+         lan-tx_packets : 8597.439999999999
+         lan-tx_dropped : 0
+         wan-tx_errors  : 0
+         wan-tx_bytes   : 391328.44
+         wan-tx_kb      : 382.16
+         wan-tx_mb      : 0.37
+         wan-tx_packets : 979.14
+         wan-tx_dropped : 0
+
+         You might filter out all the 0 values, we keep them to prevent any null pointer expetions!
+
+         You can Filter for whatever parameter you like (e.g. with Select-Object)
+
+         BUG: The loadavg_ attributes are not working at the moment. The UniFi SDN Controller does not return any values for them!
+
+         .PARAMETER UnifiSite
+         ID of the client-device to be modified
+
+         .PARAMETER Start
+         Startpoint in UniFi Unix timestamp in milliseconds
+
+         .PARAMETER End
+         Endpoint in UniFi Unix timestamp in milliseconds
+
+         .PARAMETER Attributes
+         array containing attributes (strings) to be returned, defaults to mem, cpu, and zime (Time is mandatory)
+
+         .EXAMPLE
+         PS C:\> Get-Unifi5minutesGatewayStats
+
+         Get statistics in 5 minute segments for the USG (UniFi Secure Gateway) in the default site
+
+         .EXAMPLE
+         (Get-Unifi5minutesGatewayStats -Start '1548971935421' -End '1548975579019')
+
+         Get statistics in 5 minute segments for the USG (UniFi Secure Gateway) in the default site for a given time period.
+
+         .EXAMPLE
+         (Get-Unifi5minutesGatewayStats -Start '1548980058135')
+
+         Get statistics in 5 minute segments for the USG (UniFi Secure Gateway) in the default site for the last 60 minutes (was the timestamp while the sample was created)
+
+         .EXAMPLE
+         PS C:\> (Get-Unifi5minutesGatewayStats -UnifiSite 'contoso')[-1]
+
+         Get statistics in 5 minute segments for the USG (UniFi Secure Gateway) in the site 'contoso'
+
+         .EXAMPLE
+         PS C:\> Get-Unifi5minutesGatewayStats -Attributes 'mem','cpu','loadavg_5','lan-rx_errors','wan-rx_errors','lan-tx_errors','wan-tx_errors','lan-rx_bytes','wan-rx_bytes','lan-tx_bytes','wan-tx_bytes','lan-rx_packets','wan-rx_packets','lan-tx_packets','wan-tx_packets','lan-rx_dropped','wan-rx_dropped','lan-tx_dropped','wan-tx_dropped')
+
+         Get all Values from the API
+
+         .NOTES
+         Defaults to the past 12 hours.
+         Make sure that the retention policy for 5 minutes stats is set to the correct value in the controller settings
+         Ubiquiti announced this with the Controller version 5.8 - It will not work on older versions!
+
+         A USG (UniFi Secure Gateway) is required on the site you querry!
+
+         .LINK
+         Get-UniFiConfig
+
+         .LINK
+         Set-UniFiDefaultRequestHeader
+
+         .LINK
+         Invoke-UniFiApiLogin
+
+         .LINK
+         Invoke-RestMethod
+
+         .LINK
+         ConvertFrom-UnixTimeStamp
+
+         .LINK
+         ConvertTo-UnixTimeStamp
+   #>
+
+   [CmdletBinding(ConfirmImpact = 'None')]
+   [OutputType([psobject])]
+   param
+   (
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 0)]
+      [ValidateNotNullOrEmpty()]
+      [Alias('Site')]
+      [string]
+      $UnifiSite = 'default',
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 1)]
+      [Alias('Startpoint', 'StartTime')]
+      [String]
+      $Start,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 2)]
+      [Alias('EndPoint', 'EndTime')]
+      [string]
+      $End,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 3)]
+      [ValidateSet('mem','cpu','loadavg_5','lan-rx_errors','wan-rx_errors','lan-tx_errors','wan-tx_errors','lan-rx_bytes','wan-rx_bytes','lan-tx_bytes','wan-tx_bytes','lan-rx_packets','wan-rx_packets','lan-tx_packets','wan-tx_packets','lan-rx_dropped','wan-rx_dropped','lan-tx_dropped','wan-tx_dropped', IgnoreCase = $true)]
+      [Alias('attribs', 'UniFiAttributes')]
+      [string[]]
+      $Attributes
+   )
+
+   begin
+   {
+      Write-Verbose -Message 'Start Get-Unifi5minutesGatewayStats'
+
+      # Set the defaults, if needed
+      if (-not ($Attributes))
+      {
+         [string[]]$Attributes = 'mem', 'cpu', 'loadavg_5'
+      }
+      # ensure the attributes are lowercase (we ignore the case on the input for the user covinience)
+      [string[]]$Attributes = ($Attributes).ToLower()
+
+      # Save Datestring to keep everything consitant
+      $now = (Get-Date)
+
+      if (-not ($Start))
+      {
+         $Start = (ConvertTo-UnixTimeStamp -Date ($now.AddHours(-12)) -Milliseconds)
+      }
+
+      if (-not ($End))
+      {
+         $End = (ConvertTo-UnixTimeStamp -Date $now -Milliseconds)
+      }
+
+      # Cleanup
+      $Session = $null
+
+      #region SafeProgressPreference
+      # Safe ProgressPreference and Setup SilentlyContinue for the function
+      $ExistingProgressPreference = ($ProgressPreference)
+      $ProgressPreference = 'SilentlyContinue'
+      #endregion SafeProgressPreference
+
+      #region CheckSession
+      if (-not (Get-UniFiIsAlive))
+      {
+         #region LoginCheckLoop
+         # TODO: Move to config
+         [int]$NumberOfRetries = '3'
+         [int]$RetryTimer = '5'
+         # Setup the Loop itself
+         $RetryLoop = $false
+         [int]$RetryCounter = '0'
+         # Original code/idea was by Thomas Maurer
+         do
+         {
+            try
+            {
+               # Try to Logout
+               try
+               {
+                  if (-not (Get-UniFiIsAlive))
+                  {
+                     throw
+                  }
+               }
+               catch
+               {
+                  # We don't care about that
+                  Write-Verbose -Message 'Logout failed'
+               }
+
+               # Try a Session check (login is inherited here within the helper function)
+               if (-not (Get-UniFiIsAlive -ErrorAction Stop -WarningAction SilentlyContinue))
+               {
+                  Write-Error -Message 'Login failed' -ErrorAction Stop -Category AuthenticationError
+               }
+
+               # End the Loop
+               $RetryLoop = $true
+            }
+            catch
+            {
+               if ($RetryCounter -gt $NumberOfRetries)
+               {
+                  Write-Warning -Message ('Could still not login, after {0} retries.' -f $NumberOfRetries)
+
+                  # Stay in the Loop
+                  $RetryLoop = $true
+               }
+               else
+               {
+                  if ($RetryCounter -eq 0)
+                  {
+                     Write-Warning -Message ('Could not login! Retrying in {0} seconds.' -f $RetryTimer)
+                  }
+                  else
+                  {
+                     Write-Warning -Message ('Retry {0} of {1} failed. Retrying in {2} seconds.' -f $RetryCounter, $NumberOfRetries, $RetryTimer)
+                  }
+
+                  $null = (Start-Sleep -Seconds $RetryTimer)
+
+                  $RetryCounter = $RetryCounter + 1
+               }
+            }
+         }
+         while ($RetryLoop -eq $false)
+         #endregion LoginCheckLoop
+      }
+      #endregion CheckSession
+
+      #region ReCheckSession
+      if (-not ($RestSession))
+      {
+         # Restore ProgressPreference
+         $ProgressPreference = $ExistingProgressPreference
+
+         Write-Error -Message 'Unable to login! Check the connection to the controller, SSL certificates, and your credentials!' -ErrorAction Stop -Category AuthenticationError
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+      }
+      #endregion ReCheckSession
+
+      #region MacHandler
+      if ($Mac)
+      {
+         [string]$Mac = (ConvertTo-UniFiValidMacAddress -Mac $Mac)
+      }
+      #endregion MacHandler
+
+      #region ApiRequestBodyInput
+      $Script:ApiRequestBodyInput = [PSCustomObject][ordered]@{
+         attrs = ($Attributes + 'time')
+         start = $Start
+         end   = $End
+         mac   = $Mac
+      }
+      #endregion ApiRequestBodyInput
+
+      # Call meta function
+      $paramGetCallerPreference = @{
+         Cmdlet        = $PSCmdlet
+         SessionState  = $ExecutionContext.SessionState
+         ErrorAction   = 'SilentlyContinue'
+         WarningAction = 'SilentlyContinue'
+      }
+      $null = (Get-CallerPreference @paramGetCallerPreference)
+   }
+
+   process
+   {
+      try
+      {
+         #region ReadConfig
+         Write-Verbose -Message 'Read the Config'
+
+         $null = (Get-UniFiConfig)
+         #endregion ReadConfig
+
+         #region CertificateHandler
+         Write-Verbose -Message ('Certificate check - Should be {0}' -f $ApiSelfSignedCert)
+
+         [Net.ServicePointManager]::ServerCertificateValidationCallback = {
+            $ApiSelfSignedCert
+         }
+         #endregion CertificateHandler
+
+         #region SetRequestHeader
+         Write-Verbose -Message 'Set the API Call default Header'
+
+         $null = (Set-UniFiDefaultRequestHeader)
+         #endregion SetRequestHeader
+
+         #region SetRequestURI
+         Write-Verbose -Message 'Create the Request URI'
+         $ApiRequestUri = $ApiUri + 's/' + $UnifiSite + '/stat/report/5minutes.gw'
+         Write-Verbose -Message ('URI: {0}' -f $ApiRequestUri)
+         #endregion SetRequestURI
+
+         #region ApiRequestBody
+         $paramConvertToJson = @{
+            InputObject   = $ApiRequestBodyInput
+            Depth         = 5
+            ErrorAction   = 'Stop'
+            WarningAction = 'SilentlyContinue'
+         }
+
+         $ApiRequestBodyInput = $null
+
+         $Script:ApiRequestBody = (ConvertTo-Json @paramConvertToJson)
+         #endregion ApiRequestBody
+
+         #region Request
+         Write-Verbose -Message 'Send the Request'
+
+         $paramInvokeRestMethod = @{
+            Method        = 'Post'
+            Uri           = $ApiRequestUri
+            Headers       = $RestHeader
+            Body          = $ApiRequestBody
+            ErrorAction   = 'SilentlyContinue'
+            WarningAction = 'SilentlyContinue'
+            WebSession    = $RestSession
+         }
+         $Session = (Invoke-RestMethod @paramInvokeRestMethod)
+
+         Write-Verbose -Message "Session Meta: $(($Session.meta.rc | Out-String).Trim())"
+
+         Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+         #endregion Request
+
+         #region CreateOutput
+         $output = @()
+
+         foreach ($item in $Session.data)
+         {
+            $outputAppend = [PSCustomObject][ordered]@{
+               Time    = ((ConvertFrom-UnixTimeStamp -TimeStamp ($item.time) -Milliseconds).ToLocalTime())
+               gateway = $item.gw
+            }
+
+            #region Default
+            if ($item.mem)
+            {
+               $outputAppend | Add-Member -NotePropertyName mem -NotePropertyValue ('{0:N2}' -f ([math]::Round($item.mem,2,'AwayFromZero')))
+            }
+
+            if ($item.cpu)
+            {
+               $outputAppend | Add-Member -NotePropertyName cpu -NotePropertyValue ('{0:N2}' -f ([math]::Round($item.cpu,2,'AwayFromZero')))
+            }
+
+            if ($item.loadavg_5)
+            {
+               $outputAppend | Add-Member -NotePropertyName loadavg_5 -NotePropertyValue ([INT]$item.loadavg_5)
+            }
+            #endregion Default
+
+            #region RX
+            if (($item.'lan-rx_errors') -or ($item.'lan-rx_errors' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'lan-rx_errors' -NotePropertyValue ([int]($item.'lan-rx_errors'))
+            }
+
+            if (($item.'lan-rx_bytes') -or ($item.'lan-rx_bytes' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'lan-rx_bytes' -NotePropertyValue $item.'lan-rx_bytes'
+
+               if ((([math]::round($item.'lan-rx_bytes' / 1KB, 2)) -ne '0.0') -or (([math]::round($item.'lan-rx_bytes' / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName 'lan-rx_kb' -NotePropertyValue ([math]::round($item.'lan-rx_bytes' / 1KB, 2))
+
+                  if ((([math]::round($item.'lan-rx_bytes' / 1MB, 2)) -ne '0.0') -or (([math]::round($item.'lan-rx_bytes' / 1MB, 2)) -ne '0.00'))
+                  {
+                     $outputAppend | Add-Member -NotePropertyName 'lan-rx_mb' -NotePropertyValue ([math]::round($item.'lan-rx_bytes' / 1MB, 2))
+
+                     if ((([math]::round($item.'lan-rx_bytes' / 1GB, 2)) -ne '0.0') -or (([math]::round($item.'lan-rx_bytes' / 1GB, 2)) -ne '0.00'))
+                     {
+                        $outputAppend | Add-Member -NotePropertyName 'lan-rx_gb' -NotePropertyValue ([math]::round($item.'lan-rx_bytes' / 1GB, 2))
+
+                        if ((([math]::round($item.'lan-rx_bytes' / 1TB, 2)) -ne '0.0') -or (([math]::round($item.'lan-rx_bytes' / 1TB, 2)) -ne '0.00'))
+                        {
+                           $outputAppend | Add-Member -NotePropertyName 'lan-rx_tb' -NotePropertyValue ([math]::round($item.'lan-rx_bytes' / 1TB, 2))
+                        }
+                     }
+                  }
+               }
+            }
+
+            if (($item.'lan-rx_packets') -or ($item.'lan-rx_packets' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'lan-rx_packets' -NotePropertyValue $item.'lan-rx_packets'
+            }
+
+            if (($item.'lan-rx_dropped') -or ($item.'lan-rx_dropped' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'lan-rx_dropped' -NotePropertyValue ([int]($item.'lan-rx_dropped'))
+            }
+
+            if (($item.'wan-rx_errors') -or ($item.'wan-rx_errors' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'wan-rx_errors' -NotePropertyValue ([int]($item.'wan-rx_errors'))
+            }
+
+            if (($item.'wan-rx_byte') -or ($item.'wan-rx_byte' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'wan-rx_bytes' -NotePropertyValue $item.'wan-rx_bytes'
+
+               if ((([math]::round($item.'wan-rx_bytes' / 1KB, 2)) -ne '0.0') -or (([math]::round($item.'wan-rx_bytes' / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName 'wan-rx_kb' -NotePropertyValue ([math]::round($item.'wan-rx_bytes' / 1KB, 2))
+
+                  if ((([math]::round($item.'wan-rx_bytes' / 1MB, 2)) -ne '0.0') -or (([math]::round($item.'wan-rx_bytes' / 1MB, 2)) -ne '0.00'))
+                  {
+                     $outputAppend | Add-Member -NotePropertyName 'wan-rx_mb' -NotePropertyValue ([math]::round($item.'wan-rx_bytes' / 1MB, 2))
+
+                     if ((([math]::round($item.'wan-rx_bytes' / 1GB, 2)) -ne '0.0') -or (([math]::round($item.'wan-rx_bytes' / 1GB, 2)) -ne '0.00'))
+                     {
+                        $outputAppend | Add-Member -NotePropertyName 'wan-rx_gb' -NotePropertyValue ([math]::round($item.'wan-rx_bytes' / 1GB, 2))
+
+                        if ((([math]::round($item.'wan-rx_bytes' / 1TB, 2)) -ne '0.0') -or (([math]::round($item.'wan-rx_bytes' / 1TB, 2)) -ne '0.00'))
+                        {
+                           $outputAppend | Add-Member -NotePropertyName 'wan-rx_tb' -NotePropertyValue ([math]::round($item.'wan-rx_bytes' / 1TB, 2))
+                        }
+                     }
+                  }
+               }
+            }
+
+            if (($item.'wan-rx_packets') -or ($item.'wan-rx_packets' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'wan-rx_packets' -NotePropertyValue $item.'wan-rx_packets'
+            }
+
+            if (($item.'wan-rx_dropped') -or ($item.'wan-rx_dropped' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'wan-rx_dropped' -NotePropertyValue ([int]($item.'wan-rx_dropped'))
+            }
+            #endregion RX
+
+            #region TX
+            if (($item.'lan-tx_errors') -or ($item.'lan-tx_errors' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'lan-tx_errors' -NotePropertyValue ([int]($item.'lan-tx_errors'))
+            }
+
+            if (($item.'lan-tx_bytes') -or ($item.'lan-tx_bytes' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'lan-tx_bytes' -NotePropertyValue $item.'lan-tx_bytes'
+
+               if ((([math]::round($item.'lan-tx_bytes' / 1KB, 2)) -ne '0.0') -or (([math]::round($item.'lan-tx_bytes' / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName 'lan-tx_kb' -NotePropertyValue ([math]::round($item.'lan-tx_bytes' / 1KB, 2))
+
+                  if ((([math]::round($item.'lan-tx_bytes' / 1MB, 2)) -ne '0.0') -or (([math]::round($item.'lan-tx_bytes' / 1MB, 2)) -ne '0.00'))
+                  {
+                     $outputAppend | Add-Member -NotePropertyName 'lan-tx_mb' -NotePropertyValue ([math]::round($item.'lan-tx_bytes' / 1MB, 2))
+
+                     if ((([math]::round($item.'lan-tx_bytes' / 1GB, 2)) -ne '0.0') -or (([math]::round($item.'lan-tx_bytes' / 1GB, 2)) -ne '0.00'))
+                     {
+                        $outputAppend | Add-Member -NotePropertyName 'lan-tx_gb' -NotePropertyValue ([math]::round($item.'lan-tx_bytes' / 1GB, 2))
+
+                        if ((([math]::round($item.'lan-tx_bytes' / 1TB, 2)) -ne '0.0') -or (([math]::round($item.'lan-tx_bytes' / 1TB, 2)) -ne '0.00'))
+                        {
+                           $outputAppend | Add-Member -NotePropertyName 'lan-tx_tb' -NotePropertyValue ([math]::round($item.'lan-tx_bytes' / 1TB, 2))
+                        }
+                     }
+                  }
+               }
+            }
+
+            if (($item.'lan-tx_packets') -or ($item.'lan-tx_packets' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'lan-tx_packets' -NotePropertyValue $item.'lan-tx_packets'
+            }
+
+            if (($item.'lan-tx_dropped') -or ($item.'lan-tx_dropped' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'lan-tx_dropped' -NotePropertyValue ([int]($item.'lan-tx_dropped'))
+            }
+
+            if (($item.'wan-tx_errors') -or ($item.'wan-tx_errors' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'wan-tx_errors' -NotePropertyValue ([int]($item.'wan-tx_errors'))
+            }
+
+            if (($item.'wan-tx_bytes') -or ($item.'wan-tx_bytes' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'wan-tx_bytes' -NotePropertyValue $item.'wan-tx_bytes'
+
+               if ((([math]::round($item.'wan-tx_bytes' / 1KB, 2)) -ne '0.0') -or (([math]::round($item.'wan-tx_bytes' / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName 'wan-tx_kb' -NotePropertyValue ([math]::round($item.'wan-tx_bytes' / 1KB, 2))
+
+                  if ((([math]::round($item.'wan-tx_bytes' / 1MB, 2)) -ne '0.0') -or (([math]::round($item.'wan-tx_bytes' / 1MB, 2)) -ne '0.00'))
+                  {
+                     $outputAppend | Add-Member -NotePropertyName 'wan-tx_mb' -NotePropertyValue ([math]::round($item.'wan-tx_bytes' / 1MB, 2))
+
+                     if ((([math]::round($item.'wan-tx_bytes' / 1GB, 2)) -ne '0.0') -or (([math]::round($item.'wan-tx_bytes' / 1GB, 2)) -ne '0.00'))
+                     {
+                        $outputAppend | Add-Member -NotePropertyName 'wan-tx_gb' -NotePropertyValue ([math]::round($item.'wan-tx_bytes' / 1GB, 2))
+
+                        if ((([math]::round($item.'wan-tx_bytes' / 1TB, 2)) -ne '0.0') -or (([math]::round($item.'wan-tx_bytes' / 1TB, 2)) -ne '0.00'))
+                        {
+                           $outputAppend | Add-Member -NotePropertyName 'wan-tx_tb' -NotePropertyValue ([math]::round($item.'wan-tx_bytes' / 1TB, 2))
+                        }
+                     }
+                  }
+               }
+            }
+
+            if (($item.'wan-tx_packets') -or ($item.'wan-tx_packets' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'wan-tx_packets' -NotePropertyValue $item.'wan-tx_packets'
+            }
+
+            if (($item.'wan-tx_dropped') -or ($item.'wan-tx_dropped' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'wan-tx_dropped' -NotePropertyValue ([int]($item.'wan-tx_dropped'))
+            }
+            #endregion TX
+
+
+            # Sppend to the output
+            $output += $outputAppend
+
+            # Cleanup
+            $outputAppend = $null
+         }
+
+         # Resort to make sure everything is in the right order :)
+         $output = $output | Sort-Object Time
+         #endregion CreateOutput
+      }
+      catch
+      {
+         # Try to Logout
+         try
+         {
+            $null = (Invoke-UniFiApiLogout -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
+         }
+         catch
+         {
+            # We don't care about that
+            Write-Verbose -Message 'Logout failed'
+         }
+
+         #region ErrorHandler
+         # get error record
+         [Management.Automation.ErrorRecord]$e = $_
+
+         # retrieve information about runtime error
+         $info = [PSCustomObject]@{
+            Exception = $e.Exception.Message
+            Reason    = $e.CategoryInfo.Reason
+            Target    = $e.CategoryInfo.TargetName
+            Script    = $e.InvocationInfo.ScriptName
+            Line      = $e.InvocationInfo.ScriptLineNumber
+            Column    = $e.InvocationInfo.OffsetInLine
+         }
+
+         Write-Verbose -Message $info
+
+         Write-Error -Message ($info.Exception) -ErrorAction Stop
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+         #endregion ErrorHandler
+      }
+      finally
+      {
+         #region ResetSslTrust
+         # Reset the SSL Trust (make sure everything is back to default)
+         [Net.ServicePointManager]::ServerCertificateValidationCallback = $null
+         #endregion ResetSslTrust
+
+         #region RestoreProgressPreference
+         $ProgressPreference = $ExistingProgressPreference
+         #endregion RestoreProgressPreference
+      }
+
+      # check result
+      if ($Session.meta.rc -ne 'ok')
+      {
+         # Verbose stuff
+         $Script:line = $_.InvocationInfo.ScriptLineNumber
+         Write-Verbose -Message ('Error was in Line {0}' -f $line)
+         Write-Verbose -Message ('Error was {0}' -f $Session.meta.rc)
+
+         # Error Message
+         Write-Error -Message 'Unable to Login' -ErrorAction Stop
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+      }
+   }
+
+   end
+   {
+      # Dump the Result
+      $output
+
+      # Cleanup
+      $Session = $null
+      $output = $null
+
+      #region RestoreProgressPreference
+      $ProgressPreference = $ExistingProgressPreference
+      #endregion RestoreProgressPreference
+
+      Write-Verbose -Message 'Done Get-Unifi5minutesGatewayStats'
+   }
+}
+
+function Get-Unifi5minutesSiteStats
+{
+   <#
+         .SYNOPSIS
+         Get statistics in 5 minute segments for a complete Site
+
+         .DESCRIPTION
+         Get statistics in 5 minute segments for a complete UniFi Site
+
+         For convenience, we return the a bit more then the API, e.g. everything in KB, MB, GB, and TB instead of just bytes
+
+         We also return real timestamps instead of the unix timestaps in miliseconds that the UniFi returns
+
+         Sample output:
+         Time         : 1/28/2019 8:00:00 AM
+         wan-tx_bytes : 15674710.4243137
+         wan-tx_kb    : 15307.33
+         wan-tx_mb    : 14.95
+         wan-tx_gb    : 0.01
+         wan-rx_bytes : 74608528.2870588
+         wan-rx_kb    : 72859.89
+         wan-rx_mb    : 71.15
+         wan-rx_gb    : 0.07
+         wan_bytes    : 90283238.7113726
+         wan_kb       : 88167.23
+         wan_mb       : 86.1
+         wan_gb       : 0.08
+         wlan_bytes   : 73033651.4499586
+         wlan_kb      : 71321.93
+         wlan_mb      : 69.65
+         wlan_gb      : 0.07
+         Clients      : 35
+         LAN_Clients  : 30
+         WLAN_Clients : 5
+
+         You might filter out all the 0 values, we keep them to prevent any null pointer expetions!
+
+         You can Filter for whatever parameter you like (e.g. with Select-Object)
+
+         .PARAMETER UnifiSite
+         ID of the client-device to be modified
+
+         .PARAMETER Start
+         Startpoint in UniFi Unix timestamp in milliseconds
+
+         .PARAMETER End
+         Endpoint in UniFi Unix timestamp in milliseconds
+
+         .PARAMETER Attributes
+         array containing attributes (strings) to be returned, defaults are all
+
+         .EXAMPLE
+         PS C:\> Get-Unifi5minutesSiteStats
+
+         Get statistics in 5 minute segments for a complete UniFi in the default site
+
+         .EXAMPLE
+         (Get-Unifi5minutesSiteStats -Start '1548971935421' -End '1548975579019')
+
+         Get statistics in 5 minute segments for a complete UniFi in the default site for a given time period.
+
+         .EXAMPLE
+         (Get-Unifi5minutesSiteStats -Start '1548980058135')
+
+         Get statistics in 5 minute segments for a complete UniFi in the default site for the last 60 minutes (was the timestamp while the sample was created)
+
+         .EXAMPLE
+         PS C:\> (Get-Unifi5minutesSiteStats -UnifiSite 'contoso')[-1]
+
+         Get statistics in 5 minute segments for a complete UniFi in the site 'contoso'
+
+         .EXAMPLE
+         PS C:\> Get-Unifi5minutesSiteStats -Attributes 'bytes','wan-tx_bytes','wan-rx_bytes','wlan_bytes','num_sta','lan-num_sta','wlan-num_sta')
+
+         Get all Values from the API
+
+         .NOTES
+         Defaults to the past 12 hours
+
+         "bytes" are no longer returned with controller version 4.9.1 and later
+
+         .LINK
+         Get-UniFiConfig
+
+         .LINK
+         Set-UniFiDefaultRequestHeader
+
+         .LINK
+         Invoke-UniFiApiLogin
+
+         .LINK
+         Invoke-RestMethod
+
+         .LINK
+         ConvertFrom-UnixTimeStamp
+
+         .LINK
+         ConvertTo-UnixTimeStamp
+   #>
+
+   [CmdletBinding(ConfirmImpact = 'None')]
+   [OutputType([psobject])]
+   param
+   (
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 0)]
+      [ValidateNotNullOrEmpty()]
+      [Alias('Site')]
+      [string]
+      $UnifiSite = 'default',
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 1)]
+      [Alias('Startpoint', 'StartTime')]
+      [String]
+      $Start,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 2)]
+      [Alias('EndPoint', 'EndTime')]
+      [string]
+      $End,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 3)]
+      [ValidateSet('bytes','wan-tx_bytes','wan-rx_bytes','wlan_bytes','num_sta','lan-num_sta','wlan-num_sta', IgnoreCase = $true)]
+      [Alias('attribs', 'UniFiAttributes')]
+      [string[]]
+      $Attributes
+   )
+
+   begin
+   {
+      Write-Verbose -Message 'Start Get-Unifi5minutesSiteStats'
+
+      # Set the defaults, if needed
+      if (-not ($Attributes))
+      {
+         [string[]]$Attributes = 'bytes', 'wan-tx_bytes', 'wan-rx_bytes', 'wlan_bytes', 'num_sta', 'lan-num_sta', 'wlan-num_sta'
+      }
+      # ensure the attributes are lowercase (we ignore the case on the input for the user covinience)
+      [string[]]$Attributes = ($Attributes).ToLower()
+
+      # Save Datestring to keep everything consitant
+      $now = (Get-Date)
+
+      if (-not ($Start))
+      {
+         $Start = (ConvertTo-UnixTimeStamp -Date ($now.AddHours(-12)) -Milliseconds)
+      }
+
+      if (-not ($End))
+      {
+         $End = (ConvertTo-UnixTimeStamp -Date $now -Milliseconds)
+      }
+
+      # Cleanup
+      $Session = $null
+
+      #region SafeProgressPreference
+      # Safe ProgressPreference and Setup SilentlyContinue for the function
+      $ExistingProgressPreference = ($ProgressPreference)
+      $ProgressPreference = 'SilentlyContinue'
+      #endregion SafeProgressPreference
+
+      #region CheckSession
+      if (-not (Get-UniFiIsAlive))
+      {
+         #region LoginCheckLoop
+         # TODO: Move to config
+         [int]$NumberOfRetries = '3'
+         [int]$RetryTimer = '5'
+         # Setup the Loop itself
+         $RetryLoop = $false
+         [int]$RetryCounter = '0'
+         # Original code/idea was by Thomas Maurer
+         do
+         {
+            try
+            {
+               # Try to Logout
+               try
+               {
+                  if (-not (Get-UniFiIsAlive))
+                  {
+                     throw
+                  }
+               }
+               catch
+               {
+                  # We don't care about that
+                  Write-Verbose -Message 'Logout failed'
+               }
+
+               # Try a Session check (login is inherited here within the helper function)
+               if (-not (Get-UniFiIsAlive -ErrorAction Stop -WarningAction SilentlyContinue))
+               {
+                  Write-Error -Message 'Login failed' -ErrorAction Stop -Category AuthenticationError
+               }
+
+               # End the Loop
+               $RetryLoop = $true
+            }
+            catch
+            {
+               if ($RetryCounter -gt $NumberOfRetries)
+               {
+                  Write-Warning -Message ('Could still not login, after {0} retries.' -f $NumberOfRetries)
+
+                  # Stay in the Loop
+                  $RetryLoop = $true
+               }
+               else
+               {
+                  if ($RetryCounter -eq 0)
+                  {
+                     Write-Warning -Message ('Could not login! Retrying in {0} seconds.' -f $RetryTimer)
+                  }
+                  else
+                  {
+                     Write-Warning -Message ('Retry {0} of {1} failed. Retrying in {2} seconds.' -f $RetryCounter, $NumberOfRetries, $RetryTimer)
+                  }
+
+                  $null = (Start-Sleep -Seconds $RetryTimer)
+
+                  $RetryCounter = $RetryCounter + 1
+               }
+            }
+         }
+         while ($RetryLoop -eq $false)
+         #endregion LoginCheckLoop
+      }
+      #endregion CheckSession
+
+      #region ReCheckSession
+      if (-not ($RestSession))
+      {
+         # Restore ProgressPreference
+         $ProgressPreference = $ExistingProgressPreference
+
+         Write-Error -Message 'Unable to login! Check the connection to the controller, SSL certificates, and your credentials!' -ErrorAction Stop -Category AuthenticationError
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+      }
+      #endregion ReCheckSession
+
+      #region MacHandler
+      if ($Mac)
+      {
+         [string]$Mac = (ConvertTo-UniFiValidMacAddress -Mac $Mac)
+      }
+      #endregion MacHandler
+
+      #region ApiRequestBodyInput
+      $Script:ApiRequestBodyInput = [PSCustomObject][ordered]@{
+         attrs = ($Attributes + 'time')
+         start = $Start
+         end   = $End
+         mac   = $Mac
+      }
+      #endregion ApiRequestBodyInput
+
+      # Call meta function
+      $paramGetCallerPreference = @{
+         Cmdlet        = $PSCmdlet
+         SessionState  = $ExecutionContext.SessionState
+         ErrorAction   = 'SilentlyContinue'
+         WarningAction = 'SilentlyContinue'
+      }
+      $null = (Get-CallerPreference @paramGetCallerPreference)
+   }
+
+   process
+   {
+      try
+      {
+         #region ReadConfig
+         Write-Verbose -Message 'Read the Config'
+
+         $null = (Get-UniFiConfig)
+         #endregion ReadConfig
+
+         #region CertificateHandler
+         Write-Verbose -Message ('Certificate check - Should be {0}' -f $ApiSelfSignedCert)
+
+         [Net.ServicePointManager]::ServerCertificateValidationCallback = {
+            $ApiSelfSignedCert
+         }
+         #endregion CertificateHandler
+
+         #region SetRequestHeader
+         Write-Verbose -Message 'Set the API Call default Header'
+
+         $null = (Set-UniFiDefaultRequestHeader)
+         #endregion SetRequestHeader
+
+         #region SetRequestURI
+         Write-Verbose -Message 'Create the Request URI'
+         $ApiRequestUri = $ApiUri + 's/' + $UnifiSite + '/stat/report/5minutes.site'
+         Write-Verbose -Message ('URI: {0}' -f $ApiRequestUri)
+         #endregion SetRequestURI
+
+         #region ApiRequestBody
+         $paramConvertToJson = @{
+            InputObject   = $ApiRequestBodyInput
+            Depth         = 5
+            ErrorAction   = 'Stop'
+            WarningAction = 'SilentlyContinue'
+         }
+
+         $ApiRequestBodyInput = $null
+
+         $Script:ApiRequestBody = (ConvertTo-Json @paramConvertToJson)
+         #endregion ApiRequestBody
+
+         #region Request
+         Write-Verbose -Message 'Send the Request'
+
+         $paramInvokeRestMethod = @{
+            Method        = 'Post'
+            Uri           = $ApiRequestUri
+            Headers       = $RestHeader
+            Body          = $ApiRequestBody
+            ErrorAction   = 'SilentlyContinue'
+            WarningAction = 'SilentlyContinue'
+            WebSession    = $RestSession
+         }
+         $Session = (Invoke-RestMethod @paramInvokeRestMethod)
+
+         Write-Verbose -Message "Session Meta: $(($Session.meta.rc | Out-String).Trim())"
+
+         Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+         #endregion Request
+
+         #region CreateOutput
+         $output = @()
+
+         foreach ($item in $Session.data)
+         {
+            $outputAppend = [PSCustomObject][ordered]@{
+               Time = ((ConvertFrom-UnixTimeStamp -TimeStamp ($item.time) -Milliseconds).ToLocalTime())
+            }
+
+            #region
+            if (($item.'bytes') -or ($item.'bytes' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'bytes' -NotePropertyValue $item.'bytes'
+
+               if ((([math]::round($item.'bytes' / 1KB, 2)) -ne '0.0') -or (([math]::round($item.'bytes' / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName 'kb' -NotePropertyValue ([math]::round($item.'bytes' / 1KB, 2))
+
+                  if ((([math]::round($item.'bytes' / 1MB, 2)) -ne '0.0') -or (([math]::round($item.'bytes' / 1MB, 2)) -ne '0.00'))
+                  {
+                     $outputAppend | Add-Member -NotePropertyName 'mb' -NotePropertyValue ([math]::round($item.'bytes' / 1MB, 2))
+
+                     if ((([math]::round($item.'bytes' / 1GB, 2)) -ne '0.0') -or (([math]::round($item.'bytes' / 1GB, 2)) -ne '0.00'))
+                     {
+                        $outputAppend | Add-Member -NotePropertyName 'gb' -NotePropertyValue ([math]::round($item.'bytes' / 1GB, 2))
+
+                        if ((([math]::round($item.'bytes' / 1TB, 2)) -ne '0.0') -or (([math]::round($item.'bytes' / 1TB, 2)) -ne '0.00'))
+                        {
+                           $outputAppend | Add-Member -NotePropertyName 'tb' -NotePropertyValue ([math]::round($item.'bytes' / 1TB, 2))
+                        }
+                     }
+                  }
+               }
+            }
+
+            if (($item.'wan-tx_bytes') -or ($item.'wan-tx_bytes' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'wan-tx_bytes' -NotePropertyValue $item.'wan-tx_bytes'
+
+               if ((([math]::round($item.'wan-tx_bytes' / 1KB, 2)) -ne '0.0') -or (([math]::round($item.'wan-tx_bytes' / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName 'wan-tx_kb' -NotePropertyValue ([math]::round($item.'wan-tx_bytes' / 1KB, 2))
+
+                  if ((([math]::round($item.'wan-tx_bytes' / 1MB, 2)) -ne '0.0') -or (([math]::round($item.'wan-tx_bytes' / 1MB, 2)) -ne '0.00'))
+                  {
+                     $outputAppend | Add-Member -NotePropertyName 'wan-tx_mb' -NotePropertyValue ([math]::round($item.'wan-tx_bytes' / 1MB, 2))
+
+                     if ((([math]::round($item.'wan-tx_bytes' / 1GB, 2)) -ne '0.0') -or (([math]::round($item.'wan-tx_bytes' / 1GB, 2)) -ne '0.00'))
+                     {
+                        $outputAppend | Add-Member -NotePropertyName 'wan-tx_gb' -NotePropertyValue ([math]::round($item.'wan-tx_bytes' / 1GB, 2))
+
+                        if ((([math]::round($item.'wan-tx_bytes' / 1TB, 2)) -ne '0.0') -or (([math]::round($item.'wan-tx_bytes' / 1TB, 2)) -ne '0.00'))
+                        {
+                           $outputAppend | Add-Member -NotePropertyName 'wan-tx_tb' -NotePropertyValue ([math]::round($item.'wan-tx_bytes' / 1TB, 2))
+                        }
+                     }
+                  }
+               }
+            }
+
+            if (($item.'wan-rx_bytes') -or ($item.'wan-rx_bytes' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'wan-rx_bytes' -NotePropertyValue $item.'wan-rx_bytes'
+
+               if ((([math]::round($item.'wan-rx_bytes' / 1KB, 2)) -ne '0.0') -or (([math]::round($item.'wan-rx_bytes' / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName 'wan-rx_kb' -NotePropertyValue ([math]::round($item.'wan-rx_bytes' / 1KB, 2))
+
+                  if ((([math]::round($item.'wan-rx_bytes' / 1MB, 2)) -ne '0.0') -or (([math]::round($item.'wan-rx_bytes' / 1MB, 2)) -ne '0.00'))
+                  {
+                     $outputAppend | Add-Member -NotePropertyName 'wan-rx_mb' -NotePropertyValue ([math]::round($item.'wan-rx_bytes' / 1MB, 2))
+
+                     if ((([math]::round($item.'wan-rx_bytes' / 1GB, 2)) -ne '0.0') -or (([math]::round($item.'wan-rx_bytes' / 1GB, 2)) -ne '0.00'))
+                     {
+                        $outputAppend | Add-Member -NotePropertyName 'wan-rx_gb' -NotePropertyValue ([math]::round($item.'wan-rx_bytes' / 1GB, 2))
+
+                        if ((([math]::round($item.'wan-rx_bytes' / 1TB, 2)) -ne '0.0') -or (([math]::round($item.'wan-rx_bytes' / 1TB, 2)) -ne '0.00'))
+                        {
+                           $outputAppend | Add-Member -NotePropertyName 'wan-rx_tb' -NotePropertyValue ([math]::round($item.'wan-rx_bytes' / 1TB, 2))
+                        }
+                     }
+                  }
+               }
+            }
+
+            if ((($item.'wan-tx_bytes') -or ($item.'wan-tx_bytes' -eq '0.0')) -and (($item.'wan-rx_bytes') -or ($item.'wan-rx_bytes' -eq '0.0')))
+            {
+               $WanbytesSummed = ($item.'wan-tx_bytes' + $item.'wan-rx_bytes')
+
+               $outputAppend | Add-Member -NotePropertyName 'wan_bytes' -NotePropertyValue $WanbytesSummed
+
+               if ((([math]::round($WanbytesSummed / 1KB, 2)) -ne '0.0') -or (([math]::round($WanbytesSummed / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName 'wan_kb' -NotePropertyValue ([math]::round($WanbytesSummed / 1KB, 2))
+
+                  if ((([math]::round($WanbytesSummed / 1MB, 2)) -ne '0.0') -or (([math]::round($WanbytesSummed / 1MB, 2)) -ne '0.00'))
+                  {
+                     $outputAppend | Add-Member -NotePropertyName 'wan_mb' -NotePropertyValue ([math]::round($WanbytesSummed / 1MB, 2))
+
+                     if ((([math]::round($WanbytesSummed / 1GB, 2)) -ne '0.0') -or (([math]::round($WanbytesSummed / 1GB, 2)) -ne '0.00'))
+                     {
+                        $outputAppend | Add-Member -NotePropertyName 'wan_gb' -NotePropertyValue ([math]::round($WanbytesSummed / 1GB, 2))
+
+                        if ((([math]::round($WanbytesSummed / 1TB, 2)) -ne '0.0') -or (([math]::round($WanbytesSummed / 1TB, 2)) -ne '0.00'))
+                        {
+                           $outputAppend | Add-Member -NotePropertyName 'wan_tb' -NotePropertyValue ([math]::round($WanbytesSummed / 1TB, 2))
+                        }
+                     }
+                  }
+               }
+
+               $WanbytesSummed = $null
+            }
+
+            if (($item.'wlan_bytes') -or ($item.'wlan_bytes' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'wlan_bytes' -NotePropertyValue $item.'wlan_bytes'
+
+               if ((([math]::round($item.'wlan_bytes' / 1KB, 2)) -ne '0.0') -or (([math]::round($item.'wlan_bytes' / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName 'wlan_kb' -NotePropertyValue ([math]::round($item.'wlan_bytes' / 1KB, 2))
+
+                  if ((([math]::round($item.'wlan_bytes' / 1MB, 2)) -ne '0.0') -or (([math]::round($item.'wlan_bytes' / 1MB, 2)) -ne '0.00'))
+                  {
+                     $outputAppend | Add-Member -NotePropertyName 'wlan_mb' -NotePropertyValue ([math]::round($item.'wlan_bytes' / 1MB, 2))
+
+                     if ((([math]::round($item.'wlan_bytes' / 1GB, 2)) -ne '0.0') -or (([math]::round($item.'wlan_bytes' / 1GB, 2)) -ne '0.00'))
+                     {
+                        $outputAppend | Add-Member -NotePropertyName 'wlan_gb' -NotePropertyValue ([math]::round($item.'wlan_bytes' / 1GB, 2))
+
+                        if ((([math]::round($item.'wlan_bytes' / 1TB, 2)) -ne '0.0') -or (([math]::round($item.'wlan_bytes' / 1TB, 2)) -ne '0.00'))
+                        {
+                           $outputAppend | Add-Member -NotePropertyName 'wlan_tb' -NotePropertyValue ([math]::round($item.'wlan_bytes' / 1TB, 2))
+                        }
+                     }
+                  }
+               }
+            }
+
+            if (($item.'num_sta') -or ($item.'num_sta' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'Clients' -NotePropertyValue $item.'num_sta'
+            }
+
+            if (($item.'lan-num_sta') -or ($item.'lan-num_sta' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'LAN_Clients' -NotePropertyValue $item.'lan-num_sta'
+            }
+
+            if (($item.'wlan-num_sta') -or ($item.'wlan-num_sta' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'WLAN_Clients' -NotePropertyValue $item.'wlan-num_sta'
+            }
+            #endregion
+
+            # Sppend to the output
+            $output += $outputAppend
+
+            # Cleanup
+            $outputAppend = $null
+         }
+
+         # Resort to make sure everything is in the right order :)
+         $output = $output | Sort-Object Time
+         #endregion CreateOutput
+      }
+      catch
+      {
+         # Try to Logout
+         try
+         {
+            $null = (Invoke-UniFiApiLogout -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
+         }
+         catch
+         {
+            # We don't care about that
+            Write-Verbose -Message 'Logout failed'
+         }
+
+         #region ErrorHandler
+         # get error record
+         [Management.Automation.ErrorRecord]$e = $_
+
+         # retrieve information about runtime error
+         $info = [PSCustomObject]@{
+            Exception = $e.Exception.Message
+            Reason    = $e.CategoryInfo.Reason
+            Target    = $e.CategoryInfo.TargetName
+            Script    = $e.InvocationInfo.ScriptName
+            Line      = $e.InvocationInfo.ScriptLineNumber
+            Column    = $e.InvocationInfo.OffsetInLine
+         }
+
+         Write-Verbose -Message $info
+
+         Write-Error -Message ($info.Exception) -ErrorAction Stop
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+         #endregion ErrorHandler
+      }
+      finally
+      {
+         #region ResetSslTrust
+         # Reset the SSL Trust (make sure everything is back to default)
+         [Net.ServicePointManager]::ServerCertificateValidationCallback = $null
+         #endregion ResetSslTrust
+
+         #region RestoreProgressPreference
+         $ProgressPreference = $ExistingProgressPreference
+         #endregion RestoreProgressPreference
+      }
+
+      # check result
+      if ($Session.meta.rc -ne 'ok')
+      {
+         # Verbose stuff
+         $Script:line = $_.InvocationInfo.ScriptLineNumber
+         Write-Verbose -Message ('Error was in Line {0}' -f $line)
+         Write-Verbose -Message ('Error was {0}' -f $Session.meta.rc)
+
+         # Error Message
+         Write-Error -Message 'Unable to Login' -ErrorAction Stop
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+      }
+   }
+
+   end
+   {
+      # Dump the Result
+      $output
+
+      # Cleanup
+      $Session = $null
+      $output = $null
+
+      #region RestoreProgressPreference
+      $ProgressPreference = $ExistingProgressPreference
+      #endregion RestoreProgressPreference
+
+      Write-Verbose -Message 'Done Get-Unifi5minutesSiteStats'
+   }
+}
+
+function Get-UnifiDailyApStats
+{
+   <#
+         .SYNOPSIS
+         Get daily stats Access Point stats
+
+         .DESCRIPTION
+         Get daily stats for all or just one access points in a given UniFi site
+         For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).
+         We also return real timestamps instead of the unix timestaps that the UniFi returns
+
+         .PARAMETER UnifiSite
+         ID of the client-device to be modified
+
+         .PARAMETER Mac
+         Client MAC address
+
+         .PARAMETER Start
+         Startpoint in UniFi Unix timestamp in milliseconds
+
+         .PARAMETER End
+         Endpoint in UniFi Unix timestamp in milliseconds
+
+         .EXAMPLE
+         PS C:\> Get-UnifiDailyApStats
+
+         Get daily stats for all or just one access points in the default site
+
+         .EXAMPLE
+         PS C:\> Get-UnifiDailyApStats -Mac '78:8a:20:59:e6:88'
+
+         Get daily stats for a given (78:8a:20:59:e6:88) access point in the default site
+
+         .EXAMPLE
+         (Get-UnifiDailyApStats -Start '1548971935421' -End '1548975579019')
+
+         Get the statistics for a given time period.
+
+         .EXAMPLE
+         PS C:\> Get-UnifiDailyApStats -UnifiSite 'contoso' | Where-Object { ($_.ConnectedClients -ne '0') -and ($_.Traffic -ne '0.00') }
+
+         Get daily stats for all access points in the site 'contoso', results are filtered and display only if clients are connected and traffic is generated.
+
+         .EXAMPLE
+         PS C:\> (Get-UnifiDailyApStats -UnifiSite 'contoso')[-1]
+
+         Get daily stats for all access points in the site 'contoso'
+
+         .NOTES
+         Defaults to the past 7 days (7*24 hours)
+         UniFi controller older then 4.6.6 keeps the statistics only for 5 hours.
+         And it depends on your controller settings (Setup in "Settings/Maintenance" in the "DATA RETENTION" Block)
+
+         .LINK
+         Get-UniFiConfig
+
+         .LINK
+         Set-UniFiDefaultRequestHeader
+
+         .LINK
+         Invoke-UniFiApiLogin
+
+         .LINK
+         Invoke-RestMethod
+
+         .LINK
+         ConvertFrom-UnixTimeStamp
+
+         .LINK
+         ConvertTo-UnixTimeStamp
+   #>
+
+   [CmdletBinding(ConfirmImpact = 'None')]
+   [OutputType([psobject])]
+   param
+   (
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 0)]
+      [ValidateNotNullOrEmpty()]
+      [Alias('Site')]
+      [string]
+      $UnifiSite = 'default',
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 1)]
+      [ValidateNotNullOrEmpty()]
+      [Alias('UniFiMac', 'MacAddress')]
+      [string]
+      $Mac,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 2)]
+      [Alias('Startpoint', 'StartTime')]
+      [String]
+      $Start,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 3)]
+      [Alias('EndPoint', 'EndTime')]
+      [string]
+      $End
+   )
+
+   begin
+   {
+      Write-Verbose -Message 'Start Get-UnifiDailyApStats'
+
+      # Save Datestring to keep everything consitant
+      $now = (Get-Date)
+
+      if (-not ($Start))
+      {
+         $Start = (ConvertTo-UnixTimeStamp -Date ($now.AddDays(-7)) -Milliseconds)
+      }
+
+      if (-not ($End))
+      {
+         $End = (ConvertTo-UnixTimeStamp -Date $now -Milliseconds)
+      }
+
+      # Cleanup
+      $Session = $null
+
+      #region SafeProgressPreference
+      # Safe ProgressPreference and Setup SilentlyContinue for the function
+      $ExistingProgressPreference = ($ProgressPreference)
+      $ProgressPreference = 'SilentlyContinue'
+      #endregion SafeProgressPreference
+
+      #region CheckSession
+      if (-not (Get-UniFiIsAlive))
+      {
+         #region LoginCheckLoop
+         # TODO: Move to config
+         [int]$NumberOfRetries = '3'
+         [int]$RetryTimer = '5'
+         # Setup the Loop itself
+         $RetryLoop = $false
+         [int]$RetryCounter = '0'
+         # Original code/idea was by Thomas Maurer
+         do
+         {
+            try
+            {
+               # Try to Logout
+               try
+               {
+                  if (-not (Get-UniFiIsAlive))
+                  {
+                     Throw
+                  }
+               }
+               catch
+               {
+                  # We don't care about that
+                  Write-Verbose -Message 'Logout failed'
+               }
+
+               # Try a Session check (login is inherited here within the helper function)
+               if (-not (Get-UniFiIsAlive -ErrorAction Stop -WarningAction SilentlyContinue))
+               {
+                  Write-Error -Message 'Login failed' -ErrorAction Stop -Category AuthenticationError
+               }
+
+               # End the Loop
+               $RetryLoop = $true
+            }
+            catch
+            {
+               if ($RetryCounter -gt $NumberOfRetries)
+               {
+                  Write-Warning -Message ('Could still not login, after {0} retries.' -f $NumberOfRetries)
+
+                  # Stay in the Loop
+                  $RetryLoop = $true
+               }
+               else
+               {
+                  if ($RetryCounter -eq 0)
+                  {
+                     Write-Warning -Message ('Could not login! Retrying in {0} seconds.' -f $RetryTimer)
+                  }
+                  else
+                  {
+                     Write-Warning -Message ('Retry {0} of {1} failed. Retrying in {2} seconds.' -f $RetryCounter, $NumberOfRetries, $RetryTimer)
+                  }
+
+                  $null = (Start-Sleep -Seconds $RetryTimer)
+
+                  $RetryCounter = $RetryCounter + 1
+               }
+            }
+         }
+         While ($RetryLoop -eq $false)
+         #endregion LoginCheckLoop
+      }
+      #endregion CheckSession
+
+      #region ReCheckSession
+      if (-not ($RestSession))
+      {
+         # Restore ProgressPreference
+         $ProgressPreference = $ExistingProgressPreference
+
+         Write-Error -Message 'Unable to login! Check the connection to the controller, SSL certificates, and your credentials!' -ErrorAction Stop -Category AuthenticationError
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+      }
+      #endregion ReCheckSession
+
+      #region MacHandler
+      if ($Mac)
+      {
+         [string]$Mac = (ConvertTo-UniFiValidMacAddress -Mac $Mac)
+      }
+      #endregion MacHandler
+
+      #region ApiRequestBodyInput
+      $Script:ApiRequestBodyInput = [PSCustomObject][ordered]@{
+         attrs = 'bytes', 'num_sta', 'time'
+         start = $Start
+         end   = $End
+      }
+
+      if ($Mac)
+      {
+         $ApiRequestBodyInput | Add-Member -MemberType NoteProperty -Name mac -Value $Mac
+      }
+      #endregion ApiRequestBodyInput
+
+      # Call meta function
+      $paramGetCallerPreference = @{
+         Cmdlet        = $PSCmdlet
+         SessionState  = $ExecutionContext.SessionState
+         ErrorAction   = 'SilentlyContinue'
+         WarningAction = 'SilentlyContinue'
+      }
+      $null = (Get-CallerPreference @paramGetCallerPreference)
+   }
+
+   process
+   {
+      try
+      {
+         #region ReadConfig
+         Write-Verbose -Message 'Read the Config'
+
+         $null = (Get-UniFiConfig)
+         #endregion ReadConfig
+
+         #region CertificateHandler
+         Write-Verbose -Message ('Certificate check - Should be {0}' -f $ApiSelfSignedCert)
+
+         [Net.ServicePointManager]::ServerCertificateValidationCallback = {
+            $ApiSelfSignedCert
+         }
+         #endregion CertificateHandler
+
+         #region SetRequestHeader
+         Write-Verbose -Message 'Set the API Call default Header'
+
+         $null = (Set-UniFiDefaultRequestHeader)
+         #endregion SetRequestHeader
+
+         #region SetRequestURI
+         Write-Verbose -Message 'Create the Request URI'
+         $ApiRequestUri = $ApiUri + 's/' + $UnifiSite + '/stat/report/daily.ap'
+         Write-Verbose -Message ('URI: {0}' -f $ApiRequestUri)
+         #endregion SetRequestURI
+
+         #region ApiRequestBody
+         $paramConvertToJson = @{
+            InputObject   = $ApiRequestBodyInput
+            Depth         = 5
+            ErrorAction   = 'Stop'
+            WarningAction = 'SilentlyContinue'
+         }
+
+         $ApiRequestBodyInput = $null
+
+         $Script:ApiRequestBody = (ConvertTo-Json @paramConvertToJson)
+         #endregion ApiRequestBody
+
+         #region Request
+         Write-Verbose -Message 'Send the Request'
+         $paramInvokeRestMethod = @{
+            Method        = 'Post'
+            Uri           = $ApiRequestUri
+            Headers       = $RestHeader
+            Body          = $ApiRequestBody
+            ErrorAction   = 'SilentlyContinue'
+            WarningAction = 'SilentlyContinue'
+            WebSession    = $RestSession
+         }
+         $Session = (Invoke-RestMethod @paramInvokeRestMethod)
+
+         Write-Verbose -Message "Session Meta: $(($Session.meta.rc | Out-String).Trim())"
+
+         Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+         #endregion Request
+
+         #region CreateOutput
+         $output = @()
+
+         foreach($item in $Session.data)
+         {
+            $outputAppend = [PSCustomObject][ordered]@{
+               AccesPoint = $item.ap
+               Time       = ((ConvertFrom-UnixTimeStamp -TimeStamp ($item.time) -Milliseconds).ToLocalTime())
+               Clients    = $item.num_sta
+               Traffic    = ([math]::round($item.bytes / 1MB, 2))
+            }
+            # Sppend to the output
+            $output += $outputAppend
+
+            # Cleanup
+            $outputAppend = $null
+         }
+
+         # Resort to make sure everything is in the right order :)
+         $output = $output | Sort-Object Time
+         #endregion CreateOutput
+      }
+      catch
+      {
+         # Try to Logout
+         try
+         {
+            $null = (Invoke-UniFiApiLogout -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
+         }
+         catch
+         {
+            # We don't care about that
+            Write-Verbose -Message 'Logout failed'
+         }
+
+         #region ErrorHandler
+         # get error record
+         [Management.Automation.ErrorRecord]$e = $_
+
+         # retrieve information about runtime error
+         $info = [PSCustomObject]@{
+            Exception = $e.Exception.Message
+            Reason    = $e.CategoryInfo.Reason
+            Target    = $e.CategoryInfo.TargetName
+            Script    = $e.InvocationInfo.ScriptName
+            Line      = $e.InvocationInfo.ScriptLineNumber
+            Column    = $e.InvocationInfo.OffsetInLine
+         }
+
+         Write-Verbose -Message $info
+
+         Write-Error -Message ($info.Exception) -ErrorAction Stop
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+         #endregion ErrorHandler
+      }
+      finally
+      {
+         #region ResetSslTrust
+         # Reset the SSL Trust (make sure everything is back to default)
+         [Net.ServicePointManager]::ServerCertificateValidationCallback = $null
+         #endregion ResetSslTrust
+
+         #region RestoreProgressPreference
+         $ProgressPreference = $ExistingProgressPreference
+         #endregion RestoreProgressPreference
+      }
+
+      # check result
+      if ($Session.meta.rc -ne 'ok')
+      {
+         # Verbose stuff
+         $Script:line = $_.InvocationInfo.ScriptLineNumber
+         Write-Verbose -Message ('Error was in Line {0}' -f $line)
+         Write-Verbose -Message ('Error was {0}' -f $Session.meta.rc)
+
+         # Error Message
+         Write-Error -Message 'Unable to Login' -ErrorAction Stop
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+      }
+   }
+
+   end
+   {
+      # Dump the Result
+      $output
+
+      # Cleanup
+      $Session = $null
+      $output = $null
+
+      #region RestoreProgressPreference
+      $ProgressPreference = $ExistingProgressPreference
+      #endregion RestoreProgressPreference
+
+      Write-Verbose -Message 'Done Get-UnifiDailyApStats'
+   }
+}
+
+function Get-UnifiDailyClientStats
+{
+   <#
+         .SYNOPSIS
+         Get daily user/client statistics for a given user/client
+
+         .DESCRIPTION
+         Get daily user/client statistics for a given user/client
+
+         For convenience, we return the a bit more then the API, e.g. everything in KB, MB, GB, and TB instead of just bytes
+         We also return real timestamps instead of the unix timestaps in miliseconds that the UniFi returns
+
+         Sample output:
+         Time          : 2/1/2019 1:00:00 AM
+         rx_bytes      : 105.0
+         rx_kb         : 0.10
+         rx_mb         : 0.00
+         rx_gb         : 0.00
+         rx_tb         : 0.00
+         rx_rate       : 650000.0
+         rx_rate_mbps  : 634.77
+         rx_retries    : 0
+         rx_packets    : 2.5
+         tx_bytes      : 213.0
+         tx_kb         : 0.21
+         tx_mb         : 0.00
+         tx_gb         : 0.00
+         tx_tb         : 0.00
+         tx_rate       : 650000.0
+         tx_rate_mbps  : 634.77
+         tx_retries    : 1
+         tx_packets    : 4.5
+         Traffic_bytes : 318
+         Traffic_kb    : 0.31
+         Traffic_mb    : 0.00
+         Traffic_gb    : 0.00
+         Traffic_tb    : 0.00
+         Signal        : -65
+         Signal_plain  : -65.0
+
+         In reality, we filter out all 0.00 values (e.g. tx_mb above)
+         You can Filter for whatever parameter you like (e.g. with Select-Object)
+
+         .PARAMETER UnifiSite
+         ID of the client-device to be modified
+
+         .PARAMETER Mac
+         Client MAC address (required)
+
+         .PARAMETER Start
+         Startpoint in UniFi Unix timestamp in milliseconds
+
+         .PARAMETER End
+         Endpoint in UniFi Unix timestamp in milliseconds
+
+         .PARAMETER Attributes
+         array containing attributes (strings) to be returned, defaults to rx_bytes and tx_bytes
+
+         .EXAMPLE
+         PS C:\> Get-UnifiDailyClientStats -Mac '78:8a:20:59:e6:88'
+
+         Get daily user/client statistics for given (78:8a:20:59:e6:88) user/client in the default site
+
+         .EXAMPLE
+         (Get-UnifiDailyClientStats -Mac '78:8a:20:59:e6:88' -Start '1548971935421' -End '1548975579019')
+
+         Get daily user/client statistics for a given (78:8a:20:59:e6:88) user/client in the default site for a given time period.
+
+         .EXAMPLE
+         (Get-UnifiDailyClientStats -Mac '78:8a:20:59:e6:88' -Start '1548980058135')
+
+         Get daily user/client statistics for a given (78:8a:20:59:e6:88) user/client in the default site for the last 60 minutes (was the timestamp while the sample was created)
+
+         .EXAMPLE
+         PS C:\> (Get-UnifiDailyClientStats -Mac '78:8a:20:59:e6:88' -UnifiSite 'contoso')[-1]
+
+         Get daily user/client statistics for a given (78:8a:20:59:e6:88) user/client in the site 'contoso'
+
+         .EXAMPLE
+         PS C:\> Get-UnifiDailyClientStats -Mac '78:8a:20:59:e6:88' -Attributes 'rx_bytes', 'tx_bytes', 'signal', 'rx_rate', 'tx_rate', 'rx_retries', 'tx_retries', 'rx_packets', 'tx_packets')
+
+         Get all Values from the API
+
+         .NOTES
+         defaults to the past week (7*24 hours)
+         Ubiquiti announced this with the Controller version 5.8 - It will not work on older versions!
+         Make sure that "Clients Historical Data" (Collect clients' historical data) has been enabled in the UniFi controller in "Settings/Maintenance"
+
+         .LINK
+         Get-UniFiConfig
+
+         .LINK
+         Set-UniFiDefaultRequestHeader
+
+         .LINK
+         Invoke-UniFiApiLogin
+
+         .LINK
+         Invoke-RestMethod
+
+         .LINK
+         ConvertFrom-UnixTimeStamp
+
+         .LINK
+         ConvertTo-UnixTimeStamp
+   #>
+
+   [CmdletBinding(ConfirmImpact = 'None')]
+   [OutputType([psobject])]
+   param
+   (
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 0)]
+      [ValidateNotNullOrEmpty()]
+      [Alias('Site')]
+      [string]
+      $UnifiSite = 'default',
+      [Parameter(Mandatory,
+            ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 1)]
+      [ValidateNotNullOrEmpty()]
+      [Alias('UniFiMac', 'MacAddress')]
+      [string]
+      $Mac,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 2)]
+      [Alias('Startpoint', 'StartTime')]
+      [String]
+      $Start,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 3)]
+      [Alias('EndPoint', 'EndTime')]
+      [string]
+      $End,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 4)]
+      [ValidateSet('rx_bytes', 'tx_bytes', 'signal', 'rx_rate', 'tx_rate', 'rx_retries', 'tx_retries', 'rx_packets', 'tx_packets', IgnoreCase = $true)]
+      [Alias('attribs', 'UniFiAttributes')]
+      [string[]]
+      $Attributes
+   )
+
+   begin
+   {
+      Write-Verbose -Message 'Start Get-UnifiDailyClientStats'
+
+      # Set the defaults, if needed
+      if (-not ($Attributes))
+      {
+         [string[]]$Attributes = 'rx_bytes', 'tx_bytes'
+      }
+      # ensure the attributes are lowercase (we ignore the case on the input for the user covinience)
+      [string[]]$Attributes = ($Attributes).ToLower()
+
+      # Save Datestring to keep everything consitant
+      $now = (Get-Date)
+
+      if (-not ($Start))
+      {
+         $Start = (ConvertTo-UnixTimeStamp -Date ($now.AddDays(-7)) -Milliseconds)
+      }
+
+      if (-not ($End))
+      {
+         $End = (ConvertTo-UnixTimeStamp -Date $now -Milliseconds)
+      }
+
+      # Cleanup
+      $Session = $null
+
+      #region SafeProgressPreference
+      # Safe ProgressPreference and Setup SilentlyContinue for the function
+      $ExistingProgressPreference = ($ProgressPreference)
+      $ProgressPreference = 'SilentlyContinue'
+      #endregion SafeProgressPreference
+
+      #region CheckSession
+      if (-not (Get-UniFiIsAlive))
+      {
+         #region LoginCheckLoop
+         # TODO: Move to config
+         [int]$NumberOfRetries = '3'
+         [int]$RetryTimer = '5'
+         # Setup the Loop itself
+         $RetryLoop = $false
+         [int]$RetryCounter = '0'
+         # Original code/idea was by Thomas Maurer
+         do
+         {
+            try
+            {
+               # Try to Logout
+               try
+               {
+                  if (-not (Get-UniFiIsAlive))
+                  {
+                     throw
+                  }
+               }
+               catch
+               {
+                  # We don't care about that
+                  Write-Verbose -Message 'Logout failed'
+               }
+
+               # Try a Session check (login is inherited here within the helper function)
+               if (-not (Get-UniFiIsAlive -ErrorAction Stop -WarningAction SilentlyContinue))
+               {
+                  Write-Error -Message 'Login failed' -ErrorAction Stop -Category AuthenticationError
+               }
+
+               # End the Loop
+               $RetryLoop = $true
+            }
+            catch
+            {
+               if ($RetryCounter -gt $NumberOfRetries)
+               {
+                  Write-Warning -Message ('Could still not login, after {0} retries.' -f $NumberOfRetries)
+
+                  # Stay in the Loop
+                  $RetryLoop = $true
+               }
+               else
+               {
+                  if ($RetryCounter -eq 0)
+                  {
+                     Write-Warning -Message ('Could not login! Retrying in {0} seconds.' -f $RetryTimer)
+                  }
+                  else
+                  {
+                     Write-Warning -Message ('Retry {0} of {1} failed. Retrying in {2} seconds.' -f $RetryCounter, $NumberOfRetries, $RetryTimer)
+                  }
+
+                  $null = (Start-Sleep -Seconds $RetryTimer)
+
+                  $RetryCounter = $RetryCounter + 1
+               }
+            }
+         }
+         while ($RetryLoop -eq $false)
+         #endregion LoginCheckLoop
+      }
+      #endregion CheckSession
+
+      #region ReCheckSession
+      if (-not ($RestSession))
+      {
+         # Restore ProgressPreference
+         $ProgressPreference = $ExistingProgressPreference
+
+         Write-Error -Message 'Unable to login! Check the connection to the controller, SSL certificates, and your credentials!' -ErrorAction Stop -Category AuthenticationError
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+      }
+      #endregion ReCheckSession
+
+      #region MacHandler
+      if ($Mac)
+      {
+         [string]$Mac = (ConvertTo-UniFiValidMacAddress -Mac $Mac)
+      }
+      #endregion MacHandler
+
+      #region ApiRequestBodyInput
+      $Script:ApiRequestBodyInput = [PSCustomObject][ordered]@{
+         attrs = ($Attributes + 'time')
+         start = $Start
+         end   = $End
+         mac   = $Mac
+      }
+      #endregion ApiRequestBodyInput
+
+      # Call meta function
+      $paramGetCallerPreference = @{
+         Cmdlet        = $PSCmdlet
+         SessionState  = $ExecutionContext.SessionState
+         ErrorAction   = 'SilentlyContinue'
+         WarningAction = 'SilentlyContinue'
+      }
+      $null = (Get-CallerPreference @paramGetCallerPreference)
+   }
+
+   process
+   {
+      try
+      {
+         #region ReadConfig
+         Write-Verbose -Message 'Read the Config'
+
+         $null = (Get-UniFiConfig)
+         #endregion ReadConfig
+
+         #region CertificateHandler
+         Write-Verbose -Message ('Certificate check - Should be {0}' -f $ApiSelfSignedCert)
+
+         [Net.ServicePointManager]::ServerCertificateValidationCallback = {
+            $ApiSelfSignedCert
+         }
+         #endregion CertificateHandler
+
+         #region SetRequestHeader
+         Write-Verbose -Message 'Set the API Call default Header'
+
+         $null = (Set-UniFiDefaultRequestHeader)
+         #endregion SetRequestHeader
+
+         #region SetRequestURI
+         Write-Verbose -Message 'Create the Request URI'
+         $ApiRequestUri = $ApiUri + 's/' + $UnifiSite + '/stat/report/daily.user'
+         Write-Verbose -Message ('URI: {0}' -f $ApiRequestUri)
+         #endregion SetRequestURI
+
+         #region ApiRequestBody
+         $paramConvertToJson = @{
+            InputObject   = $ApiRequestBodyInput
+            Depth         = 5
+            ErrorAction   = 'Stop'
+            WarningAction = 'SilentlyContinue'
+         }
+
+         $ApiRequestBodyInput = $null
+
+         $Script:ApiRequestBody = (ConvertTo-Json @paramConvertToJson)
+         #endregion ApiRequestBody
+
+         #region Request
+         Write-Verbose -Message 'Send the Request'
+
+         $paramInvokeRestMethod = @{
+            Method        = 'Post'
+            Uri           = $ApiRequestUri
+            Headers       = $RestHeader
+            Body          = $ApiRequestBody
+            ErrorAction   = 'SilentlyContinue'
+            WarningAction = 'SilentlyContinue'
+            WebSession    = $RestSession
+         }
+         $Session = (Invoke-RestMethod @paramInvokeRestMethod)
+
+         Write-Verbose -Message "Session Meta: $(($Session.meta.rc | Out-String).Trim())"
+
+         Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+         #endregion Request
+
+         #region CreateOutput
+         $output = @()
+
+         foreach ($item in $Session.data)
+         {
+            $outputAppend = [PSCustomObject][ordered]@{
+               Time = ((ConvertFrom-UnixTimeStamp -TimeStamp ($item.time) -Milliseconds).ToLocalTime())
+            }
+
+            #region RX
+            if ($item.rx_bytes)
+            {
+               $outputAppend | Add-Member -NotePropertyName rx_bytes -NotePropertyValue $item.rx_bytes
+
+               if ((([math]::round($item.rx_bytes / 1KB, 2)) -ne '0.0') -or (([math]::round($item.rx_bytes / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName rx_kb -NotePropertyValue ([math]::round($item.rx_bytes / 1KB, 2))
+
+                  if ((([math]::round($item.rx_bytes / 1MB, 2)) -ne '0.0') -or (([math]::round($item.rx_bytes / 1MB, 2)) -ne '0.00'))
+                  {
+                     $outputAppend | Add-Member -NotePropertyName rx_mb -NotePropertyValue ([math]::round($item.rx_bytes / 1MB, 2))
+
+                     if ((([math]::round($item.rx_bytes / 1GB, 2)) -ne '0.0') -or (([math]::round($item.rx_bytes / 1GB, 2)) -ne '0.00'))
+                     {
+                        $outputAppend | Add-Member -NotePropertyName rx_gb -NotePropertyValue ([math]::round($item.rx_bytes / 1GB, 2))
+
+                        if ((([math]::round($item.rx_bytes / 1TB, 2)) -ne '0.0') -or (([math]::round($item.rx_bytes / 1TB, 2)) -ne '0.00'))
+                        {
+                           $outputAppend | Add-Member -NotePropertyName rx_tb -NotePropertyValue ([math]::round($item.rx_bytes / 1TB, 2))
+                        }
+                     }
+                  }
+               }
+            }
+
+            if ($item.rx_rate)
+            {
+               $outputAppend | Add-Member -NotePropertyName rx_rate -NotePropertyValue $item.rx_rate
+
+               if ((([math]::round($item.rx_rate / 1KB, 2)) -ne '0.0') -or (([math]::round($item.rx_rate / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName rx_rate_mbps -NotePropertyValue ([math]::round($item.rx_rate / 1KB, 2))
+               }
+            }
+
+            # If 0.0 handler added
+            if (($item.rx_retries) -or ($item.rx_retries -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName rx_retries -NotePropertyValue ([INT]$item.rx_retries)
+            }
+
+            if ($item.rx_packets)
+            {
+               $outputAppend | Add-Member -NotePropertyName rx_packets -NotePropertyValue $item.rx_packets
+            }
+            #endregion RX
+
+            #region TX
+            if ($item.tx_bytes)
+            {
+               $outputAppend | Add-Member -NotePropertyName tx_bytes -NotePropertyValue $item.tx_bytes
+
+               if ((([math]::round($item.tx_bytes / 1KB, 2)) -ne '0.0') -or (([math]::round($item.tx_bytes / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName tx_kb -NotePropertyValue ([math]::round($item.tx_bytes / 1KB, 2))
+
+                  if ((([math]::round($item.tx_bytes / 1MB, 2)) -ne '0.0') -or (([math]::round($item.tx_bytes / 1MB, 2)) -ne '0.00'))
+                  {
+                     $outputAppend | Add-Member -NotePropertyName tx_mb -NotePropertyValue ([math]::round($item.tx_bytes / 1MB, 2))
+
+                     if ((([math]::round($item.tx_bytes / 1GB, 2)) -ne '0.0') -or (([math]::round($item.tx_bytes / 1GB, 2)) -ne '0.00'))
+                     {
+                        $outputAppend | Add-Member -NotePropertyName tx_gb -NotePropertyValue ([math]::round($item.tx_bytes / 1GB, 2))
+
+                        if ((([math]::round($item.tx_bytes / 1TB, 2)) -ne '0.0') -or (([math]::round($item.tx_bytes / 1TB, 2)) -ne '0.00'))
+                        {
+                           $outputAppend | Add-Member -NotePropertyName tx_tb -NotePropertyValue ([math]::round($item.tx_bytes / 1TB, 2))
+                        }
+                     }
+                  }
+               }
+            }
+
+            if ($item.tx_rate)
+            {
+               $outputAppend | Add-Member -NotePropertyName tx_rate -NotePropertyValue $item.tx_rate
+               if ((([math]::round($item.tx_rate / 1KB, 2)) -ne '0.0') -or (([math]::round($item.tx_rate / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName tx_rate_mbps -NotePropertyValue ([math]::round($item.tx_rate / 1KB, 2))
+               }
+            }
+
+            # If 0.0 handler added
+            if (($item.tx_retries) -or ($item.tx_retries -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName tx_retries -NotePropertyValue ([INT]$item.tx_retries)
+            }
+
+            if ($item.tx_packets)
+            {
+               $outputAppend | Add-Member -NotePropertyName tx_packets -NotePropertyValue $item.tx_packets
+            }
+            #endregion TX
+
+            #region Traffic
+            if (($item.rx_bytes) -and ($item.tx_bytes))
+            {
+               $outputAppend | Add-Member -NotePropertyName Traffic_bytes -NotePropertyValue ([math]::round(($item.rx_bytes + $item.tx_bytes)))
+
+               if ((([math]::round(($item.rx_bytes + $item.tx_bytes) / 1KB, 2)) -ne '0.0') -or (([math]::round(($item.rx_bytes + $item.tx_bytes) / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName Traffic_kb -NotePropertyValue ([math]::round(($item.rx_bytes + $item.tx_bytes) / 1KB, 2))
+
+                  if ((([math]::round(($item.rx_bytes + $item.tx_bytes) / 1MB, 2)) -ne '0.0') -or (([math]::round(($item.rx_bytes + $item.tx_bytes) / 1MB, 2)) -ne '0.00'))
+                  {
+                     $outputAppend | Add-Member -NotePropertyName Traffic_mb -NotePropertyValue ([math]::round(($item.rx_bytes + $item.tx_bytes) / 1MB, 2))
+
+                     if ((([math]::round(($item.rx_bytes + $item.tx_bytes) / 1GB, 2)) -ne '0.0') -or (([math]::round(($item.rx_bytes + $item.tx_bytes) / 1GB, 2)) -ne '0.00'))
+                     {
+                        $outputAppend | Add-Member -NotePropertyName Traffic_gb -NotePropertyValue ([math]::round(($item.rx_bytes + $item.tx_bytes) / 1GB, 2))
+
+                        if ((([math]::round(($item.rx_bytes + $item.tx_bytes) / 1TB, 2)) -ne '0.0') -or (([math]::round(($item.rx_bytes + $item.tx_bytes) / 1TB, 2)) -ne '0.00'))
+                        {
+                           $outputAppend | Add-Member -NotePropertyName Traffic_tb -NotePropertyValue ([math]::round(($item.rx_bytes + $item.tx_bytes) / 1TB, 2))
+                        }
+                     }
+                  }
+               }
+            }
+            #endregion Traffic
+
+            #region Signal
+            if ($item.signal)
+            {
+               $outputAppend | Add-Member -NotePropertyName Signal -NotePropertyValue ([math]::Truncate($item.signal))
+               $outputAppend | Add-Member -NotePropertyName Signal_plain -NotePropertyValue $item.signal
+            }
+            #endregion Signal
+
+            # Sppend to the output
+            $output += $outputAppend
+
+            # Cleanup
+            $outputAppend = $null
+         }
+
+         # Resort to make sure everything is in the right order :)
+         $output = $output | Sort-Object Time
+         #endregion CreateOutput
+      }
+      catch
+      {
+         # Try to Logout
+         try
+         {
+            $null = (Invoke-UniFiApiLogout -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
+         }
+         catch
+         {
+            # We don't care about that
+            Write-Verbose -Message 'Logout failed'
+         }
+
+         #region ErrorHandler
+         # get error record
+         [Management.Automation.ErrorRecord]$e = $_
+
+         # retrieve information about runtime error
+         $info = [PSCustomObject]@{
+            Exception = $e.Exception.Message
+            Reason    = $e.CategoryInfo.Reason
+            Target    = $e.CategoryInfo.TargetName
+            Script    = $e.InvocationInfo.ScriptName
+            Line      = $e.InvocationInfo.ScriptLineNumber
+            Column    = $e.InvocationInfo.OffsetInLine
+         }
+
+         Write-Verbose -Message $info
+
+         Write-Error -Message ($info.Exception) -ErrorAction Stop
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+         #endregion ErrorHandler
+      }
+      finally
+      {
+         #region ResetSslTrust
+         # Reset the SSL Trust (make sure everything is back to default)
+         [Net.ServicePointManager]::ServerCertificateValidationCallback = $null
+         #endregion ResetSslTrust
+
+         #region RestoreProgressPreference
+         $ProgressPreference = $ExistingProgressPreference
+         #endregion RestoreProgressPreference
+      }
+
+      # check result
+      if ($Session.meta.rc -ne 'ok')
+      {
+         # Verbose stuff
+         $Script:line = $_.InvocationInfo.ScriptLineNumber
+         Write-Verbose -Message ('Error was in Line {0}' -f $line)
+         Write-Verbose -Message ('Error was {0}' -f $Session.meta.rc)
+
+         # Error Message
+         Write-Error -Message 'Unable to Login' -ErrorAction Stop
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+      }
+   }
+
+   end
+   {
+      # Dump the Result
+      $output
+
+      # Cleanup
+      $Session = $null
+      $output = $null
+
+      #region RestoreProgressPreference
+      $ProgressPreference = $ExistingProgressPreference
+      #endregion RestoreProgressPreference
+
+      Write-Verbose -Message 'Done Get-UnifiDailyClientStats'
+   }
+}
+
+function Get-UnifiDailyGatewayStats
+{
+   <#
+         .SYNOPSIS
+         Get daily statistics for the USG
+
+         .DESCRIPTION
+         Get daily statistics for the USG (UniFi Secure Gateway)
+
+         For convenience, we return the a bit more then the API, e.g. everything in KB, MB, GB, and TB instead of just bytes
+         We also return real timestamps instead of the unix timestaps in miliseconds that the UniFi returns
+
+         Sample output:
+         Time           : 2/1/2019 1:00:00 AM
+         mem            : 33.23
+         cpu            : 3.25
+         lan-rx_errors  : 0
+         lan-rx_bytes   : 1715484318.69231
+         lan-rx_kb      : 1675277.65
+         lan-rx_mb      : 1636.01
+         lan-rx_gb      : 1.6
+         lan-rx_packets : 16370719.6153846
+         lan-rx_dropped : 125
+         wan-rx_errors  : 0
+         wan-rx_packets : 20559905.0769231
+         wan-rx_dropped : 1214
+         lan-tx_errors  : 0
+         lan-tx_bytes   : 30648673319.6923
+         lan-tx_kb      : 29930345.04
+         lan-tx_mb      : 29228.85
+         lan-tx_gb      : 28.54
+         lan-tx_tb      : 0.03
+         lan-tx_packets : 25358762.6923077
+         lan-tx_dropped : 0
+         wan-tx_errors  : 0
+         wan-tx_bytes   : 1047615654
+         wan-tx_kb      : 1023062.16
+         wan-tx_mb      : 999.08
+         wan-tx_gb      : 0.98
+         wan-tx_packets : 11374571.2307692
+         wan-tx_dropped : 0
+
+         You might filter out all the 0 values, we keep them to prevent any null pointer expetions!
+
+         You can Filter for whatever parameter you like (e.g. with Select-Object)
+
+         BUG: The loadavg_ attributes are not working at the moment. The UniFi SDN Controller does not return any values for them!
+
+         .PARAMETER UnifiSite
+         ID of the client-device to be modified
+
+         .PARAMETER Start
+         Startpoint in UniFi Unix timestamp in milliseconds
+
+         .PARAMETER End
+         Endpoint in UniFi Unix timestamp in milliseconds
+
+         .PARAMETER Attributes
+         array containing attributes (strings) to be returned, defaults to mem, cpu, and zime (Time is mandatory)
+
+         .EXAMPLE
+         PS C:\> Get-UnifiDailyGatewayStats
+
+         Get daily statistics for the USG (UniFi Secure Gateway) in the default site
+
+         .EXAMPLE
+         (Get-UnifiDailyGatewayStats -Start '1548971935421' -End '1548975579019')
+
+         Get daily statistics for the USG (UniFi Secure Gateway) in the default site for a given time period.
+
+         .EXAMPLE
+         (Get-UnifiDailyGatewayStats -Start '1548980058135')
+
+         Get daily statistics for the USG (UniFi Secure Gateway) in the default site for the last 60 minutes (was the timestamp while the sample was created)
+
+         .EXAMPLE
+         PS C:\> (Get-UnifiDailyGatewayStats -UnifiSite 'contoso')[-1]
+
+         Get daily statistics for the USG (UniFi Secure Gateway) in the site 'contoso'
+
+         .EXAMPLE
+         PS C:\> Get-UnifiDailyGatewayStats -Attributes 'mem','cpu','loadavg_5','lan-rx_errors','wan-rx_errors','lan-tx_errors','wan-tx_errors','lan-rx_bytes','wan-rx_bytes','lan-tx_bytes','wan-tx_bytes','lan-rx_packets','wan-rx_packets','lan-tx_packets','wan-tx_packets','lan-rx_dropped','wan-rx_dropped','lan-tx_dropped','wan-tx_dropped')
+
+         Get all Values from the API
+
+         .NOTES
+         Defaults to the past year (52*7*24 hours)
+
+         A USG (UniFi Secure Gateway) is required on the site you querry!
+
+         .LINK
+         Get-UniFiConfig
+
+         .LINK
+         Set-UniFiDefaultRequestHeader
+
+         .LINK
+         Invoke-UniFiApiLogin
+
+         .LINK
+         Invoke-RestMethod
+
+         .LINK
+         ConvertFrom-UnixTimeStamp
+
+         .LINK
+         ConvertTo-UnixTimeStamp
+   #>
+
+   [CmdletBinding(ConfirmImpact = 'None')]
+   [OutputType([psobject])]
+   param
+   (
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 0)]
+      [ValidateNotNullOrEmpty()]
+      [Alias('Site')]
+      [string]
+      $UnifiSite = 'default',
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 1)]
+      [Alias('Startpoint', 'StartTime')]
+      [String]
+      $Start,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 2)]
+      [Alias('EndPoint', 'EndTime')]
+      [string]
+      $End,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 3)]
+      [ValidateSet('mem','cpu','loadavg_5','lan-rx_errors','wan-rx_errors','lan-tx_errors','wan-tx_errors','lan-rx_bytes','wan-rx_bytes','lan-tx_bytes','wan-tx_bytes','lan-rx_packets','wan-rx_packets','lan-tx_packets','wan-tx_packets','lan-rx_dropped','wan-rx_dropped','lan-tx_dropped','wan-tx_dropped', IgnoreCase = $true)]
+      [Alias('attribs', 'UniFiAttributes')]
+      [string[]]
+      $Attributes
+   )
+
+   begin
+   {
+      Write-Verbose -Message 'Start Get-UnifiDailyGatewayStats'
+
+      # Set the defaults, if needed
+      if (-not ($Attributes))
+      {
+         [string[]]$Attributes = 'mem', 'cpu', 'loadavg_5'
+      }
+      # ensure the attributes are lowercase (we ignore the case on the input for the user covinience)
+      [string[]]$Attributes = ($Attributes).ToLower()
+
+      # Save Datestring to keep everything consitant
+      $now = (Get-Date)
+
+      if (-not ($Start))
+      {
+         $Start = (ConvertTo-UnixTimeStamp -Date ($now.AddDays(-365)) -Milliseconds)
+      }
+
+      if (-not ($End))
+      {
+         $End = (ConvertTo-UnixTimeStamp -Date $now -Milliseconds)
+      }
+
+      # Cleanup
+      $Session = $null
+
+      #region SafeProgressPreference
+      # Safe ProgressPreference and Setup SilentlyContinue for the function
+      $ExistingProgressPreference = ($ProgressPreference)
+      $ProgressPreference = 'SilentlyContinue'
+      #endregion SafeProgressPreference
+
+      #region CheckSession
+      if (-not (Get-UniFiIsAlive))
+      {
+         #region LoginCheckLoop
+         # TODO: Move to config
+         [int]$NumberOfRetries = '3'
+         [int]$RetryTimer = '5'
+         # Setup the Loop itself
+         $RetryLoop = $false
+         [int]$RetryCounter = '0'
+         # Original code/idea was by Thomas Maurer
+         do
+         {
+            try
+            {
+               # Try to Logout
+               try
+               {
+                  if (-not (Get-UniFiIsAlive))
+                  {
+                     throw
+                  }
+               }
+               catch
+               {
+                  # We don't care about that
+                  Write-Verbose -Message 'Logout failed'
+               }
+
+               # Try a Session check (login is inherited here within the helper function)
+               if (-not (Get-UniFiIsAlive -ErrorAction Stop -WarningAction SilentlyContinue))
+               {
+                  Write-Error -Message 'Login failed' -ErrorAction Stop -Category AuthenticationError
+               }
+
+               # End the Loop
+               $RetryLoop = $true
+            }
+            catch
+            {
+               if ($RetryCounter -gt $NumberOfRetries)
+               {
+                  Write-Warning -Message ('Could still not login, after {0} retries.' -f $NumberOfRetries)
+
+                  # Stay in the Loop
+                  $RetryLoop = $true
+               }
+               else
+               {
+                  if ($RetryCounter -eq 0)
+                  {
+                     Write-Warning -Message ('Could not login! Retrying in {0} seconds.' -f $RetryTimer)
+                  }
+                  else
+                  {
+                     Write-Warning -Message ('Retry {0} of {1} failed. Retrying in {2} seconds.' -f $RetryCounter, $NumberOfRetries, $RetryTimer)
+                  }
+
+                  $null = (Start-Sleep -Seconds $RetryTimer)
+
+                  $RetryCounter = $RetryCounter + 1
+               }
+            }
+         }
+         while ($RetryLoop -eq $false)
+         #endregion LoginCheckLoop
+      }
+      #endregion CheckSession
+
+      #region ReCheckSession
+      if (-not ($RestSession))
+      {
+         # Restore ProgressPreference
+         $ProgressPreference = $ExistingProgressPreference
+
+         Write-Error -Message 'Unable to login! Check the connection to the controller, SSL certificates, and your credentials!' -ErrorAction Stop -Category AuthenticationError
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+      }
+      #endregion ReCheckSession
+
+      #region MacHandler
+      if ($Mac)
+      {
+         [string]$Mac = (ConvertTo-UniFiValidMacAddress -Mac $Mac)
+      }
+      #endregion MacHandler
+
+      #region ApiRequestBodyInput
+      $Script:ApiRequestBodyInput = [PSCustomObject][ordered]@{
+         attrs = ($Attributes + 'time')
+         start = $Start
+         end   = $End
+         mac   = $Mac
+      }
+      #endregion ApiRequestBodyInput
+
+      # Call meta function
+      $paramGetCallerPreference = @{
+         Cmdlet        = $PSCmdlet
+         SessionState  = $ExecutionContext.SessionState
+         ErrorAction   = 'SilentlyContinue'
+         WarningAction = 'SilentlyContinue'
+      }
+      $null = (Get-CallerPreference @paramGetCallerPreference)
+   }
+
+   process
+   {
+      try
+      {
+         #region ReadConfig
+         Write-Verbose -Message 'Read the Config'
+
+         $null = (Get-UniFiConfig)
+         #endregion ReadConfig
+
+         #region CertificateHandler
+         Write-Verbose -Message ('Certificate check - Should be {0}' -f $ApiSelfSignedCert)
+
+         [Net.ServicePointManager]::ServerCertificateValidationCallback = {
+            $ApiSelfSignedCert
+         }
+         #endregion CertificateHandler
+
+         #region SetRequestHeader
+         Write-Verbose -Message 'Set the API Call default Header'
+
+         $null = (Set-UniFiDefaultRequestHeader)
+         #endregion SetRequestHeader
+
+         #region SetRequestURI
+         Write-Verbose -Message 'Create the Request URI'
+         $ApiRequestUri = $ApiUri + 's/' + $UnifiSite + '/stat/report/daily.gw'
+         Write-Verbose -Message ('URI: {0}' -f $ApiRequestUri)
+         #endregion SetRequestURI
+
+         #region ApiRequestBody
+         $paramConvertToJson = @{
+            InputObject   = $ApiRequestBodyInput
+            Depth         = 5
+            ErrorAction   = 'Stop'
+            WarningAction = 'SilentlyContinue'
+         }
+
+         $ApiRequestBodyInput = $null
+
+         $Script:ApiRequestBody = (ConvertTo-Json @paramConvertToJson)
+         #endregion ApiRequestBody
+
+         #region Request
+         Write-Verbose -Message 'Send the Request'
+
+         $paramInvokeRestMethod = @{
+            Method        = 'Post'
+            Uri           = $ApiRequestUri
+            Headers       = $RestHeader
+            Body          = $ApiRequestBody
+            ErrorAction   = 'SilentlyContinue'
+            WarningAction = 'SilentlyContinue'
+            WebSession    = $RestSession
+         }
+         $Session = (Invoke-RestMethod @paramInvokeRestMethod)
+
+         Write-Verbose -Message "Session Meta: $(($Session.meta.rc | Out-String).Trim())"
+
+         Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+         #endregion Request
+
+         #region CreateOutput
+         $output = @()
+
+         foreach ($item in $Session.data)
+         {
+            $outputAppend = [PSCustomObject][ordered]@{
+               Time    = ((ConvertFrom-UnixTimeStamp -TimeStamp ($item.time) -Milliseconds).ToLocalTime())
+               gateway = $item.gw
+            }
+
+            #region Default
+            if ($item.mem)
+            {
+               $outputAppend | Add-Member -NotePropertyName mem -NotePropertyValue ('{0:N2}' -f ([math]::Round($item.mem,2,'AwayFromZero')))
+            }
+
+            if ($item.cpu)
+            {
+               $outputAppend | Add-Member -NotePropertyName cpu -NotePropertyValue ('{0:N2}' -f ([math]::Round($item.cpu,2,'AwayFromZero')))
+            }
+
+            if ($item.loadavg_5)
+            {
+               $outputAppend | Add-Member -NotePropertyName loadavg_5 -NotePropertyValue ([INT]$item.loadavg_5)
+            }
+            #endregion Default
+
+            #region RX
+            if (($item.'lan-rx_errors') -or ($item.'lan-rx_errors' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'lan-rx_errors' -NotePropertyValue ([int]($item.'lan-rx_errors'))
+            }
+
+            if (($item.'lan-rx_bytes') -or ($item.'lan-rx_bytes' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'lan-rx_bytes' -NotePropertyValue $item.'lan-rx_bytes'
+
+               if ((([math]::round($item.'lan-rx_bytes' / 1KB, 2)) -ne '0.0') -or (([math]::round($item.'lan-rx_bytes' / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName 'lan-rx_kb' -NotePropertyValue ([math]::round($item.'lan-rx_bytes' / 1KB, 2))
+
+                  if ((([math]::round($item.'lan-rx_bytes' / 1MB, 2)) -ne '0.0') -or (([math]::round($item.'lan-rx_bytes' / 1MB, 2)) -ne '0.00'))
+                  {
+                     $outputAppend | Add-Member -NotePropertyName 'lan-rx_mb' -NotePropertyValue ([math]::round($item.'lan-rx_bytes' / 1MB, 2))
+
+                     if ((([math]::round($item.'lan-rx_bytes' / 1GB, 2)) -ne '0.0') -or (([math]::round($item.'lan-rx_bytes' / 1GB, 2)) -ne '0.00'))
+                     {
+                        $outputAppend | Add-Member -NotePropertyName 'lan-rx_gb' -NotePropertyValue ([math]::round($item.'lan-rx_bytes' / 1GB, 2))
+
+                        if ((([math]::round($item.'lan-rx_bytes' / 1TB, 2)) -ne '0.0') -or (([math]::round($item.'lan-rx_bytes' / 1TB, 2)) -ne '0.00'))
+                        {
+                           $outputAppend | Add-Member -NotePropertyName 'lan-rx_tb' -NotePropertyValue ([math]::round($item.'lan-rx_bytes' / 1TB, 2))
+                        }
+                     }
+                  }
+               }
+            }
+
+            if (($item.'lan-rx_packets') -or ($item.'lan-rx_packets' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'lan-rx_packets' -NotePropertyValue $item.'lan-rx_packets'
+            }
+
+            if (($item.'lan-rx_dropped') -or ($item.'lan-rx_dropped' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'lan-rx_dropped' -NotePropertyValue ([int]($item.'lan-rx_dropped'))
+            }
+
+            if (($item.'wan-rx_errors') -or ($item.'wan-rx_errors' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'wan-rx_errors' -NotePropertyValue ([int]($item.'wan-rx_errors'))
+            }
+
+            if (($item.'wan-rx_byte') -or ($item.'wan-rx_byte' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'wan-rx_bytes' -NotePropertyValue $item.'wan-rx_bytes'
+
+               if ((([math]::round($item.'wan-rx_bytes' / 1KB, 2)) -ne '0.0') -or (([math]::round($item.'wan-rx_bytes' / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName 'wan-rx_kb' -NotePropertyValue ([math]::round($item.'wan-rx_bytes' / 1KB, 2))
+
+                  if ((([math]::round($item.'wan-rx_bytes' / 1MB, 2)) -ne '0.0') -or (([math]::round($item.'wan-rx_bytes' / 1MB, 2)) -ne '0.00'))
+                  {
+                     $outputAppend | Add-Member -NotePropertyName 'wan-rx_mb' -NotePropertyValue ([math]::round($item.'wan-rx_bytes' / 1MB, 2))
+
+                     if ((([math]::round($item.'wan-rx_bytes' / 1GB, 2)) -ne '0.0') -or (([math]::round($item.'wan-rx_bytes' / 1GB, 2)) -ne '0.00'))
+                     {
+                        $outputAppend | Add-Member -NotePropertyName 'wan-rx_gb' -NotePropertyValue ([math]::round($item.'wan-rx_bytes' / 1GB, 2))
+
+                        if ((([math]::round($item.'wan-rx_bytes' / 1TB, 2)) -ne '0.0') -or (([math]::round($item.'wan-rx_bytes' / 1TB, 2)) -ne '0.00'))
+                        {
+                           $outputAppend | Add-Member -NotePropertyName 'wan-rx_tb' -NotePropertyValue ([math]::round($item.'wan-rx_bytes' / 1TB, 2))
+                        }
+                     }
+                  }
+               }
+            }
+
+            if (($item.'wan-rx_packets') -or ($item.'wan-rx_packets' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'wan-rx_packets' -NotePropertyValue $item.'wan-rx_packets'
+            }
+
+            if (($item.'wan-rx_dropped') -or ($item.'wan-rx_dropped' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'wan-rx_dropped' -NotePropertyValue ([int]($item.'wan-rx_dropped'))
+            }
+            #endregion RX
+
+            #region TX
+            if (($item.'lan-tx_errors') -or ($item.'lan-tx_errors' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'lan-tx_errors' -NotePropertyValue ([int]($item.'lan-tx_errors'))
+            }
+
+            if (($item.'lan-tx_bytes') -or ($item.'lan-tx_bytes' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'lan-tx_bytes' -NotePropertyValue $item.'lan-tx_bytes'
+
+               if ((([math]::round($item.'lan-tx_bytes' / 1KB, 2)) -ne '0.0') -or (([math]::round($item.'lan-tx_bytes' / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName 'lan-tx_kb' -NotePropertyValue ([math]::round($item.'lan-tx_bytes' / 1KB, 2))
+
+                  if ((([math]::round($item.'lan-tx_bytes' / 1MB, 2)) -ne '0.0') -or (([math]::round($item.'lan-tx_bytes' / 1MB, 2)) -ne '0.00'))
+                  {
+                     $outputAppend | Add-Member -NotePropertyName 'lan-tx_mb' -NotePropertyValue ([math]::round($item.'lan-tx_bytes' / 1MB, 2))
+
+                     if ((([math]::round($item.'lan-tx_bytes' / 1GB, 2)) -ne '0.0') -or (([math]::round($item.'lan-tx_bytes' / 1GB, 2)) -ne '0.00'))
+                     {
+                        $outputAppend | Add-Member -NotePropertyName 'lan-tx_gb' -NotePropertyValue ([math]::round($item.'lan-tx_bytes' / 1GB, 2))
+
+                        if ((([math]::round($item.'lan-tx_bytes' / 1TB, 2)) -ne '0.0') -or (([math]::round($item.'lan-tx_bytes' / 1TB, 2)) -ne '0.00'))
+                        {
+                           $outputAppend | Add-Member -NotePropertyName 'lan-tx_tb' -NotePropertyValue ([math]::round($item.'lan-tx_bytes' / 1TB, 2))
+                        }
+                     }
+                  }
+               }
+            }
+
+            if (($item.'lan-tx_packets') -or ($item.'lan-tx_packets' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'lan-tx_packets' -NotePropertyValue $item.'lan-tx_packets'
+            }
+
+            if (($item.'lan-tx_dropped') -or ($item.'lan-tx_dropped' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'lan-tx_dropped' -NotePropertyValue ([int]($item.'lan-tx_dropped'))
+            }
+
+            if (($item.'wan-tx_errors') -or ($item.'wan-tx_errors' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'wan-tx_errors' -NotePropertyValue ([int]($item.'wan-tx_errors'))
+            }
+
+            if (($item.'wan-tx_bytes') -or ($item.'wan-tx_bytes' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'wan-tx_bytes' -NotePropertyValue $item.'wan-tx_bytes'
+
+               if ((([math]::round($item.'wan-tx_bytes' / 1KB, 2)) -ne '0.0') -or (([math]::round($item.'wan-tx_bytes' / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName 'wan-tx_kb' -NotePropertyValue ([math]::round($item.'wan-tx_bytes' / 1KB, 2))
+
+                  if ((([math]::round($item.'wan-tx_bytes' / 1MB, 2)) -ne '0.0') -or (([math]::round($item.'wan-tx_bytes' / 1MB, 2)) -ne '0.00'))
+                  {
+                     $outputAppend | Add-Member -NotePropertyName 'wan-tx_mb' -NotePropertyValue ([math]::round($item.'wan-tx_bytes' / 1MB, 2))
+
+                     if ((([math]::round($item.'wan-tx_bytes' / 1GB, 2)) -ne '0.0') -or (([math]::round($item.'wan-tx_bytes' / 1GB, 2)) -ne '0.00'))
+                     {
+                        $outputAppend | Add-Member -NotePropertyName 'wan-tx_gb' -NotePropertyValue ([math]::round($item.'wan-tx_bytes' / 1GB, 2))
+
+                        if ((([math]::round($item.'wan-tx_bytes' / 1TB, 2)) -ne '0.0') -or (([math]::round($item.'wan-tx_bytes' / 1TB, 2)) -ne '0.00'))
+                        {
+                           $outputAppend | Add-Member -NotePropertyName 'wan-tx_tb' -NotePropertyValue ([math]::round($item.'wan-tx_bytes' / 1TB, 2))
+                        }
+                     }
+                  }
+               }
+            }
+
+            if (($item.'wan-tx_packets') -or ($item.'wan-tx_packets' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'wan-tx_packets' -NotePropertyValue $item.'wan-tx_packets'
+            }
+
+            if (($item.'wan-tx_dropped') -or ($item.'wan-tx_dropped' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'wan-tx_dropped' -NotePropertyValue ([int]($item.'wan-tx_dropped'))
+            }
+            #endregion TX
+
+
+            # Sppend to the output
+            $output += $outputAppend
+
+            # Cleanup
+            $outputAppend = $null
+         }
+
+         # Resort to make sure everything is in the right order :)
+         $output = $output | Sort-Object Time
+         #endregion CreateOutput
+      }
+      catch
+      {
+         # Try to Logout
+         try
+         {
+            $null = (Invoke-UniFiApiLogout -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
+         }
+         catch
+         {
+            # We don't care about that
+            Write-Verbose -Message 'Logout failed'
+         }
+
+         #region ErrorHandler
+         # get error record
+         [Management.Automation.ErrorRecord]$e = $_
+
+         # retrieve information about runtime error
+         $info = [PSCustomObject]@{
+            Exception = $e.Exception.Message
+            Reason    = $e.CategoryInfo.Reason
+            Target    = $e.CategoryInfo.TargetName
+            Script    = $e.InvocationInfo.ScriptName
+            Line      = $e.InvocationInfo.ScriptLineNumber
+            Column    = $e.InvocationInfo.OffsetInLine
+         }
+
+         Write-Verbose -Message $info
+
+         Write-Error -Message ($info.Exception) -ErrorAction Stop
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+         #endregion ErrorHandler
+      }
+      finally
+      {
+         #region ResetSslTrust
+         # Reset the SSL Trust (make sure everything is back to default)
+         [Net.ServicePointManager]::ServerCertificateValidationCallback = $null
+         #endregion ResetSslTrust
+
+         #region RestoreProgressPreference
+         $ProgressPreference = $ExistingProgressPreference
+         #endregion RestoreProgressPreference
+      }
+
+      # check result
+      if ($Session.meta.rc -ne 'ok')
+      {
+         # Verbose stuff
+         $Script:line = $_.InvocationInfo.ScriptLineNumber
+         Write-Verbose -Message ('Error was in Line {0}' -f $line)
+         Write-Verbose -Message ('Error was {0}' -f $Session.meta.rc)
+
+         # Error Message
+         Write-Error -Message 'Unable to Login' -ErrorAction Stop
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+      }
+   }
+
+   end
+   {
+      # Dump the Result
+      $output
+
+      # Cleanup
+      $Session = $null
+      $output = $null
+
+      #region RestoreProgressPreference
+      $ProgressPreference = $ExistingProgressPreference
+      #endregion RestoreProgressPreference
+
+      Write-Verbose -Message 'Done Get-UnifiDailyGatewayStats'
+   }
+}
+
+function Get-UnifiDailySiteStats
+{
+   <#
+         .SYNOPSIS
+         Get daily statistics for a complete Site
+
+         .DESCRIPTION
+         Get daily statistics for a complete UniFi Site
+
+         For convenience, we return the a bit more then the API, e.g. everything in KB, MB, GB, and TB instead of just bytes
+
+         We also return real timestamps instead of the unix timestaps in miliseconds that the UniFi returns
+
+         Sample output:
+         Time         : 1/28/2019 7:00:00 AM
+         wan-tx_bytes : 5943900.402553191
+         wan-tx_kb    : 5804.59
+         wan-tx_mb    : 5.67
+         wan-tx_gb    : 0.01
+         wan-rx_bytes : 33117387.3812766
+         wan-rx_kb    : 32341.2
+         wan-rx_mb    : 31.58
+         wan-rx_gb    : 0.03
+         wan_bytes    : 39061287.783829791
+         wan_kb       : 38145.79
+         wan_mb       : 37.25
+         wan_gb       : 0.04
+         wlan_bytes   : 7030900.205833333
+         wlan_kb      : 6866.11
+         wlan_mb      : 6.71
+         wlan_gb      : 0.01
+         Clients      : 33
+         LAN_Clients  : 29
+         WLAN_Clients : 4
+
+         You might filter out all the 0 values, we keep them to prevent any null pointer expetions!
+
+         You can Filter for whatever parameter you like (e.g. with Select-Object)
+
+         .PARAMETER UnifiSite
+         ID of the client-device to be modified
+
+         .PARAMETER Start
+         Startpoint in UniFi Unix timestamp in milliseconds
+
+         .PARAMETER End
+         Endpoint in UniFi Unix timestamp in milliseconds
+
+         .PARAMETER Attributes
+         array containing attributes (strings) to be returned, defaults are all
+
+         .EXAMPLE
+         PS C:\> Get-UnifiDailySiteStats
+
+         Get daily statistics for a complete UniFi for the default site
+
+         .EXAMPLE
+         (Get-UnifiDailySiteStats -Start '1548971935421' -End '1548975579019')
+
+         Get daily statistics for a complete UniFi for the default site for a given time period.
+
+         .EXAMPLE
+         (Get-UnifiDailySiteStats -Start '1548980058135')
+
+         Get daily statistics for a complete UniFi for the default site for the last 60 minutes (was the timestamp while the sample was created)
+
+         .EXAMPLE
+         PS C:\> (Get-UnifiDailySiteStats -UnifiSite 'contoso')[-1]
+
+         Get daily statistics for a complete UniFi for the site 'contoso'
+
+         .EXAMPLE
+         PS C:\> Get-UnifiDailySiteStats -Attributes 'bytes','wan-tx_bytes','wan-rx_bytes','wlan_bytes','num_sta','lan-num_sta','wlan-num_sta')
+
+         Get all Values from the API
+
+         .NOTES
+         Defaults to the past 7 days (52*7*24 hours)
+
+         "bytes" are no longer returned with controller version 4.9.1 and later
+
+         .LINK
+         Get-UniFiConfig
+
+         .LINK
+         Set-UniFiDefaultRequestHeader
+
+         .LINK
+         Invoke-UniFiApiLogin
+
+         .LINK
+         Invoke-RestMethod
+
+         .LINK
+         ConvertFrom-UnixTimeStamp
+
+         .LINK
+         ConvertTo-UnixTimeStamp
+   #>
+
+   [CmdletBinding(ConfirmImpact = 'None')]
+   [OutputType([psobject])]
+   param
+   (
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 0)]
+      [ValidateNotNullOrEmpty()]
+      [Alias('Site')]
+      [string]
+      $UnifiSite = 'default',
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 1)]
+      [Alias('Startpoint', 'StartTime')]
+      [String]
+      $Start,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 2)]
+      [Alias('EndPoint', 'EndTime')]
+      [string]
+      $End,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 3)]
+      [ValidateSet('bytes','wan-tx_bytes','wan-rx_bytes','wlan_bytes','num_sta','lan-num_sta','wlan-num_sta', IgnoreCase = $true)]
+      [Alias('attribs', 'UniFiAttributes')]
+      [string[]]
+      $Attributes
+   )
+
+   begin
+   {
+      Write-Verbose -Message 'Start Get-UnifiDailySiteStats'
+
+      # Set the defaults, if needed
+      if (-not ($Attributes))
+      {
+         [string[]]$Attributes = 'bytes', 'wan-tx_bytes', 'wan-rx_bytes', 'wlan_bytes', 'num_sta', 'lan-num_sta', 'wlan-num_sta'
+      }
+      # ensure the attributes are lowercase (we ignore the case on the input for the user covinience)
+      [string[]]$Attributes = ($Attributes).ToLower()
+
+      # Save Datestring to keep everything consitant
+      $now = (Get-Date)
+
+      if (-not ($Start))
+      {
+         $Start = (ConvertTo-UnixTimeStamp -Date ($now.AddDays(-7)) -Milliseconds)
+      }
+
+      if (-not ($End))
+      {
+         $End = (ConvertTo-UnixTimeStamp -Date $now -Milliseconds)
+      }
+
+      # Cleanup
+      $Session = $null
+
+      #region SafeProgressPreference
+      # Safe ProgressPreference and Setup SilentlyContinue for the function
+      $ExistingProgressPreference = ($ProgressPreference)
+      $ProgressPreference = 'SilentlyContinue'
+      #endregion SafeProgressPreference
+
+      #region CheckSession
+      if (-not (Get-UniFiIsAlive))
+      {
+         #region LoginCheckLoop
+         # TODO: Move to config
+         [int]$NumberOfRetries = '3'
+         [int]$RetryTimer = '5'
+         # Setup the Loop itself
+         $RetryLoop = $false
+         [int]$RetryCounter = '0'
+         # Original code/idea was by Thomas Maurer
+         do
+         {
+            try
+            {
+               # Try to Logout
+               try
+               {
+                  if (-not (Get-UniFiIsAlive))
+                  {
+                     throw
+                  }
+               }
+               catch
+               {
+                  # We don't care about that
+                  Write-Verbose -Message 'Logout failed'
+               }
+
+               # Try a Session check (login is inherited here within the helper function)
+               if (-not (Get-UniFiIsAlive -ErrorAction Stop -WarningAction SilentlyContinue))
+               {
+                  Write-Error -Message 'Login failed' -ErrorAction Stop -Category AuthenticationError
+               }
+
+               # End the Loop
+               $RetryLoop = $true
+            }
+            catch
+            {
+               if ($RetryCounter -gt $NumberOfRetries)
+               {
+                  Write-Warning -Message ('Could still not login, after {0} retries.' -f $NumberOfRetries)
+
+                  # Stay in the Loop
+                  $RetryLoop = $true
+               }
+               else
+               {
+                  if ($RetryCounter -eq 0)
+                  {
+                     Write-Warning -Message ('Could not login! Retrying in {0} seconds.' -f $RetryTimer)
+                  }
+                  else
+                  {
+                     Write-Warning -Message ('Retry {0} of {1} failed. Retrying in {2} seconds.' -f $RetryCounter, $NumberOfRetries, $RetryTimer)
+                  }
+
+                  $null = (Start-Sleep -Seconds $RetryTimer)
+
+                  $RetryCounter = $RetryCounter + 1
+               }
+            }
+         }
+         while ($RetryLoop -eq $false)
+         #endregion LoginCheckLoop
+      }
+      #endregion CheckSession
+
+      #region ReCheckSession
+      if (-not ($RestSession))
+      {
+         # Restore ProgressPreference
+         $ProgressPreference = $ExistingProgressPreference
+
+         Write-Error -Message 'Unable to login! Check the connection to the controller, SSL certificates, and your credentials!' -ErrorAction Stop -Category AuthenticationError
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+      }
+      #endregion ReCheckSession
+
+      #region MacHandler
+      if ($Mac)
+      {
+         [string]$Mac = (ConvertTo-UniFiValidMacAddress -Mac $Mac)
+      }
+      #endregion MacHandler
+
+      #region ApiRequestBodyInput
+      $Script:ApiRequestBodyInput = [PSCustomObject][ordered]@{
+         attrs = ($Attributes + 'time')
+         start = $Start
+         end   = $End
+         mac   = $Mac
+      }
+      #endregion ApiRequestBodyInput
+
+      # Call meta function
+      $paramGetCallerPreference = @{
+         Cmdlet        = $PSCmdlet
+         SessionState  = $ExecutionContext.SessionState
+         ErrorAction   = 'SilentlyContinue'
+         WarningAction = 'SilentlyContinue'
+      }
+      $null = (Get-CallerPreference @paramGetCallerPreference)
+   }
+
+   process
+   {
+      try
+      {
+         #region ReadConfig
+         Write-Verbose -Message 'Read the Config'
+
+         $null = (Get-UniFiConfig)
+         #endregion ReadConfig
+
+         #region CertificateHandler
+         Write-Verbose -Message ('Certificate check - Should be {0}' -f $ApiSelfSignedCert)
+
+         [Net.ServicePointManager]::ServerCertificateValidationCallback = {
+            $ApiSelfSignedCert
+         }
+         #endregion CertificateHandler
+
+         #region SetRequestHeader
+         Write-Verbose -Message 'Set the API Call default Header'
+
+         $null = (Set-UniFiDefaultRequestHeader)
+         #endregion SetRequestHeader
+
+         #region SetRequestURI
+         Write-Verbose -Message 'Create the Request URI'
+         $ApiRequestUri = $ApiUri + 's/' + $UnifiSite + '/stat/report/daily.site'
+         Write-Verbose -Message ('URI: {0}' -f $ApiRequestUri)
+         #endregion SetRequestURI
+
+         #region ApiRequestBody
+         $paramConvertToJson = @{
+            InputObject   = $ApiRequestBodyInput
+            Depth         = 5
+            ErrorAction   = 'Stop'
+            WarningAction = 'SilentlyContinue'
+         }
+
+         $ApiRequestBodyInput = $null
+
+         $Script:ApiRequestBody = (ConvertTo-Json @paramConvertToJson)
+         #endregion ApiRequestBody
+
+         #region Request
+         Write-Verbose -Message 'Send the Request'
+
+         $paramInvokeRestMethod = @{
+            Method        = 'Post'
+            Uri           = $ApiRequestUri
+            Headers       = $RestHeader
+            Body          = $ApiRequestBody
+            ErrorAction   = 'SilentlyContinue'
+            WarningAction = 'SilentlyContinue'
+            WebSession    = $RestSession
+         }
+         $Session = (Invoke-RestMethod @paramInvokeRestMethod)
+
+         Write-Verbose -Message "Session Meta: $(($Session.meta.rc | Out-String).Trim())"
+
+         Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+         #endregion Request
+
+         #region CreateOutput
+         $output = @()
+
+         foreach ($item in $Session.data)
+         {
+            $outputAppend = [PSCustomObject][ordered]@{
+               Time = ((ConvertFrom-UnixTimeStamp -TimeStamp ($item.time) -Milliseconds).ToLocalTime())
+            }
+
+            #region
+            if (($item.'bytes') -or ($item.'bytes' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'bytes' -NotePropertyValue $item.'bytes'
+
+               if ((([math]::round($item.'bytes' / 1KB, 2)) -ne '0.0') -or (([math]::round($item.'bytes' / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName 'kb' -NotePropertyValue ([math]::round($item.'bytes' / 1KB, 2))
+
+                  if ((([math]::round($item.'bytes' / 1MB, 2)) -ne '0.0') -or (([math]::round($item.'bytes' / 1MB, 2)) -ne '0.00'))
+                  {
+                     $outputAppend | Add-Member -NotePropertyName 'mb' -NotePropertyValue ([math]::round($item.'bytes' / 1MB, 2))
+
+                     if ((([math]::round($item.'bytes' / 1GB, 2)) -ne '0.0') -or (([math]::round($item.'bytes' / 1GB, 2)) -ne '0.00'))
+                     {
+                        $outputAppend | Add-Member -NotePropertyName 'gb' -NotePropertyValue ([math]::round($item.'bytes' / 1GB, 2))
+
+                        if ((([math]::round($item.'bytes' / 1TB, 2)) -ne '0.0') -or (([math]::round($item.'bytes' / 1TB, 2)) -ne '0.00'))
+                        {
+                           $outputAppend | Add-Member -NotePropertyName 'tb' -NotePropertyValue ([math]::round($item.'bytes' / 1TB, 2))
+                        }
+                     }
+                  }
+               }
+            }
+
+            if (($item.'wan-tx_bytes') -or ($item.'wan-tx_bytes' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'wan-tx_bytes' -NotePropertyValue $item.'wan-tx_bytes'
+
+               if ((([math]::round($item.'wan-tx_bytes' / 1KB, 2)) -ne '0.0') -or (([math]::round($item.'wan-tx_bytes' / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName 'wan-tx_kb' -NotePropertyValue ([math]::round($item.'wan-tx_bytes' / 1KB, 2))
+
+                  if ((([math]::round($item.'wan-tx_bytes' / 1MB, 2)) -ne '0.0') -or (([math]::round($item.'wan-tx_bytes' / 1MB, 2)) -ne '0.00'))
+                  {
+                     $outputAppend | Add-Member -NotePropertyName 'wan-tx_mb' -NotePropertyValue ([math]::round($item.'wan-tx_bytes' / 1MB, 2))
+
+                     if ((([math]::round($item.'wan-tx_bytes' / 1GB, 2)) -ne '0.0') -or (([math]::round($item.'wan-tx_bytes' / 1GB, 2)) -ne '0.00'))
+                     {
+                        $outputAppend | Add-Member -NotePropertyName 'wan-tx_gb' -NotePropertyValue ([math]::round($item.'wan-tx_bytes' / 1GB, 2))
+
+                        if ((([math]::round($item.'wan-tx_bytes' / 1TB, 2)) -ne '0.0') -or (([math]::round($item.'wan-tx_bytes' / 1TB, 2)) -ne '0.00'))
+                        {
+                           $outputAppend | Add-Member -NotePropertyName 'wan-tx_tb' -NotePropertyValue ([math]::round($item.'wan-tx_bytes' / 1TB, 2))
+                        }
+                     }
+                  }
+               }
+            }
+
+            if (($item.'wan-rx_bytes') -or ($item.'wan-rx_bytes' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'wan-rx_bytes' -NotePropertyValue $item.'wan-rx_bytes'
+
+               if ((([math]::round($item.'wan-rx_bytes' / 1KB, 2)) -ne '0.0') -or (([math]::round($item.'wan-rx_bytes' / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName 'wan-rx_kb' -NotePropertyValue ([math]::round($item.'wan-rx_bytes' / 1KB, 2))
+
+                  if ((([math]::round($item.'wan-rx_bytes' / 1MB, 2)) -ne '0.0') -or (([math]::round($item.'wan-rx_bytes' / 1MB, 2)) -ne '0.00'))
+                  {
+                     $outputAppend | Add-Member -NotePropertyName 'wan-rx_mb' -NotePropertyValue ([math]::round($item.'wan-rx_bytes' / 1MB, 2))
+
+                     if ((([math]::round($item.'wan-rx_bytes' / 1GB, 2)) -ne '0.0') -or (([math]::round($item.'wan-rx_bytes' / 1GB, 2)) -ne '0.00'))
+                     {
+                        $outputAppend | Add-Member -NotePropertyName 'wan-rx_gb' -NotePropertyValue ([math]::round($item.'wan-rx_bytes' / 1GB, 2))
+
+                        if ((([math]::round($item.'wan-rx_bytes' / 1TB, 2)) -ne '0.0') -or (([math]::round($item.'wan-rx_bytes' / 1TB, 2)) -ne '0.00'))
+                        {
+                           $outputAppend | Add-Member -NotePropertyName 'wan-rx_tb' -NotePropertyValue ([math]::round($item.'wan-rx_bytes' / 1TB, 2))
+                        }
+                     }
+                  }
+               }
+            }
+
+            if ((($item.'wan-tx_bytes') -or ($item.'wan-tx_bytes' -eq '0.0')) -and (($item.'wan-rx_bytes') -or ($item.'wan-rx_bytes' -eq '0.0')))
+            {
+               $WanbytesSummed = ($item.'wan-tx_bytes' + $item.'wan-rx_bytes')
+
+               $outputAppend | Add-Member -NotePropertyName 'wan_bytes' -NotePropertyValue $WanbytesSummed
+
+               if ((([math]::round($WanbytesSummed / 1KB, 2)) -ne '0.0') -or (([math]::round($WanbytesSummed / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName 'wan_kb' -NotePropertyValue ([math]::round($WanbytesSummed / 1KB, 2))
+
+                  if ((([math]::round($WanbytesSummed / 1MB, 2)) -ne '0.0') -or (([math]::round($WanbytesSummed / 1MB, 2)) -ne '0.00'))
+                  {
+                     $outputAppend | Add-Member -NotePropertyName 'wan_mb' -NotePropertyValue ([math]::round($WanbytesSummed / 1MB, 2))
+
+                     if ((([math]::round($WanbytesSummed / 1GB, 2)) -ne '0.0') -or (([math]::round($WanbytesSummed / 1GB, 2)) -ne '0.00'))
+                     {
+                        $outputAppend | Add-Member -NotePropertyName 'wan_gb' -NotePropertyValue ([math]::round($WanbytesSummed / 1GB, 2))
+
+                        if ((([math]::round($WanbytesSummed / 1TB, 2)) -ne '0.0') -or (([math]::round($WanbytesSummed / 1TB, 2)) -ne '0.00'))
+                        {
+                           $outputAppend | Add-Member -NotePropertyName 'wan_tb' -NotePropertyValue ([math]::round($WanbytesSummed / 1TB, 2))
+                        }
+                     }
+                  }
+               }
+
+               $WanbytesSummed = $null
+            }
+
+            if (($item.'wlan_bytes') -or ($item.'wlan_bytes' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'wlan_bytes' -NotePropertyValue $item.'wlan_bytes'
+
+               if ((([math]::round($item.'wlan_bytes' / 1KB, 2)) -ne '0.0') -or (([math]::round($item.'wlan_bytes' / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName 'wlan_kb' -NotePropertyValue ([math]::round($item.'wlan_bytes' / 1KB, 2))
+
+                  if ((([math]::round($item.'wlan_bytes' / 1MB, 2)) -ne '0.0') -or (([math]::round($item.'wlan_bytes' / 1MB, 2)) -ne '0.00'))
+                  {
+                     $outputAppend | Add-Member -NotePropertyName 'wlan_mb' -NotePropertyValue ([math]::round($item.'wlan_bytes' / 1MB, 2))
+
+                     if ((([math]::round($item.'wlan_bytes' / 1GB, 2)) -ne '0.0') -or (([math]::round($item.'wlan_bytes' / 1GB, 2)) -ne '0.00'))
+                     {
+                        $outputAppend | Add-Member -NotePropertyName 'wlan_gb' -NotePropertyValue ([math]::round($item.'wlan_bytes' / 1GB, 2))
+
+                        if ((([math]::round($item.'wlan_bytes' / 1TB, 2)) -ne '0.0') -or (([math]::round($item.'wlan_bytes' / 1TB, 2)) -ne '0.00'))
+                        {
+                           $outputAppend | Add-Member -NotePropertyName 'wlan_tb' -NotePropertyValue ([math]::round($item.'wlan_bytes' / 1TB, 2))
+                        }
+                     }
+                  }
+               }
+            }
+
+            if (($item.'num_sta') -or ($item.'num_sta' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'Clients' -NotePropertyValue $item.'num_sta'
+            }
+
+            if (($item.'lan-num_sta') -or ($item.'lan-num_sta' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'LAN_Clients' -NotePropertyValue $item.'lan-num_sta'
+            }
+
+            if (($item.'wlan-num_sta') -or ($item.'wlan-num_sta' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'WLAN_Clients' -NotePropertyValue $item.'wlan-num_sta'
+            }
+            #endregion
+
+            # Sppend to the output
+            $output += $outputAppend
+
+            # Cleanup
+            $outputAppend = $null
+         }
+
+         # Resort to make sure everything is in the right order :)
+         $output = $output | Sort-Object Time
+         #endregion CreateOutput
+      }
+      catch
+      {
+         # Try to Logout
+         try
+         {
+            $null = (Invoke-UniFiApiLogout -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
+         }
+         catch
+         {
+            # We don't care about that
+            Write-Verbose -Message 'Logout failed'
+         }
+
+         #region ErrorHandler
+         # get error record
+         [Management.Automation.ErrorRecord]$e = $_
+
+         # retrieve information about runtime error
+         $info = [PSCustomObject]@{
+            Exception = $e.Exception.Message
+            Reason    = $e.CategoryInfo.Reason
+            Target    = $e.CategoryInfo.TargetName
+            Script    = $e.InvocationInfo.ScriptName
+            Line      = $e.InvocationInfo.ScriptLineNumber
+            Column    = $e.InvocationInfo.OffsetInLine
+         }
+
+         Write-Verbose -Message $info
+
+         Write-Error -Message ($info.Exception) -ErrorAction Stop
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+         #endregion ErrorHandler
+      }
+      finally
+      {
+         #region ResetSslTrust
+         # Reset the SSL Trust (make sure everything is back to default)
+         [Net.ServicePointManager]::ServerCertificateValidationCallback = $null
+         #endregion ResetSslTrust
+
+         #region RestoreProgressPreference
+         $ProgressPreference = $ExistingProgressPreference
+         #endregion RestoreProgressPreference
+      }
+
+      # check result
+      if ($Session.meta.rc -ne 'ok')
+      {
+         # Verbose stuff
+         $Script:line = $_.InvocationInfo.ScriptLineNumber
+         Write-Verbose -Message ('Error was in Line {0}' -f $line)
+         Write-Verbose -Message ('Error was {0}' -f $Session.meta.rc)
+
+         # Error Message
+         Write-Error -Message 'Unable to Login' -ErrorAction Stop
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+      }
+   }
+
+   end
+   {
+      # Dump the Result
+      $output
+
+      # Cleanup
+      $Session = $null
+      $output = $null
+
+      #region RestoreProgressPreference
+      $ProgressPreference = $ExistingProgressPreference
+      #endregion RestoreProgressPreference
+
+      Write-Verbose -Message 'Done Get-UnifiDailySiteStats'
+   }
+}
+
 function Get-UnifiFirewallGroupDetails
 {
    <#
@@ -1578,6 +5829,9 @@ function Get-UnifiFirewallGroupDetails
    begin
    {
       Write-Verbose -Message 'Start Get-UnifiFirewallGroupDetails'
+
+      # Call meta function
+      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
 
       # Cleanup
       $Session = $null
@@ -1995,6 +6249,9 @@ function Get-UnifiFirewallGroups
          break
       }
       #endregion ReCheckSession
+
+      # Call meta function
+      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
    }
 
    process
@@ -2121,6 +6378,2208 @@ function Get-UnifiFirewallGroups
    }
 }
 
+function Get-UnifiHourlyApStats
+{
+   <#
+         .SYNOPSIS
+         Get hourly stats Access Point stats
+
+         .DESCRIPTION
+         Get hourly stats for all or just one access points in a given UniFi site
+         For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).
+         We also return real timestamps instead of the unix timestaps that the UniFi returns
+
+         .PARAMETER UnifiSite
+         ID of the client-device to be modified
+
+         .PARAMETER Mac
+         Client MAC address
+
+         .PARAMETER Start
+         Startpoint in UniFi Unix timestamp in milliseconds
+
+         .PARAMETER End
+         Endpoint in UniFi Unix timestamp in milliseconds
+
+         .EXAMPLE
+         PS C:\> Get-UnifiHourlyApStats
+
+         Get hourly stats for all or just one access points in the default site
+
+         .EXAMPLE
+         PS C:\> Get-UnifiHourlyApStats -Mac '78:8a:20:59:e6:88'
+
+         Get hourly stats for a given (78:8a:20:59:e6:88) access point in the default site
+
+         .EXAMPLE
+         (Get-UnifiHourlyApStats -Start '1548971935421' -End '1548975579019')
+
+         Get the statistics for a given time period.
+
+         .EXAMPLE
+         (Get-UnifiHourlyApStats -Start '1548971935421')
+
+         Get hourly stats for the last 2 hours (was the timestamp while the sample was created)
+
+         .EXAMPLE
+         PS C:\> Get-UnifiHourlyApStats -UnifiSite 'contoso' | Where-Object { ($_.ConnectedClients -ne '0') -and ($_.Traffic -ne '0.00') }
+
+         Get hourly stats for all access points in the site 'contoso', results are filtered and display only if clients are connected and traffic is generated.
+
+         .EXAMPLE
+         PS C:\> (Get-UnifiHourlyApStats -UnifiSite 'contoso')[-1]
+
+         Get hourly stats for all access points in the site 'contoso'
+
+         .NOTES
+         Defaults to the past 7 days (7*24 hours)
+         UniFi controller older then 4.6.6 keeps the statistics only for 5 hours.
+         And it depends on your controller settings (Setup in "Settings/Maintenance" in the "DATA RETENTION" Block)
+
+         .LINK
+         Get-UniFiConfig
+
+         .LINK
+         Set-UniFiDefaultRequestHeader
+
+         .LINK
+         Invoke-UniFiApiLogin
+
+         .LINK
+         Invoke-RestMethod
+
+         .LINK
+         ConvertFrom-UnixTimeStamp
+
+         .LINK
+         ConvertTo-UnixTimeStamp
+   #>
+
+   [CmdletBinding(ConfirmImpact = 'None')]
+   [OutputType([psobject])]
+   param
+   (
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 0)]
+      [ValidateNotNullOrEmpty()]
+      [Alias('Site')]
+      [string]
+      $UnifiSite = 'default',
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 1)]
+      [ValidateNotNullOrEmpty()]
+      [Alias('UniFiMac', 'MacAddress')]
+      [string]
+      $Mac,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 2)]
+      [Alias('Startpoint', 'StartTime')]
+      [String]
+      $Start,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 3)]
+      [Alias('EndPoint', 'EndTime')]
+      [string]
+      $End
+   )
+
+   begin
+   {
+      Write-Verbose -Message 'Start Get-UnifiHourlyApStats'
+
+      # Save Datestring to keep everything consitant
+      $now = (Get-Date)
+
+      if (-not ($Start))
+      {
+         $Start = (ConvertTo-UnixTimeStamp -Date ($now.AddDays(-7)) -Milliseconds)
+      }
+
+      if (-not ($End))
+      {
+         $End = (ConvertTo-UnixTimeStamp -Date $now -Milliseconds)
+      }
+
+      # Cleanup
+      $Session = $null
+
+      #region SafeProgressPreference
+      # Safe ProgressPreference and Setup SilentlyContinue for the function
+      $ExistingProgressPreference = ($ProgressPreference)
+      $ProgressPreference = 'SilentlyContinue'
+      #endregion SafeProgressPreference
+
+      #region CheckSession
+      if (-not (Get-UniFiIsAlive))
+      {
+         #region LoginCheckLoop
+         # TODO: Move to config
+         [int]$NumberOfRetries = '3'
+         [int]$RetryTimer = '5'
+         # Setup the Loop itself
+         $RetryLoop = $false
+         [int]$RetryCounter = '0'
+         # Original code/idea was by Thomas Maurer
+         do
+         {
+            try
+            {
+               # Try to Logout
+               try
+               {
+                  if (-not (Get-UniFiIsAlive))
+                  {
+                     Throw
+                  }
+               }
+               catch
+               {
+                  # We don't care about that
+                  Write-Verbose -Message 'Logout failed'
+               }
+
+               # Try a Session check (login is inherited here within the helper function)
+               if (-not (Get-UniFiIsAlive -ErrorAction Stop -WarningAction SilentlyContinue))
+               {
+                  Write-Error -Message 'Login failed' -ErrorAction Stop -Category AuthenticationError
+               }
+
+               # End the Loop
+               $RetryLoop = $true
+            }
+            catch
+            {
+               if ($RetryCounter -gt $NumberOfRetries)
+               {
+                  Write-Warning -Message ('Could still not login, after {0} retries.' -f $NumberOfRetries)
+
+                  # Stay in the Loop
+                  $RetryLoop = $true
+               }
+               else
+               {
+                  if ($RetryCounter -eq 0)
+                  {
+                     Write-Warning -Message ('Could not login! Retrying in {0} seconds.' -f $RetryTimer)
+                  }
+                  else
+                  {
+                     Write-Warning -Message ('Retry {0} of {1} failed. Retrying in {2} seconds.' -f $RetryCounter, $NumberOfRetries, $RetryTimer)
+                  }
+
+                  $null = (Start-Sleep -Seconds $RetryTimer)
+
+                  $RetryCounter = $RetryCounter + 1
+               }
+            }
+         }
+         While ($RetryLoop -eq $false)
+         #endregion LoginCheckLoop
+      }
+      #endregion CheckSession
+
+      #region ReCheckSession
+      if (-not ($RestSession))
+      {
+         # Restore ProgressPreference
+         $ProgressPreference = $ExistingProgressPreference
+
+         Write-Error -Message 'Unable to login! Check the connection to the controller, SSL certificates, and your credentials!' -ErrorAction Stop -Category AuthenticationError
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+      }
+      #endregion ReCheckSession
+
+      #region MacHandler
+      if ($Mac)
+      {
+         [string]$Mac = (ConvertTo-UniFiValidMacAddress -Mac $Mac)
+      }
+      #endregion MacHandler
+
+      #region ApiRequestBodyInput
+      $Script:ApiRequestBodyInput = [PSCustomObject][ordered]@{
+         attrs = 'bytes', 'num_sta', 'time'
+         start = $Start
+         end   = $End
+      }
+
+      if ($Mac)
+      {
+         $ApiRequestBodyInput | Add-Member -MemberType NoteProperty -Name mac -Value $Mac
+      }
+      #endregion ApiRequestBodyInput
+
+      # Call meta function
+      $paramGetCallerPreference = @{
+         Cmdlet        = $PSCmdlet
+         SessionState  = $ExecutionContext.SessionState
+         ErrorAction   = 'SilentlyContinue'
+         WarningAction = 'SilentlyContinue'
+      }
+      $null = (Get-CallerPreference @paramGetCallerPreference)
+   }
+
+   process
+   {
+      try
+      {
+         #region ReadConfig
+         Write-Verbose -Message 'Read the Config'
+
+         $null = (Get-UniFiConfig)
+         #endregion ReadConfig
+
+         #region CertificateHandler
+         Write-Verbose -Message ('Certificate check - Should be {0}' -f $ApiSelfSignedCert)
+
+         [Net.ServicePointManager]::ServerCertificateValidationCallback = {
+            $ApiSelfSignedCert
+         }
+         #endregion CertificateHandler
+
+         #region SetRequestHeader
+         Write-Verbose -Message 'Set the API Call default Header'
+
+         $null = (Set-UniFiDefaultRequestHeader)
+         #endregion SetRequestHeader
+
+         #region SetRequestURI
+         Write-Verbose -Message 'Create the Request URI'
+         $ApiRequestUri = $ApiUri + 's/' + $UnifiSite + '/stat/report/hourly.ap'
+         Write-Verbose -Message ('URI: {0}' -f $ApiRequestUri)
+         #endregion SetRequestURI
+
+         #region ApiRequestBody
+         $paramConvertToJson = @{
+            InputObject   = $ApiRequestBodyInput
+            Depth         = 5
+            ErrorAction   = 'Stop'
+            WarningAction = 'SilentlyContinue'
+         }
+
+         $ApiRequestBodyInput = $null
+
+         $Script:ApiRequestBody = (ConvertTo-Json @paramConvertToJson)
+         #endregion ApiRequestBody
+
+         #region Request
+         Write-Verbose -Message 'Send the Request'
+         $paramInvokeRestMethod = @{
+            Method        = 'Post'
+            Uri           = $ApiRequestUri
+            Headers       = $RestHeader
+            Body          = $ApiRequestBody
+            ErrorAction   = 'SilentlyContinue'
+            WarningAction = 'SilentlyContinue'
+            WebSession    = $RestSession
+         }
+         $Session = (Invoke-RestMethod @paramInvokeRestMethod)
+
+         Write-Verbose -Message "Session Meta: $(($Session.meta.rc | Out-String).Trim())"
+
+         Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+         #endregion Request
+
+         #region CreateOutput
+         $output = @()
+
+         foreach($item in $Session.data)
+         {
+            $outputAppend = [PSCustomObject][ordered]@{
+               AccesPoint = $item.ap
+               Time       = ((ConvertFrom-UnixTimeStamp -TimeStamp ($item.time) -Milliseconds).ToLocalTime())
+               Clients    = $item.num_sta
+               Traffic    = ([math]::round($item.bytes / 1MB, 2))
+            }
+            # Sppend to the output
+            $output += $outputAppend
+
+            # Cleanup
+            $outputAppend = $null
+         }
+
+         # Resort to make sure everything is in the right order :)
+         $output = $output | Sort-Object Time
+         #endregion CreateOutput
+      }
+      catch
+      {
+         # Try to Logout
+         try
+         {
+            $null = (Invoke-UniFiApiLogout -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
+         }
+         catch
+         {
+            # We don't care about that
+            Write-Verbose -Message 'Logout failed'
+         }
+
+         #region ErrorHandler
+         # get error record
+         [Management.Automation.ErrorRecord]$e = $_
+
+         # retrieve information about runtime error
+         $info = [PSCustomObject]@{
+            Exception = $e.Exception.Message
+            Reason    = $e.CategoryInfo.Reason
+            Target    = $e.CategoryInfo.TargetName
+            Script    = $e.InvocationInfo.ScriptName
+            Line      = $e.InvocationInfo.ScriptLineNumber
+            Column    = $e.InvocationInfo.OffsetInLine
+         }
+
+         Write-Verbose -Message $info
+
+         Write-Error -Message ($info.Exception) -ErrorAction Stop
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+         #endregion ErrorHandler
+      }
+      finally
+      {
+         #region ResetSslTrust
+         # Reset the SSL Trust (make sure everything is back to default)
+         [Net.ServicePointManager]::ServerCertificateValidationCallback = $null
+         #endregion ResetSslTrust
+
+         #region RestoreProgressPreference
+         $ProgressPreference = $ExistingProgressPreference
+         #endregion RestoreProgressPreference
+      }
+
+      # check result
+      if ($Session.meta.rc -ne 'ok')
+      {
+         # Verbose stuff
+         $Script:line = $_.InvocationInfo.ScriptLineNumber
+         Write-Verbose -Message ('Error was in Line {0}' -f $line)
+         Write-Verbose -Message ('Error was {0}' -f $Session.meta.rc)
+
+         # Error Message
+         Write-Error -Message 'Unable to Login' -ErrorAction Stop
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+      }
+   }
+
+   end
+   {
+      # Dump the Result
+      $output
+
+      # Cleanup
+      $Session = $null
+      $output = $null
+
+      #region RestoreProgressPreference
+      $ProgressPreference = $ExistingProgressPreference
+      #endregion RestoreProgressPreference
+
+      Write-Verbose -Message 'Done Get-UnifiHourlyApStats'
+   }
+}
+
+function Get-UnifiHourlyClientStats
+{
+   <#
+         .SYNOPSIS
+         Get hourly user/client statistics for a given user/client
+
+         .DESCRIPTION
+         Get hourly user/client statistics for a given user/client
+
+         For convenience, we return the a bit more then the API, e.g. everything in KB, MB, GB, and TB instead of just bytes
+         We also return real timestamps instead of the unix timestaps in miliseconds that the UniFi returns
+
+         Sample output:
+         Time          : 2/1/2019 4:00:00 PM
+         rx_bytes      : 105.0
+         rx_kb         : 0.10
+         rx_mb         : 0.00
+         rx_gb         : 0.00
+         rx_tb         : 0.00
+         rx_rate       : 650000.0
+         rx_rate_mbps  : 634.77
+         rx_retries    : 0
+         rx_packets    : 2.5
+         tx_bytes      : 213.0
+         tx_kb         : 0.21
+         tx_mb         : 0.00
+         tx_gb         : 0.00
+         tx_tb         : 0.00
+         tx_rate       : 650000.0
+         tx_rate_mbps  : 634.77
+         tx_retries    : 1
+         tx_packets    : 4.5
+         Traffic_bytes : 318
+         Traffic_kb    : 0.31
+         Traffic_mb    : 0.00
+         Traffic_gb    : 0.00
+         Traffic_tb    : 0.00
+         Signal        : -65
+         Signal_plain  : -65.0
+
+         In reality, we filter out all 0.00 values (e.g. tx_mb above)
+         You can Filter for whatever parameter you like (e.g. with Select-Object)
+
+         .PARAMETER UnifiSite
+         ID of the client-device to be modified
+
+         .PARAMETER Mac
+         Client MAC address (required)
+
+         .PARAMETER Start
+         Startpoint in UniFi Unix timestamp in milliseconds
+
+         .PARAMETER End
+         Endpoint in UniFi Unix timestamp in milliseconds
+
+         .PARAMETER Attributes
+         array containing attributes (strings) to be returned, defaults to rx_bytes and tx_bytes
+
+         .EXAMPLE
+         PS C:\> Get-UnifiHourlyClientStats -Mac '78:8a:20:59:e6:88'
+
+         Get hourly user/client statistics for a given (78:8a:20:59:e6:88) user/client in the default site
+
+         .EXAMPLE
+         (Get-UnifiHourlyClientStats -Mac '78:8a:20:59:e6:88' -Start '1548971935421' -End '1548975579019')
+
+         Get hourly user/client statistics for a given (78:8a:20:59:e6:88) user/client in the default site for a given time period.
+
+         .EXAMPLE
+         (Get-UnifiHourlyClientStats -Mac '78:8a:20:59:e6:88' -Start '1548980058135')
+
+         Get hourly user/client statistics for a given (78:8a:20:59:e6:88) user/client in the default site for the last 60 minutes (was the timestamp while the sample was created)
+
+         .EXAMPLE
+         PS C:\> (Get-UnifiHourlyClientStats -Mac '78:8a:20:59:e6:88' -UnifiSite 'contoso')[-1]
+
+         Get hourly user/client statistics for a given (78:8a:20:59:e6:88) user/client in the site 'contoso'
+
+         .EXAMPLE
+         PS C:\> Get-UnifiHourlyClientStats -Mac '78:8a:20:59:e6:88' -Attributes 'rx_bytes', 'tx_bytes', 'signal', 'rx_rate', 'tx_rate', 'rx_retries', 'tx_retries', 'rx_packets', 'tx_packets')
+
+         Get all Values from the API
+
+         .NOTES
+         Defaults to the past week (7*24 hours)
+
+         Ubiquiti announced this with the Controller version 5.8 - It will not work on older versions!
+
+         Make sure that "Clients Historical Data" (Collect clients' historical data) has been enabled in the UniFi controller in "Settings/Maintenance"
+
+         .LINK
+         Get-UniFiConfig
+
+         .LINK
+         Set-UniFiDefaultRequestHeader
+
+         .LINK
+         Invoke-UniFiApiLogin
+
+         .LINK
+         Invoke-RestMethod
+
+         .LINK
+         ConvertFrom-UnixTimeStamp
+
+         .LINK
+         ConvertTo-UnixTimeStamp
+   #>
+
+   [CmdletBinding(ConfirmImpact = 'None')]
+   [OutputType([psobject])]
+   param
+   (
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 0)]
+      [ValidateNotNullOrEmpty()]
+      [Alias('Site')]
+      [string]
+      $UnifiSite = 'default',
+      [Parameter(Mandatory,
+            ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 1)]
+      [ValidateNotNullOrEmpty()]
+      [Alias('UniFiMac', 'MacAddress')]
+      [string]
+      $Mac,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 2)]
+      [Alias('Startpoint', 'StartTime')]
+      [String]
+      $Start,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 3)]
+      [Alias('EndPoint', 'EndTime')]
+      [string]
+      $End,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 4)]
+      [ValidateSet('rx_bytes', 'tx_bytes', 'signal', 'rx_rate', 'tx_rate', 'rx_retries', 'tx_retries', 'rx_packets', 'tx_packets', IgnoreCase = $true)]
+      [Alias('attribs', 'UniFiAttributes')]
+      [string[]]
+      $Attributes
+   )
+
+   begin
+   {
+      Write-Verbose -Message 'Start Get-UnifiHourlyClientStats'
+
+      # Set the defaults, if needed
+      if (-not ($Attributes))
+      {
+         [string[]]$Attributes = 'rx_bytes', 'tx_bytes'
+      }
+      # ensure the attributes are lowercase (we ignore the case on the input for the user covinience)
+      [string[]]$Attributes = ($Attributes).ToLower()
+
+      # Save Datestring to keep everything consitant
+      $now = (Get-Date)
+
+      if (-not ($Start))
+      {
+         $Start = (ConvertTo-UnixTimeStamp -Date ($now.AddDays(-7)) -Milliseconds)
+      }
+
+      if (-not ($End))
+      {
+         $End = (ConvertTo-UnixTimeStamp -Date $now -Milliseconds)
+      }
+
+      # Cleanup
+      $Session = $null
+
+      #region SafeProgressPreference
+      # Safe ProgressPreference and Setup SilentlyContinue for the function
+      $ExistingProgressPreference = ($ProgressPreference)
+      $ProgressPreference = 'SilentlyContinue'
+      #endregion SafeProgressPreference
+
+      #region CheckSession
+      if (-not (Get-UniFiIsAlive))
+      {
+         #region LoginCheckLoop
+         # TODO: Move to config
+         [int]$NumberOfRetries = '3'
+         [int]$RetryTimer = '5'
+         # Setup the Loop itself
+         $RetryLoop = $false
+         [int]$RetryCounter = '0'
+         # Original code/idea was by Thomas Maurer
+         do
+         {
+            try
+            {
+               # Try to Logout
+               try
+               {
+                  if (-not (Get-UniFiIsAlive))
+                  {
+                     throw
+                  }
+               }
+               catch
+               {
+                  # We don't care about that
+                  Write-Verbose -Message 'Logout failed'
+               }
+
+               # Try a Session check (login is inherited here within the helper function)
+               if (-not (Get-UniFiIsAlive -ErrorAction Stop -WarningAction SilentlyContinue))
+               {
+                  Write-Error -Message 'Login failed' -ErrorAction Stop -Category AuthenticationError
+               }
+
+               # End the Loop
+               $RetryLoop = $true
+            }
+            catch
+            {
+               if ($RetryCounter -gt $NumberOfRetries)
+               {
+                  Write-Warning -Message ('Could still not login, after {0} retries.' -f $NumberOfRetries)
+
+                  # Stay in the Loop
+                  $RetryLoop = $true
+               }
+               else
+               {
+                  if ($RetryCounter -eq 0)
+                  {
+                     Write-Warning -Message ('Could not login! Retrying in {0} seconds.' -f $RetryTimer)
+                  }
+                  else
+                  {
+                     Write-Warning -Message ('Retry {0} of {1} failed. Retrying in {2} seconds.' -f $RetryCounter, $NumberOfRetries, $RetryTimer)
+                  }
+
+                  $null = (Start-Sleep -Seconds $RetryTimer)
+
+                  $RetryCounter = $RetryCounter + 1
+               }
+            }
+         }
+         while ($RetryLoop -eq $false)
+         #endregion LoginCheckLoop
+      }
+      #endregion CheckSession
+
+      #region ReCheckSession
+      if (-not ($RestSession))
+      {
+         # Restore ProgressPreference
+         $ProgressPreference = $ExistingProgressPreference
+
+         Write-Error -Message 'Unable to login! Check the connection to the controller, SSL certificates, and your credentials!' -ErrorAction Stop -Category AuthenticationError
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+      }
+      #endregion ReCheckSession
+
+      #region MacHandler
+      if ($Mac)
+      {
+         [string]$Mac = (ConvertTo-UniFiValidMacAddress -Mac $Mac)
+      }
+      #endregion MacHandler
+
+      #region ApiRequestBodyInput
+      $Script:ApiRequestBodyInput = [PSCustomObject][ordered]@{
+         attrs = ($Attributes + 'time')
+         start = $Start
+         end   = $End
+         mac   = $Mac
+      }
+      #endregion ApiRequestBodyInput
+
+      # Call meta function
+      $paramGetCallerPreference = @{
+         Cmdlet        = $PSCmdlet
+         SessionState  = $ExecutionContext.SessionState
+         ErrorAction   = 'SilentlyContinue'
+         WarningAction = 'SilentlyContinue'
+      }
+      $null = (Get-CallerPreference @paramGetCallerPreference)
+   }
+
+   process
+   {
+      try
+      {
+         #region ReadConfig
+         Write-Verbose -Message 'Read the Config'
+
+         $null = (Get-UniFiConfig)
+         #endregion ReadConfig
+
+         #region CertificateHandler
+         Write-Verbose -Message ('Certificate check - Should be {0}' -f $ApiSelfSignedCert)
+
+         [Net.ServicePointManager]::ServerCertificateValidationCallback = {
+            $ApiSelfSignedCert
+         }
+         #endregion CertificateHandler
+
+         #region SetRequestHeader
+         Write-Verbose -Message 'Set the API Call default Header'
+
+         $null = (Set-UniFiDefaultRequestHeader)
+         #endregion SetRequestHeader
+
+         #region SetRequestURI
+         Write-Verbose -Message 'Create the Request URI'
+         $ApiRequestUri = $ApiUri + 's/' + $UnifiSite + '/stat/report/hourly.user'
+         Write-Verbose -Message ('URI: {0}' -f $ApiRequestUri)
+         #endregion SetRequestURI
+
+         #region ApiRequestBody
+         $paramConvertToJson = @{
+            InputObject   = $ApiRequestBodyInput
+            Depth         = 5
+            ErrorAction   = 'Stop'
+            WarningAction = 'SilentlyContinue'
+         }
+
+         $ApiRequestBodyInput = $null
+
+         $Script:ApiRequestBody = (ConvertTo-Json @paramConvertToJson)
+         #endregion ApiRequestBody
+
+         #region Request
+         Write-Verbose -Message 'Send the Request'
+
+         $paramInvokeRestMethod = @{
+            Method        = 'Post'
+            Uri           = $ApiRequestUri
+            Headers       = $RestHeader
+            Body          = $ApiRequestBody
+            ErrorAction   = 'SilentlyContinue'
+            WarningAction = 'SilentlyContinue'
+            WebSession    = $RestSession
+         }
+         $Session = (Invoke-RestMethod @paramInvokeRestMethod)
+
+         Write-Verbose -Message "Session Meta: $(($Session.meta.rc | Out-String).Trim())"
+
+         Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+         #endregion Request
+
+         #region CreateOutput
+         $output = @()
+
+         foreach ($item in $Session.data)
+         {
+            $outputAppend = [PSCustomObject][ordered]@{
+               Time = ((ConvertFrom-UnixTimeStamp -TimeStamp ($item.time) -Milliseconds).ToLocalTime())
+            }
+
+            #region RX
+            if ($item.rx_bytes)
+            {
+               $outputAppend | Add-Member -NotePropertyName rx_bytes -NotePropertyValue $item.rx_bytes
+
+               if ((([math]::round($item.rx_bytes / 1KB, 2)) -ne '0.0') -or (([math]::round($item.rx_bytes / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName rx_kb -NotePropertyValue ([math]::round($item.rx_bytes / 1KB, 2))
+
+                  if ((([math]::round($item.rx_bytes / 1MB, 2)) -ne '0.0') -or (([math]::round($item.rx_bytes / 1MB, 2)) -ne '0.00'))
+                  {
+                     $outputAppend | Add-Member -NotePropertyName rx_mb -NotePropertyValue ([math]::round($item.rx_bytes / 1MB, 2))
+
+                     if ((([math]::round($item.rx_bytes / 1GB, 2)) -ne '0.0') -or (([math]::round($item.rx_bytes / 1GB, 2)) -ne '0.00'))
+                     {
+                        $outputAppend | Add-Member -NotePropertyName rx_gb -NotePropertyValue ([math]::round($item.rx_bytes / 1GB, 2))
+
+                        if ((([math]::round($item.rx_bytes / 1TB, 2)) -ne '0.0') -or (([math]::round($item.rx_bytes / 1TB, 2)) -ne '0.00'))
+                        {
+                           $outputAppend | Add-Member -NotePropertyName rx_tb -NotePropertyValue ([math]::round($item.rx_bytes / 1TB, 2))
+                        }
+                     }
+                  }
+               }
+            }
+
+            if ($item.rx_rate)
+            {
+               $outputAppend | Add-Member -NotePropertyName rx_rate -NotePropertyValue $item.rx_rate
+
+               if ((([math]::round($item.rx_rate / 1KB, 2)) -ne '0.0') -or (([math]::round($item.rx_rate / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName rx_rate_mbps -NotePropertyValue ([math]::round($item.rx_rate / 1KB, 2))
+               }
+            }
+
+            # If 0.0 handler added
+            if (($item.rx_retries) -or ($item.rx_retries -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName rx_retries -NotePropertyValue ([INT]$item.rx_retries)
+            }
+
+            if ($item.rx_packets)
+            {
+               $outputAppend | Add-Member -NotePropertyName rx_packets -NotePropertyValue $item.rx_packets
+            }
+            #endregion RX
+
+            #region TX
+            if ($item.tx_bytes)
+            {
+               $outputAppend | Add-Member -NotePropertyName tx_bytes -NotePropertyValue $item.tx_bytes
+
+               if ((([math]::round($item.tx_bytes / 1KB, 2)) -ne '0.0') -or (([math]::round($item.tx_bytes / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName tx_kb -NotePropertyValue ([math]::round($item.tx_bytes / 1KB, 2))
+
+                  if ((([math]::round($item.tx_bytes / 1MB, 2)) -ne '0.0') -or (([math]::round($item.tx_bytes / 1MB, 2)) -ne '0.00'))
+                  {
+                     $outputAppend | Add-Member -NotePropertyName tx_mb -NotePropertyValue ([math]::round($item.tx_bytes / 1MB, 2))
+
+                     if ((([math]::round($item.tx_bytes / 1GB, 2)) -ne '0.0') -or (([math]::round($item.tx_bytes / 1GB, 2)) -ne '0.00'))
+                     {
+                        $outputAppend | Add-Member -NotePropertyName tx_gb -NotePropertyValue ([math]::round($item.tx_bytes / 1GB, 2))
+
+                        if ((([math]::round($item.tx_bytes / 1TB, 2)) -ne '0.0') -or (([math]::round($item.tx_bytes / 1TB, 2)) -ne '0.00'))
+                        {
+                           $outputAppend | Add-Member -NotePropertyName tx_tb -NotePropertyValue ([math]::round($item.tx_bytes / 1TB, 2))
+                        }
+                     }
+                  }
+               }
+            }
+
+            if ($item.tx_rate)
+            {
+               $outputAppend | Add-Member -NotePropertyName tx_rate -NotePropertyValue $item.tx_rate
+               if ((([math]::round($item.tx_rate / 1KB, 2)) -ne '0.0') -or (([math]::round($item.tx_rate / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName tx_rate_mbps -NotePropertyValue ([math]::round($item.tx_rate / 1KB, 2))
+               }
+            }
+
+            # If 0.0 handler added
+            if (($item.tx_retries) -or ($item.tx_retries -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName tx_retries -NotePropertyValue ([INT]$item.tx_retries)
+            }
+
+            if ($item.tx_packets)
+            {
+               $outputAppend | Add-Member -NotePropertyName tx_packets -NotePropertyValue $item.tx_packets
+            }
+            #endregion TX
+
+            #region Traffic
+            if (($item.rx_bytes) -and ($item.tx_bytes))
+            {
+               $outputAppend | Add-Member -NotePropertyName Traffic_bytes -NotePropertyValue ([math]::round(($item.rx_bytes + $item.tx_bytes)))
+
+               if ((([math]::round(($item.rx_bytes + $item.tx_bytes) / 1KB, 2)) -ne '0.0') -or (([math]::round(($item.rx_bytes + $item.tx_bytes) / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName Traffic_kb -NotePropertyValue ([math]::round(($item.rx_bytes + $item.tx_bytes) / 1KB, 2))
+
+                  if ((([math]::round(($item.rx_bytes + $item.tx_bytes) / 1MB, 2)) -ne '0.0') -or (([math]::round(($item.rx_bytes + $item.tx_bytes) / 1MB, 2)) -ne '0.00'))
+                  {
+                     $outputAppend | Add-Member -NotePropertyName Traffic_mb -NotePropertyValue ([math]::round(($item.rx_bytes + $item.tx_bytes) / 1MB, 2))
+
+                     if ((([math]::round(($item.rx_bytes + $item.tx_bytes) / 1GB, 2)) -ne '0.0') -or (([math]::round(($item.rx_bytes + $item.tx_bytes) / 1GB, 2)) -ne '0.00'))
+                     {
+                        $outputAppend | Add-Member -NotePropertyName Traffic_gb -NotePropertyValue ([math]::round(($item.rx_bytes + $item.tx_bytes) / 1GB, 2))
+
+                        if ((([math]::round(($item.rx_bytes + $item.tx_bytes) / 1TB, 2)) -ne '0.0') -or (([math]::round(($item.rx_bytes + $item.tx_bytes) / 1TB, 2)) -ne '0.00'))
+                        {
+                           $outputAppend | Add-Member -NotePropertyName Traffic_tb -NotePropertyValue ([math]::round(($item.rx_bytes + $item.tx_bytes) / 1TB, 2))
+                        }
+                     }
+                  }
+               }
+            }
+            #endregion Traffic
+
+            #region Signal
+            if ($item.signal)
+            {
+               $outputAppend | Add-Member -NotePropertyName Signal -NotePropertyValue ([math]::Truncate($item.signal))
+               $outputAppend | Add-Member -NotePropertyName Signal_plain -NotePropertyValue $item.signal
+            }
+            #endregion Signal
+
+            # Sppend to the output
+            $output += $outputAppend
+
+            # Cleanup
+            $outputAppend = $null
+         }
+
+         # Resort to make sure everything is in the right order :)
+         $output = $output | Sort-Object Time
+         #endregion CreateOutput
+      }
+      catch
+      {
+         # Try to Logout
+         try
+         {
+            $null = (Invoke-UniFiApiLogout -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
+         }
+         catch
+         {
+            # We don't care about that
+            Write-Verbose -Message 'Logout failed'
+         }
+
+         #region ErrorHandler
+         # get error record
+         [Management.Automation.ErrorRecord]$e = $_
+
+         # retrieve information about runtime error
+         $info = [PSCustomObject]@{
+            Exception = $e.Exception.Message
+            Reason    = $e.CategoryInfo.Reason
+            Target    = $e.CategoryInfo.TargetName
+            Script    = $e.InvocationInfo.ScriptName
+            Line      = $e.InvocationInfo.ScriptLineNumber
+            Column    = $e.InvocationInfo.OffsetInLine
+         }
+
+         Write-Verbose -Message $info
+
+         Write-Error -Message ($info.Exception) -ErrorAction Stop
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+         #endregion ErrorHandler
+      }
+      finally
+      {
+         #region ResetSslTrust
+         # Reset the SSL Trust (make sure everything is back to default)
+         [Net.ServicePointManager]::ServerCertificateValidationCallback = $null
+         #endregion ResetSslTrust
+
+         #region RestoreProgressPreference
+         $ProgressPreference = $ExistingProgressPreference
+         #endregion RestoreProgressPreference
+      }
+
+      # check result
+      if ($Session.meta.rc -ne 'ok')
+      {
+         # Verbose stuff
+         $Script:line = $_.InvocationInfo.ScriptLineNumber
+         Write-Verbose -Message ('Error was in Line {0}' -f $line)
+         Write-Verbose -Message ('Error was {0}' -f $Session.meta.rc)
+
+         # Error Message
+         Write-Error -Message 'Unable to Login' -ErrorAction Stop
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+      }
+   }
+
+   end
+   {
+      # Dump the Result
+      $output
+
+      # Cleanup
+      $Session = $null
+      $output = $null
+
+      #region RestoreProgressPreference
+      $ProgressPreference = $ExistingProgressPreference
+      #endregion RestoreProgressPreference
+
+      Write-Verbose -Message 'Done Get-UnifiHourlyClientStats'
+   }
+}
+
+function Get-UnifiHourlyGatewayStats
+{
+   <#
+         .SYNOPSIS
+         Get hourly statistics for the USG
+
+         .DESCRIPTION
+         Get hourly statistics for the USG (UniFi Secure Gateway)
+
+         For convenience, we return the a bit more then the API, e.g. everything in KB, MB, GB, and TB instead of just bytes
+         We also return real timestamps instead of the unix timestaps in miliseconds that the UniFi returns
+
+         Sample output:
+         Time           : 2/1/2019 6:00:00 PM
+         mem            : 33.29
+         cpu            : 3.07
+         lan-rx_errors  : 0
+         lan-rx_bytes   : 50242070.25
+         lan-rx_kb      : 49064.52
+         lan-rx_mb      : 47.91
+         lan-rx_gb      : 0.05
+         lan-rx_packets : 298575.0
+         lan-rx_dropped : 0
+         wan-rx_errors  : 0
+         wan-rx_packets : 64705.74999999999
+         wan-rx_dropped : 0
+         lan-tx_errors  : 0
+         lan-tx_bytes   : 82506381.25
+         lan-tx_kb      : 80572.64
+         lan-tx_mb      : 78.68
+         lan-tx_gb      : 0.08
+         lan-tx_packets : 310632.50000000006
+         lan-tx_dropped : 0
+         wan-tx_errors  : 0
+         wan-tx_bytes   : 16211129
+         wan-tx_kb      : 15831.18
+         wan-tx_mb      : 15.46
+         wan-tx_gb      : 0.02
+         wan-tx_packets : 42872.99999999999
+         wan-tx_dropped : 0
+
+         You might filter out all the 0 values, we keep them to prevent any null pointer expetions!
+
+         You can Filter for whatever parameter you like (e.g. with Select-Object)
+
+         BUG: The loadavg_ attributes are not working at the moment. The UniFi SDN Controller does not return any values for them!
+
+         .PARAMETER UnifiSite
+         ID of the client-device to be modified
+
+         .PARAMETER Start
+         Startpoint in UniFi Unix timestamp in milliseconds
+
+         .PARAMETER End
+         Endpoint in UniFi Unix timestamp in milliseconds
+
+         .PARAMETER Attributes
+         array containing attributes (strings) to be returned, defaults to mem, cpu, and zime (Time is mandatory)
+
+         .EXAMPLE
+         PS C:\> Get-UnifiHourlyGatewayStats
+
+         Get hourly statistics for the USG (UniFi Secure Gateway) in the default site
+
+         .EXAMPLE
+         (Get-UnifiHourlyGatewayStats -Start '1548971935421' -End '1548975579019')
+
+         Get hourly statistics for the USG (UniFi Secure Gateway) in the default site for a given time period.
+
+         .EXAMPLE
+         (Get-UnifiHourlyGatewayStats -Start '1548980058135')
+
+         Get hourly statistics for the USG (UniFi Secure Gateway) in the default site for the last 60 minutes (was the timestamp while the sample was created)
+
+         .EXAMPLE
+         PS C:\> (Get-UnifiHourlyGatewayStats -UnifiSite 'contoso')[-1]
+
+         Get hourly statistics for the USG (UniFi Secure Gateway) in the site 'contoso'
+
+         .EXAMPLE
+         PS C:\> Get-UnifiHourlyGatewayStats -Attributes 'mem','cpu','loadavg_5','lan-rx_errors','wan-rx_errors','lan-tx_errors','wan-tx_errors','lan-rx_bytes','wan-rx_bytes','lan-tx_bytes','wan-tx_bytes','lan-rx_packets','wan-rx_packets','lan-tx_packets','wan-tx_packets','lan-rx_dropped','wan-rx_dropped','lan-tx_dropped','wan-tx_dropped')
+
+         Get all Values from the API
+
+         .NOTES
+         Defaults to the past week (7*24 hours)
+
+         A USG (UniFi Secure Gateway) is required on the site you querry!
+
+         .LINK
+         Get-UniFiConfig
+
+         .LINK
+         Set-UniFiDefaultRequestHeader
+
+         .LINK
+         Invoke-UniFiApiLogin
+
+         .LINK
+         Invoke-RestMethod
+
+         .LINK
+         ConvertFrom-UnixTimeStamp
+
+         .LINK
+         ConvertTo-UnixTimeStamp
+   #>
+
+   [CmdletBinding(ConfirmImpact = 'None')]
+   [OutputType([psobject])]
+   param
+   (
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 0)]
+      [ValidateNotNullOrEmpty()]
+      [Alias('Site')]
+      [string]
+      $UnifiSite = 'default',
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 1)]
+      [Alias('Startpoint', 'StartTime')]
+      [String]
+      $Start,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 2)]
+      [Alias('EndPoint', 'EndTime')]
+      [string]
+      $End,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 3)]
+      [ValidateSet('mem','cpu','loadavg_5','lan-rx_errors','wan-rx_errors','lan-tx_errors','wan-tx_errors','lan-rx_bytes','wan-rx_bytes','lan-tx_bytes','wan-tx_bytes','lan-rx_packets','wan-rx_packets','lan-tx_packets','wan-tx_packets','lan-rx_dropped','wan-rx_dropped','lan-tx_dropped','wan-tx_dropped', IgnoreCase = $true)]
+      [Alias('attribs', 'UniFiAttributes')]
+      [string[]]
+      $Attributes
+   )
+
+   begin
+   {
+      Write-Verbose -Message 'Start Get-UnifiHourlyGatewayStats'
+
+      # Set the defaults, if needed
+      if (-not ($Attributes))
+      {
+         [string[]]$Attributes = 'mem', 'cpu', 'loadavg_5'
+      }
+      # ensure the attributes are lowercase (we ignore the case on the input for the user covinience)
+      [string[]]$Attributes = ($Attributes).ToLower()
+
+      # Save Datestring to keep everything consitant
+      $now = (Get-Date)
+
+      if (-not ($Start))
+      {
+         $Start = (ConvertTo-UnixTimeStamp -Date ($now.AddDays(-7)) -Milliseconds)
+      }
+
+      if (-not ($End))
+      {
+         $End = (ConvertTo-UnixTimeStamp -Date $now -Milliseconds)
+      }
+
+      # Cleanup
+      $Session = $null
+
+      #region SafeProgressPreference
+      # Safe ProgressPreference and Setup SilentlyContinue for the function
+      $ExistingProgressPreference = ($ProgressPreference)
+      $ProgressPreference = 'SilentlyContinue'
+      #endregion SafeProgressPreference
+
+      #region CheckSession
+      if (-not (Get-UniFiIsAlive))
+      {
+         #region LoginCheckLoop
+         # TODO: Move to config
+         [int]$NumberOfRetries = '3'
+         [int]$RetryTimer = '5'
+         # Setup the Loop itself
+         $RetryLoop = $false
+         [int]$RetryCounter = '0'
+         # Original code/idea was by Thomas Maurer
+         do
+         {
+            try
+            {
+               # Try to Logout
+               try
+               {
+                  if (-not (Get-UniFiIsAlive))
+                  {
+                     throw
+                  }
+               }
+               catch
+               {
+                  # We don't care about that
+                  Write-Verbose -Message 'Logout failed'
+               }
+
+               # Try a Session check (login is inherited here within the helper function)
+               if (-not (Get-UniFiIsAlive -ErrorAction Stop -WarningAction SilentlyContinue))
+               {
+                  Write-Error -Message 'Login failed' -ErrorAction Stop -Category AuthenticationError
+               }
+
+               # End the Loop
+               $RetryLoop = $true
+            }
+            catch
+            {
+               if ($RetryCounter -gt $NumberOfRetries)
+               {
+                  Write-Warning -Message ('Could still not login, after {0} retries.' -f $NumberOfRetries)
+
+                  # Stay in the Loop
+                  $RetryLoop = $true
+               }
+               else
+               {
+                  if ($RetryCounter -eq 0)
+                  {
+                     Write-Warning -Message ('Could not login! Retrying in {0} seconds.' -f $RetryTimer)
+                  }
+                  else
+                  {
+                     Write-Warning -Message ('Retry {0} of {1} failed. Retrying in {2} seconds.' -f $RetryCounter, $NumberOfRetries, $RetryTimer)
+                  }
+
+                  $null = (Start-Sleep -Seconds $RetryTimer)
+
+                  $RetryCounter = $RetryCounter + 1
+               }
+            }
+         }
+         while ($RetryLoop -eq $false)
+         #endregion LoginCheckLoop
+      }
+      #endregion CheckSession
+
+      #region ReCheckSession
+      if (-not ($RestSession))
+      {
+         # Restore ProgressPreference
+         $ProgressPreference = $ExistingProgressPreference
+
+         Write-Error -Message 'Unable to login! Check the connection to the controller, SSL certificates, and your credentials!' -ErrorAction Stop -Category AuthenticationError
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+      }
+      #endregion ReCheckSession
+
+      #region MacHandler
+      if ($Mac)
+      {
+         [string]$Mac = (ConvertTo-UniFiValidMacAddress -Mac $Mac)
+      }
+      #endregion MacHandler
+
+      #region ApiRequestBodyInput
+      $Script:ApiRequestBodyInput = [PSCustomObject][ordered]@{
+         attrs = ($Attributes + 'time')
+         start = $Start
+         end   = $End
+         mac   = $Mac
+      }
+      #endregion ApiRequestBodyInput
+
+      # Call meta function
+      $paramGetCallerPreference = @{
+         Cmdlet        = $PSCmdlet
+         SessionState  = $ExecutionContext.SessionState
+         ErrorAction   = 'SilentlyContinue'
+         WarningAction = 'SilentlyContinue'
+      }
+      $null = (Get-CallerPreference @paramGetCallerPreference)
+   }
+
+   process
+   {
+      try
+      {
+         #region ReadConfig
+         Write-Verbose -Message 'Read the Config'
+
+         $null = (Get-UniFiConfig)
+         #endregion ReadConfig
+
+         #region CertificateHandler
+         Write-Verbose -Message ('Certificate check - Should be {0}' -f $ApiSelfSignedCert)
+
+         [Net.ServicePointManager]::ServerCertificateValidationCallback = {
+            $ApiSelfSignedCert
+         }
+         #endregion CertificateHandler
+
+         #region SetRequestHeader
+         Write-Verbose -Message 'Set the API Call default Header'
+
+         $null = (Set-UniFiDefaultRequestHeader)
+         #endregion SetRequestHeader
+
+         #region SetRequestURI
+         Write-Verbose -Message 'Create the Request URI'
+         $ApiRequestUri = $ApiUri + 's/' + $UnifiSite + '/stat/report/hourly.gw'
+         Write-Verbose -Message ('URI: {0}' -f $ApiRequestUri)
+         #endregion SetRequestURI
+
+         #region ApiRequestBody
+         $paramConvertToJson = @{
+            InputObject   = $ApiRequestBodyInput
+            Depth         = 5
+            ErrorAction   = 'Stop'
+            WarningAction = 'SilentlyContinue'
+         }
+
+         $ApiRequestBodyInput = $null
+
+         $Script:ApiRequestBody = (ConvertTo-Json @paramConvertToJson)
+         #endregion ApiRequestBody
+
+         #region Request
+         Write-Verbose -Message 'Send the Request'
+
+         $paramInvokeRestMethod = @{
+            Method        = 'Post'
+            Uri           = $ApiRequestUri
+            Headers       = $RestHeader
+            Body          = $ApiRequestBody
+            ErrorAction   = 'SilentlyContinue'
+            WarningAction = 'SilentlyContinue'
+            WebSession    = $RestSession
+         }
+         $Session = (Invoke-RestMethod @paramInvokeRestMethod)
+
+         Write-Verbose -Message "Session Meta: $(($Session.meta.rc | Out-String).Trim())"
+
+         Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+         #endregion Request
+
+         #region CreateOutput
+         $output = @()
+
+         foreach ($item in $Session.data)
+         {
+            $outputAppend = [PSCustomObject][ordered]@{
+               Time    = ((ConvertFrom-UnixTimeStamp -TimeStamp ($item.time) -Milliseconds).ToLocalTime())
+               gateway = $item.gw
+            }
+
+            #region Default
+            if ($item.mem)
+            {
+               $outputAppend | Add-Member -NotePropertyName mem -NotePropertyValue ('{0:N2}' -f ([math]::Round($item.mem,2,'AwayFromZero')))
+            }
+
+            if ($item.cpu)
+            {
+               $outputAppend | Add-Member -NotePropertyName cpu -NotePropertyValue ('{0:N2}' -f ([math]::Round($item.cpu,2,'AwayFromZero')))
+            }
+
+            if ($item.loadavg_5)
+            {
+               $outputAppend | Add-Member -NotePropertyName loadavg_5 -NotePropertyValue ([INT]$item.loadavg_5)
+            }
+            #endregion Default
+
+            #region RX
+            if (($item.'lan-rx_errors') -or ($item.'lan-rx_errors' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'lan-rx_errors' -NotePropertyValue ([int]($item.'lan-rx_errors'))
+            }
+
+            if (($item.'lan-rx_bytes') -or ($item.'lan-rx_bytes' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'lan-rx_bytes' -NotePropertyValue $item.'lan-rx_bytes'
+
+               if ((([math]::round($item.'lan-rx_bytes' / 1KB, 2)) -ne '0.0') -or (([math]::round($item.'lan-rx_bytes' / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName 'lan-rx_kb' -NotePropertyValue ([math]::round($item.'lan-rx_bytes' / 1KB, 2))
+
+                  if ((([math]::round($item.'lan-rx_bytes' / 1MB, 2)) -ne '0.0') -or (([math]::round($item.'lan-rx_bytes' / 1MB, 2)) -ne '0.00'))
+                  {
+                     $outputAppend | Add-Member -NotePropertyName 'lan-rx_mb' -NotePropertyValue ([math]::round($item.'lan-rx_bytes' / 1MB, 2))
+
+                     if ((([math]::round($item.'lan-rx_bytes' / 1GB, 2)) -ne '0.0') -or (([math]::round($item.'lan-rx_bytes' / 1GB, 2)) -ne '0.00'))
+                     {
+                        $outputAppend | Add-Member -NotePropertyName 'lan-rx_gb' -NotePropertyValue ([math]::round($item.'lan-rx_bytes' / 1GB, 2))
+
+                        if ((([math]::round($item.'lan-rx_bytes' / 1TB, 2)) -ne '0.0') -or (([math]::round($item.'lan-rx_bytes' / 1TB, 2)) -ne '0.00'))
+                        {
+                           $outputAppend | Add-Member -NotePropertyName 'lan-rx_tb' -NotePropertyValue ([math]::round($item.'lan-rx_bytes' / 1TB, 2))
+                        }
+                     }
+                  }
+               }
+            }
+
+            if (($item.'lan-rx_packets') -or ($item.'lan-rx_packets' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'lan-rx_packets' -NotePropertyValue $item.'lan-rx_packets'
+            }
+
+            if (($item.'lan-rx_dropped') -or ($item.'lan-rx_dropped' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'lan-rx_dropped' -NotePropertyValue ([int]($item.'lan-rx_dropped'))
+            }
+
+            if (($item.'wan-rx_errors') -or ($item.'wan-rx_errors' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'wan-rx_errors' -NotePropertyValue ([int]($item.'wan-rx_errors'))
+            }
+
+            if (($item.'wan-rx_byte') -or ($item.'wan-rx_byte' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'wan-rx_bytes' -NotePropertyValue $item.'wan-rx_bytes'
+
+               if ((([math]::round($item.'wan-rx_bytes' / 1KB, 2)) -ne '0.0') -or (([math]::round($item.'wan-rx_bytes' / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName 'wan-rx_kb' -NotePropertyValue ([math]::round($item.'wan-rx_bytes' / 1KB, 2))
+
+                  if ((([math]::round($item.'wan-rx_bytes' / 1MB, 2)) -ne '0.0') -or (([math]::round($item.'wan-rx_bytes' / 1MB, 2)) -ne '0.00'))
+                  {
+                     $outputAppend | Add-Member -NotePropertyName 'wan-rx_mb' -NotePropertyValue ([math]::round($item.'wan-rx_bytes' / 1MB, 2))
+
+                     if ((([math]::round($item.'wan-rx_bytes' / 1GB, 2)) -ne '0.0') -or (([math]::round($item.'wan-rx_bytes' / 1GB, 2)) -ne '0.00'))
+                     {
+                        $outputAppend | Add-Member -NotePropertyName 'wan-rx_gb' -NotePropertyValue ([math]::round($item.'wan-rx_bytes' / 1GB, 2))
+
+                        if ((([math]::round($item.'wan-rx_bytes' / 1TB, 2)) -ne '0.0') -or (([math]::round($item.'wan-rx_bytes' / 1TB, 2)) -ne '0.00'))
+                        {
+                           $outputAppend | Add-Member -NotePropertyName 'wan-rx_tb' -NotePropertyValue ([math]::round($item.'wan-rx_bytes' / 1TB, 2))
+                        }
+                     }
+                  }
+               }
+            }
+
+            if (($item.'wan-rx_packets') -or ($item.'wan-rx_packets' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'wan-rx_packets' -NotePropertyValue $item.'wan-rx_packets'
+            }
+
+            if (($item.'wan-rx_dropped') -or ($item.'wan-rx_dropped' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'wan-rx_dropped' -NotePropertyValue ([int]($item.'wan-rx_dropped'))
+            }
+            #endregion RX
+
+            #region TX
+            if (($item.'lan-tx_errors') -or ($item.'lan-tx_errors' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'lan-tx_errors' -NotePropertyValue ([int]($item.'lan-tx_errors'))
+            }
+
+            if (($item.'lan-tx_bytes') -or ($item.'lan-tx_bytes' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'lan-tx_bytes' -NotePropertyValue $item.'lan-tx_bytes'
+
+               if ((([math]::round($item.'lan-tx_bytes' / 1KB, 2)) -ne '0.0') -or (([math]::round($item.'lan-tx_bytes' / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName 'lan-tx_kb' -NotePropertyValue ([math]::round($item.'lan-tx_bytes' / 1KB, 2))
+
+                  if ((([math]::round($item.'lan-tx_bytes' / 1MB, 2)) -ne '0.0') -or (([math]::round($item.'lan-tx_bytes' / 1MB, 2)) -ne '0.00'))
+                  {
+                     $outputAppend | Add-Member -NotePropertyName 'lan-tx_mb' -NotePropertyValue ([math]::round($item.'lan-tx_bytes' / 1MB, 2))
+
+                     if ((([math]::round($item.'lan-tx_bytes' / 1GB, 2)) -ne '0.0') -or (([math]::round($item.'lan-tx_bytes' / 1GB, 2)) -ne '0.00'))
+                     {
+                        $outputAppend | Add-Member -NotePropertyName 'lan-tx_gb' -NotePropertyValue ([math]::round($item.'lan-tx_bytes' / 1GB, 2))
+
+                        if ((([math]::round($item.'lan-tx_bytes' / 1TB, 2)) -ne '0.0') -or (([math]::round($item.'lan-tx_bytes' / 1TB, 2)) -ne '0.00'))
+                        {
+                           $outputAppend | Add-Member -NotePropertyName 'lan-tx_tb' -NotePropertyValue ([math]::round($item.'lan-tx_bytes' / 1TB, 2))
+                        }
+                     }
+                  }
+               }
+            }
+
+            if (($item.'lan-tx_packets') -or ($item.'lan-tx_packets' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'lan-tx_packets' -NotePropertyValue $item.'lan-tx_packets'
+            }
+
+            if (($item.'lan-tx_dropped') -or ($item.'lan-tx_dropped' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'lan-tx_dropped' -NotePropertyValue ([int]($item.'lan-tx_dropped'))
+            }
+
+            if (($item.'wan-tx_errors') -or ($item.'wan-tx_errors' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'wan-tx_errors' -NotePropertyValue ([int]($item.'wan-tx_errors'))
+            }
+
+            if (($item.'wan-tx_bytes') -or ($item.'wan-tx_bytes' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'wan-tx_bytes' -NotePropertyValue $item.'wan-tx_bytes'
+
+               if ((([math]::round($item.'wan-tx_bytes' / 1KB, 2)) -ne '0.0') -or (([math]::round($item.'wan-tx_bytes' / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName 'wan-tx_kb' -NotePropertyValue ([math]::round($item.'wan-tx_bytes' / 1KB, 2))
+
+                  if ((([math]::round($item.'wan-tx_bytes' / 1MB, 2)) -ne '0.0') -or (([math]::round($item.'wan-tx_bytes' / 1MB, 2)) -ne '0.00'))
+                  {
+                     $outputAppend | Add-Member -NotePropertyName 'wan-tx_mb' -NotePropertyValue ([math]::round($item.'wan-tx_bytes' / 1MB, 2))
+
+                     if ((([math]::round($item.'wan-tx_bytes' / 1GB, 2)) -ne '0.0') -or (([math]::round($item.'wan-tx_bytes' / 1GB, 2)) -ne '0.00'))
+                     {
+                        $outputAppend | Add-Member -NotePropertyName 'wan-tx_gb' -NotePropertyValue ([math]::round($item.'wan-tx_bytes' / 1GB, 2))
+
+                        if ((([math]::round($item.'wan-tx_bytes' / 1TB, 2)) -ne '0.0') -or (([math]::round($item.'wan-tx_bytes' / 1TB, 2)) -ne '0.00'))
+                        {
+                           $outputAppend | Add-Member -NotePropertyName 'wan-tx_tb' -NotePropertyValue ([math]::round($item.'wan-tx_bytes' / 1TB, 2))
+                        }
+                     }
+                  }
+               }
+            }
+
+            if (($item.'wan-tx_packets') -or ($item.'wan-tx_packets' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'wan-tx_packets' -NotePropertyValue $item.'wan-tx_packets'
+            }
+
+            if (($item.'wan-tx_dropped') -or ($item.'wan-tx_dropped' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'wan-tx_dropped' -NotePropertyValue ([int]($item.'wan-tx_dropped'))
+            }
+            #endregion TX
+
+
+            # Sppend to the output
+            $output += $outputAppend
+
+            # Cleanup
+            $outputAppend = $null
+         }
+
+         # Resort to make sure everything is in the right order :)
+         $output = $output | Sort-Object Time
+         #endregion CreateOutput
+      }
+      catch
+      {
+         # Try to Logout
+         try
+         {
+            $null = (Invoke-UniFiApiLogout -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
+         }
+         catch
+         {
+            # We don't care about that
+            Write-Verbose -Message 'Logout failed'
+         }
+
+         #region ErrorHandler
+         # get error record
+         [Management.Automation.ErrorRecord]$e = $_
+
+         # retrieve information about runtime error
+         $info = [PSCustomObject]@{
+            Exception = $e.Exception.Message
+            Reason    = $e.CategoryInfo.Reason
+            Target    = $e.CategoryInfo.TargetName
+            Script    = $e.InvocationInfo.ScriptName
+            Line      = $e.InvocationInfo.ScriptLineNumber
+            Column    = $e.InvocationInfo.OffsetInLine
+         }
+
+         Write-Verbose -Message $info
+
+         Write-Error -Message ($info.Exception) -ErrorAction Stop
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+         #endregion ErrorHandler
+      }
+      finally
+      {
+         #region ResetSslTrust
+         # Reset the SSL Trust (make sure everything is back to default)
+         [Net.ServicePointManager]::ServerCertificateValidationCallback = $null
+         #endregion ResetSslTrust
+
+         #region RestoreProgressPreference
+         $ProgressPreference = $ExistingProgressPreference
+         #endregion RestoreProgressPreference
+      }
+
+      # check result
+      if ($Session.meta.rc -ne 'ok')
+      {
+         # Verbose stuff
+         $Script:line = $_.InvocationInfo.ScriptLineNumber
+         Write-Verbose -Message ('Error was in Line {0}' -f $line)
+         Write-Verbose -Message ('Error was {0}' -f $Session.meta.rc)
+
+         # Error Message
+         Write-Error -Message 'Unable to Login' -ErrorAction Stop
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+      }
+   }
+
+   end
+   {
+      # Dump the Result
+      $output
+
+      # Cleanup
+      $Session = $null
+      $output = $null
+
+      #region RestoreProgressPreference
+      $ProgressPreference = $ExistingProgressPreference
+      #endregion RestoreProgressPreference
+
+      Write-Verbose -Message 'Done Get-UnifiHourlyGatewayStats'
+   }
+}
+
+function Get-UnifiHourlySiteStats
+{
+   <#
+         .SYNOPSIS
+         Get horly statistics for a complete Site
+
+         .DESCRIPTION
+         Get horly statistics for a complete UniFi Site
+
+         For convenience, we return the a bit more then the API, e.g. everything in KB, MB, GB, and TB instead of just bytes
+
+         We also return real timestamps instead of the unix timestaps in miliseconds that the UniFi returns
+
+         Sample output:
+         Time         : 1/28/2019 8:00:00 AM
+         wan-tx_bytes : 15674710.4243137
+         wan-tx_kb    : 15307.33
+         wan-tx_mb    : 14.95
+         wan-tx_gb    : 0.01
+         wan-rx_bytes : 74608528.2870588
+         wan-rx_kb    : 72859.89
+         wan-rx_mb    : 71.15
+         wan-rx_gb    : 0.07
+         wan_bytes    : 90283238.7113726
+         wan_kb       : 88167.23
+         wan_mb       : 86.1
+         wan_gb       : 0.08
+         wlan_bytes   : 73033651.4499586
+         wlan_kb      : 71321.93
+         wlan_mb      : 69.65
+         wlan_gb      : 0.07
+         Clients      : 35
+         LAN_Clients  : 30
+         WLAN_Clients : 5
+
+         You might filter out all the 0 values, we keep them to prevent any null pointer expetions!
+
+         You can Filter for whatever parameter you like (e.g. with Select-Object)
+
+         .PARAMETER UnifiSite
+         ID of the client-device to be modified
+
+         .PARAMETER Start
+         Startpoint in UniFi Unix timestamp in milliseconds
+
+         .PARAMETER End
+         Endpoint in UniFi Unix timestamp in milliseconds
+
+         .PARAMETER Attributes
+         array containing attributes (strings) to be returned, defaults are all
+
+         .EXAMPLE
+         PS C:\> Get-UnifiHourlySiteStats
+
+         Get horly statistics for a complete UniFi for the default site
+
+         .EXAMPLE
+         (Get-UnifiHourlySiteStats -Start '1548971935421' -End '1548975579019')
+
+         Get horly statistics for a complete UniFi for the default site for a given time period.
+
+         .EXAMPLE
+         (Get-UnifiHourlySiteStats -Start '1548980058135')
+
+         Get horly statistics for a complete UniFi for the default site for the last 60 minutes (was the timestamp while the sample was created)
+
+         .EXAMPLE
+         PS C:\> (Get-UnifiHourlySiteStats -UnifiSite 'contoso')[-1]
+
+         Get horly statistics for a complete UniFi for the site 'contoso'
+
+         .EXAMPLE
+         PS C:\> Get-UnifiHourlySiteStats -Attributes 'bytes','wan-tx_bytes','wan-rx_bytes','wlan_bytes','num_sta','lan-num_sta','wlan-num_sta')
+
+         Get all Values from the API
+
+         .NOTES
+         Defaults to the past day (24 hours)
+
+         "bytes" are no longer returned with controller version 4.9.1 and later
+
+         .LINK
+         Get-UniFiConfig
+
+         .LINK
+         Set-UniFiDefaultRequestHeader
+
+         .LINK
+         Invoke-UniFiApiLogin
+
+         .LINK
+         Invoke-RestMethod
+
+         .LINK
+         ConvertFrom-UnixTimeStamp
+
+         .LINK
+         ConvertTo-UnixTimeStamp
+   #>
+
+   [CmdletBinding(ConfirmImpact = 'None')]
+   [OutputType([psobject])]
+   param
+   (
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 0)]
+      [ValidateNotNullOrEmpty()]
+      [Alias('Site')]
+      [string]
+      $UnifiSite = 'default',
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 1)]
+      [Alias('Startpoint', 'StartTime')]
+      [String]
+      $Start,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 2)]
+      [Alias('EndPoint', 'EndTime')]
+      [string]
+      $End,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 3)]
+      [ValidateSet('bytes','wan-tx_bytes','wan-rx_bytes','wlan_bytes','num_sta','lan-num_sta','wlan-num_sta', IgnoreCase = $true)]
+      [Alias('attribs', 'UniFiAttributes')]
+      [string[]]
+      $Attributes
+   )
+
+   begin
+   {
+      Write-Verbose -Message 'Start Get-UnifiHourlySiteStats'
+
+      # Set the defaults, if needed
+      if (-not ($Attributes))
+      {
+         [string[]]$Attributes = 'bytes', 'wan-tx_bytes', 'wan-rx_bytes', 'wlan_bytes', 'num_sta', 'lan-num_sta', 'wlan-num_sta'
+      }
+      # ensure the attributes are lowercase (we ignore the case on the input for the user covinience)
+      [string[]]$Attributes = ($Attributes).ToLower()
+
+      # Save Datestring to keep everything consitant
+      $now = (Get-Date)
+
+      if (-not ($Start))
+      {
+         $Start = (ConvertTo-UnixTimeStamp -Date ($now.AddHours(-24)) -Milliseconds)
+      }
+
+      if (-not ($End))
+      {
+         $End = (ConvertTo-UnixTimeStamp -Date $now -Milliseconds)
+      }
+
+      # Cleanup
+      $Session = $null
+
+      #region SafeProgressPreference
+      # Safe ProgressPreference and Setup SilentlyContinue for the function
+      $ExistingProgressPreference = ($ProgressPreference)
+      $ProgressPreference = 'SilentlyContinue'
+      #endregion SafeProgressPreference
+
+      #region CheckSession
+      if (-not (Get-UniFiIsAlive))
+      {
+         #region LoginCheckLoop
+         # TODO: Move to config
+         [int]$NumberOfRetries = '3'
+         [int]$RetryTimer = '5'
+         # Setup the Loop itself
+         $RetryLoop = $false
+         [int]$RetryCounter = '0'
+         # Original code/idea was by Thomas Maurer
+         do
+         {
+            try
+            {
+               # Try to Logout
+               try
+               {
+                  if (-not (Get-UniFiIsAlive))
+                  {
+                     throw
+                  }
+               }
+               catch
+               {
+                  # We don't care about that
+                  Write-Verbose -Message 'Logout failed'
+               }
+
+               # Try a Session check (login is inherited here within the helper function)
+               if (-not (Get-UniFiIsAlive -ErrorAction Stop -WarningAction SilentlyContinue))
+               {
+                  Write-Error -Message 'Login failed' -ErrorAction Stop -Category AuthenticationError
+               }
+
+               # End the Loop
+               $RetryLoop = $true
+            }
+            catch
+            {
+               if ($RetryCounter -gt $NumberOfRetries)
+               {
+                  Write-Warning -Message ('Could still not login, after {0} retries.' -f $NumberOfRetries)
+
+                  # Stay in the Loop
+                  $RetryLoop = $true
+               }
+               else
+               {
+                  if ($RetryCounter -eq 0)
+                  {
+                     Write-Warning -Message ('Could not login! Retrying in {0} seconds.' -f $RetryTimer)
+                  }
+                  else
+                  {
+                     Write-Warning -Message ('Retry {0} of {1} failed. Retrying in {2} seconds.' -f $RetryCounter, $NumberOfRetries, $RetryTimer)
+                  }
+
+                  $null = (Start-Sleep -Seconds $RetryTimer)
+
+                  $RetryCounter = $RetryCounter + 1
+               }
+            }
+         }
+         while ($RetryLoop -eq $false)
+         #endregion LoginCheckLoop
+      }
+      #endregion CheckSession
+
+      #region ReCheckSession
+      if (-not ($RestSession))
+      {
+         # Restore ProgressPreference
+         $ProgressPreference = $ExistingProgressPreference
+
+         Write-Error -Message 'Unable to login! Check the connection to the controller, SSL certificates, and your credentials!' -ErrorAction Stop -Category AuthenticationError
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+      }
+      #endregion ReCheckSession
+
+      #region MacHandler
+      if ($Mac)
+      {
+         [string]$Mac = (ConvertTo-UniFiValidMacAddress -Mac $Mac)
+      }
+      #endregion MacHandler
+
+      #region ApiRequestBodyInput
+      $Script:ApiRequestBodyInput = [PSCustomObject][ordered]@{
+         attrs = ($Attributes + 'time')
+         start = $Start
+         end   = $End
+         mac   = $Mac
+      }
+      #endregion ApiRequestBodyInput
+
+      # Call meta function
+      $paramGetCallerPreference = @{
+         Cmdlet        = $PSCmdlet
+         SessionState  = $ExecutionContext.SessionState
+         ErrorAction   = 'SilentlyContinue'
+         WarningAction = 'SilentlyContinue'
+      }
+      $null = (Get-CallerPreference @paramGetCallerPreference)
+   }
+
+   process
+   {
+      try
+      {
+         #region ReadConfig
+         Write-Verbose -Message 'Read the Config'
+
+         $null = (Get-UniFiConfig)
+         #endregion ReadConfig
+
+         #region CertificateHandler
+         Write-Verbose -Message ('Certificate check - Should be {0}' -f $ApiSelfSignedCert)
+
+         [Net.ServicePointManager]::ServerCertificateValidationCallback = {
+            $ApiSelfSignedCert
+         }
+         #endregion CertificateHandler
+
+         #region SetRequestHeader
+         Write-Verbose -Message 'Set the API Call default Header'
+
+         $null = (Set-UniFiDefaultRequestHeader)
+         #endregion SetRequestHeader
+
+         #region SetRequestURI
+         Write-Verbose -Message 'Create the Request URI'
+         $ApiRequestUri = $ApiUri + 's/' + $UnifiSite + '/stat/report/hourly.site'
+         Write-Verbose -Message ('URI: {0}' -f $ApiRequestUri)
+         #endregion SetRequestURI
+
+         #region ApiRequestBody
+         $paramConvertToJson = @{
+            InputObject   = $ApiRequestBodyInput
+            Depth         = 5
+            ErrorAction   = 'Stop'
+            WarningAction = 'SilentlyContinue'
+         }
+
+         $ApiRequestBodyInput = $null
+
+         $Script:ApiRequestBody = (ConvertTo-Json @paramConvertToJson)
+         #endregion ApiRequestBody
+
+         #region Request
+         Write-Verbose -Message 'Send the Request'
+
+         $paramInvokeRestMethod = @{
+            Method        = 'Post'
+            Uri           = $ApiRequestUri
+            Headers       = $RestHeader
+            Body          = $ApiRequestBody
+            ErrorAction   = 'SilentlyContinue'
+            WarningAction = 'SilentlyContinue'
+            WebSession    = $RestSession
+         }
+         $Session = (Invoke-RestMethod @paramInvokeRestMethod)
+
+         Write-Verbose -Message "Session Meta: $(($Session.meta.rc | Out-String).Trim())"
+
+         Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+         #endregion Request
+
+         #region CreateOutput
+         $output = @()
+
+         foreach ($item in $Session.data)
+         {
+            $outputAppend = [PSCustomObject][ordered]@{
+               Time = ((ConvertFrom-UnixTimeStamp -TimeStamp ($item.time) -Milliseconds).ToLocalTime())
+            }
+
+            #region
+            if (($item.'bytes') -or ($item.'bytes' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'bytes' -NotePropertyValue $item.'bytes'
+
+               if ((([math]::round($item.'bytes' / 1KB, 2)) -ne '0.0') -or (([math]::round($item.'bytes' / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName 'kb' -NotePropertyValue ([math]::round($item.'bytes' / 1KB, 2))
+
+                  if ((([math]::round($item.'bytes' / 1MB, 2)) -ne '0.0') -or (([math]::round($item.'bytes' / 1MB, 2)) -ne '0.00'))
+                  {
+                     $outputAppend | Add-Member -NotePropertyName 'mb' -NotePropertyValue ([math]::round($item.'bytes' / 1MB, 2))
+
+                     if ((([math]::round($item.'bytes' / 1GB, 2)) -ne '0.0') -or (([math]::round($item.'bytes' / 1GB, 2)) -ne '0.00'))
+                     {
+                        $outputAppend | Add-Member -NotePropertyName 'gb' -NotePropertyValue ([math]::round($item.'bytes' / 1GB, 2))
+
+                        if ((([math]::round($item.'bytes' / 1TB, 2)) -ne '0.0') -or (([math]::round($item.'bytes' / 1TB, 2)) -ne '0.00'))
+                        {
+                           $outputAppend | Add-Member -NotePropertyName 'tb' -NotePropertyValue ([math]::round($item.'bytes' / 1TB, 2))
+                        }
+                     }
+                  }
+               }
+            }
+
+            if (($item.'wan-tx_bytes') -or ($item.'wan-tx_bytes' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'wan-tx_bytes' -NotePropertyValue $item.'wan-tx_bytes'
+
+               if ((([math]::round($item.'wan-tx_bytes' / 1KB, 2)) -ne '0.0') -or (([math]::round($item.'wan-tx_bytes' / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName 'wan-tx_kb' -NotePropertyValue ([math]::round($item.'wan-tx_bytes' / 1KB, 2))
+
+                  if ((([math]::round($item.'wan-tx_bytes' / 1MB, 2)) -ne '0.0') -or (([math]::round($item.'wan-tx_bytes' / 1MB, 2)) -ne '0.00'))
+                  {
+                     $outputAppend | Add-Member -NotePropertyName 'wan-tx_mb' -NotePropertyValue ([math]::round($item.'wan-tx_bytes' / 1MB, 2))
+
+                     if ((([math]::round($item.'wan-tx_bytes' / 1GB, 2)) -ne '0.0') -or (([math]::round($item.'wan-tx_bytes' / 1GB, 2)) -ne '0.00'))
+                     {
+                        $outputAppend | Add-Member -NotePropertyName 'wan-tx_gb' -NotePropertyValue ([math]::round($item.'wan-tx_bytes' / 1GB, 2))
+
+                        if ((([math]::round($item.'wan-tx_bytes' / 1TB, 2)) -ne '0.0') -or (([math]::round($item.'wan-tx_bytes' / 1TB, 2)) -ne '0.00'))
+                        {
+                           $outputAppend | Add-Member -NotePropertyName 'wan-tx_tb' -NotePropertyValue ([math]::round($item.'wan-tx_bytes' / 1TB, 2))
+                        }
+                     }
+                  }
+               }
+            }
+
+            if (($item.'wan-rx_bytes') -or ($item.'wan-rx_bytes' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'wan-rx_bytes' -NotePropertyValue $item.'wan-rx_bytes'
+
+               if ((([math]::round($item.'wan-rx_bytes' / 1KB, 2)) -ne '0.0') -or (([math]::round($item.'wan-rx_bytes' / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName 'wan-rx_kb' -NotePropertyValue ([math]::round($item.'wan-rx_bytes' / 1KB, 2))
+
+                  if ((([math]::round($item.'wan-rx_bytes' / 1MB, 2)) -ne '0.0') -or (([math]::round($item.'wan-rx_bytes' / 1MB, 2)) -ne '0.00'))
+                  {
+                     $outputAppend | Add-Member -NotePropertyName 'wan-rx_mb' -NotePropertyValue ([math]::round($item.'wan-rx_bytes' / 1MB, 2))
+
+                     if ((([math]::round($item.'wan-rx_bytes' / 1GB, 2)) -ne '0.0') -or (([math]::round($item.'wan-rx_bytes' / 1GB, 2)) -ne '0.00'))
+                     {
+                        $outputAppend | Add-Member -NotePropertyName 'wan-rx_gb' -NotePropertyValue ([math]::round($item.'wan-rx_bytes' / 1GB, 2))
+
+                        if ((([math]::round($item.'wan-rx_bytes' / 1TB, 2)) -ne '0.0') -or (([math]::round($item.'wan-rx_bytes' / 1TB, 2)) -ne '0.00'))
+                        {
+                           $outputAppend | Add-Member -NotePropertyName 'wan-rx_tb' -NotePropertyValue ([math]::round($item.'wan-rx_bytes' / 1TB, 2))
+                        }
+                     }
+                  }
+               }
+            }
+
+            if ((($item.'wan-tx_bytes') -or ($item.'wan-tx_bytes' -eq '0.0')) -and (($item.'wan-rx_bytes') -or ($item.'wan-rx_bytes' -eq '0.0')))
+            {
+               $WanbytesSummed = ($item.'wan-tx_bytes' + $item.'wan-rx_bytes')
+
+               $outputAppend | Add-Member -NotePropertyName 'wan_bytes' -NotePropertyValue $WanbytesSummed
+
+               if ((([math]::round($WanbytesSummed / 1KB, 2)) -ne '0.0') -or (([math]::round($WanbytesSummed / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName 'wan_kb' -NotePropertyValue ([math]::round($WanbytesSummed / 1KB, 2))
+
+                  if ((([math]::round($WanbytesSummed / 1MB, 2)) -ne '0.0') -or (([math]::round($WanbytesSummed / 1MB, 2)) -ne '0.00'))
+                  {
+                     $outputAppend | Add-Member -NotePropertyName 'wan_mb' -NotePropertyValue ([math]::round($WanbytesSummed / 1MB, 2))
+
+                     if ((([math]::round($WanbytesSummed / 1GB, 2)) -ne '0.0') -or (([math]::round($WanbytesSummed / 1GB, 2)) -ne '0.00'))
+                     {
+                        $outputAppend | Add-Member -NotePropertyName 'wan_gb' -NotePropertyValue ([math]::round($WanbytesSummed / 1GB, 2))
+
+                        if ((([math]::round($WanbytesSummed / 1TB, 2)) -ne '0.0') -or (([math]::round($WanbytesSummed / 1TB, 2)) -ne '0.00'))
+                        {
+                           $outputAppend | Add-Member -NotePropertyName 'wan_tb' -NotePropertyValue ([math]::round($WanbytesSummed / 1TB, 2))
+                        }
+                     }
+                  }
+               }
+
+               $WanbytesSummed = $null
+            }
+
+            if (($item.'wlan_bytes') -or ($item.'wlan_bytes' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'wlan_bytes' -NotePropertyValue $item.'wlan_bytes'
+
+               if ((([math]::round($item.'wlan_bytes' / 1KB, 2)) -ne '0.0') -or (([math]::round($item.'wlan_bytes' / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName 'wlan_kb' -NotePropertyValue ([math]::round($item.'wlan_bytes' / 1KB, 2))
+
+                  if ((([math]::round($item.'wlan_bytes' / 1MB, 2)) -ne '0.0') -or (([math]::round($item.'wlan_bytes' / 1MB, 2)) -ne '0.00'))
+                  {
+                     $outputAppend | Add-Member -NotePropertyName 'wlan_mb' -NotePropertyValue ([math]::round($item.'wlan_bytes' / 1MB, 2))
+
+                     if ((([math]::round($item.'wlan_bytes' / 1GB, 2)) -ne '0.0') -or (([math]::round($item.'wlan_bytes' / 1GB, 2)) -ne '0.00'))
+                     {
+                        $outputAppend | Add-Member -NotePropertyName 'wlan_gb' -NotePropertyValue ([math]::round($item.'wlan_bytes' / 1GB, 2))
+
+                        if ((([math]::round($item.'wlan_bytes' / 1TB, 2)) -ne '0.0') -or (([math]::round($item.'wlan_bytes' / 1TB, 2)) -ne '0.00'))
+                        {
+                           $outputAppend | Add-Member -NotePropertyName 'wlan_tb' -NotePropertyValue ([math]::round($item.'wlan_bytes' / 1TB, 2))
+                        }
+                     }
+                  }
+               }
+            }
+
+            if (($item.'num_sta') -or ($item.'num_sta' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'Clients' -NotePropertyValue $item.'num_sta'
+            }
+
+            if (($item.'lan-num_sta') -or ($item.'lan-num_sta' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'LAN_Clients' -NotePropertyValue $item.'lan-num_sta'
+            }
+
+            if (($item.'wlan-num_sta') -or ($item.'wlan-num_sta' -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName 'WLAN_Clients' -NotePropertyValue $item.'wlan-num_sta'
+            }
+            #endregion
+
+            # Sppend to the output
+            $output += $outputAppend
+
+            # Cleanup
+            $outputAppend = $null
+         }
+
+         # Resort to make sure everything is in the right order :)
+         $output = $output | Sort-Object Time
+         #endregion CreateOutput
+      }
+      catch
+      {
+         # Try to Logout
+         try
+         {
+            $null = (Invoke-UniFiApiLogout -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
+         }
+         catch
+         {
+            # We don't care about that
+            Write-Verbose -Message 'Logout failed'
+         }
+
+         #region ErrorHandler
+         # get error record
+         [Management.Automation.ErrorRecord]$e = $_
+
+         # retrieve information about runtime error
+         $info = [PSCustomObject]@{
+            Exception = $e.Exception.Message
+            Reason    = $e.CategoryInfo.Reason
+            Target    = $e.CategoryInfo.TargetName
+            Script    = $e.InvocationInfo.ScriptName
+            Line      = $e.InvocationInfo.ScriptLineNumber
+            Column    = $e.InvocationInfo.OffsetInLine
+         }
+
+         Write-Verbose -Message $info
+
+         Write-Error -Message ($info.Exception) -ErrorAction Stop
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+         #endregion ErrorHandler
+      }
+      finally
+      {
+         #region ResetSslTrust
+         # Reset the SSL Trust (make sure everything is back to default)
+         [Net.ServicePointManager]::ServerCertificateValidationCallback = $null
+         #endregion ResetSslTrust
+
+         #region RestoreProgressPreference
+         $ProgressPreference = $ExistingProgressPreference
+         #endregion RestoreProgressPreference
+      }
+
+      # check result
+      if ($Session.meta.rc -ne 'ok')
+      {
+         # Verbose stuff
+         $Script:line = $_.InvocationInfo.ScriptLineNumber
+         Write-Verbose -Message ('Error was in Line {0}' -f $line)
+         Write-Verbose -Message ('Error was {0}' -f $Session.meta.rc)
+
+         # Error Message
+         Write-Error -Message 'Unable to Login' -ErrorAction Stop
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+      }
+   }
+
+   end
+   {
+      # Dump the Result
+      $output
+
+      # Cleanup
+      $Session = $null
+      $output = $null
+
+      #region RestoreProgressPreference
+      $ProgressPreference = $ExistingProgressPreference
+      #endregion RestoreProgressPreference
+
+      Write-Verbose -Message 'Done Get-UnifiHourlySiteStats'
+   }
+}
+
 function Get-UnifiNetworkDetails
 {
    <#
@@ -2228,6 +8687,9 @@ function Get-UnifiNetworkDetails
    begin
    {
       Write-Verbose -Message 'Start Get-UnifiNetworkDetails'
+
+      # Call meta function
+      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
 
       # Cleanup
       $Session = $null
@@ -2565,6 +9027,9 @@ function Get-UnifiNetworkList
    begin
    {
       Write-Verbose -Message 'Start Get-UnifiNetworkList'
+
+      # Call meta function
+      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
 
       # Cleanup
       $Session = $null
@@ -2924,6 +9389,9 @@ function Get-UnifiSpeedTestResult
    begin
    {
       Write-Verbose -Message 'Start Get-UnifiSpeedTestResult'
+
+      # Call meta function
+      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
 
       # Cleanup
       $Session = $null
@@ -3309,6 +9777,9 @@ function Invoke-UniFiApiLogin
    {
       Write-Verbose -Message 'Start Invoke-UniFiApiLogin'
 
+      ## Call meta function
+      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
+
       # Cleanup
       $RestSession = $null
       $Session = $null
@@ -3496,6 +9967,9 @@ function Invoke-UniFiApiLogout
    begin
    {
       Write-Verbose -Message 'Start Invoke-UniFiApiLogout'
+
+      # Call meta function
+      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
 
       # Cleanup
       $Session = $null
@@ -3760,28 +10234,7 @@ function Invoke-UnifiAuthorizeGuest
       $Session = $null
 
       #region MacHandler
-      <#
-            Make sure we have the right format
-      #>
-      $regex = '((\d|([a-f]|[A-F])){2}){6}'
-      [string]$Mac = $Mac.Trim().Replace(':', '').Replace('.', '').Replace('-', '')
-      if (($Mac.Length -eq 12) -and ($Mac -match $regex))
-      {
-         [string]$Mac = ($Mac -replace '..(?!$)', '$&:')
-      }
-      else
-      {
-         # Verbose stuff
-         $Script:line = $_.InvocationInfo.ScriptLineNumber
-
-         Write-Verbose -Message ('Error was in Line {0}' -f $line)
-
-         # Error Message
-         Write-Error -Message ('Sorry, but {0} is a format that the UniFi Controller will nor understand' -f $Mac) -ErrorAction Stop
-
-         # Only here to catch a global ErrorAction overwrite
-         break
-      }
+      [string]$Mac = (ConvertTo-UniFiValidMacAddress -Mac $Mac)
       #endregion MacHandler
 
       #region AccessPointMacHandler
@@ -3931,6 +10384,15 @@ function Invoke-UnifiAuthorizeGuest
          $ApiRequestBodyInput | Add-Member -MemberType NoteProperty -Name ap_mac -Value $AccessPoint -Force
       }
       #endregion ApiRequestBodyInput
+
+      # Call meta function
+		$paramGetCallerPreference = @{
+			Cmdlet	     = $PSCmdlet
+			SessionState = $ExecutionContext.SessionState
+			ErrorAction  = 'SilentlyContinue'
+			WarningAction = 'SilentlyContinue'
+		}
+		$null = (Get-CallerPreference @paramGetCallerPreference)
    }
 
    process
@@ -4155,10 +10617,6 @@ function Invoke-UnifiBlockClient
       # Cleanup
       $Session = $null
 
-      #region MacHandler
-      $Mac = $Mac.ToLower()
-      #endregion MacHandler
-
       #region SafeProgressPreference
       # Safe ProgressPreference and Setup SilentlyContinue for the function
       $ExistingProgressPreference = ($ProgressPreference)
@@ -4248,28 +10706,7 @@ function Invoke-UnifiBlockClient
       #endregion ReCheckSession
 
       #region MacHandler
-      <#
-            Make sure we have the right format
-      #>
-      $regex = '((\d|([a-f]|[A-F])){2}){6}'
-      [string]$Mac = $Mac.Trim().Replace(':', '').Replace('.', '').Replace('-', '')
-      if (($Mac.Length -eq 12) -and ($Mac -match $regex))
-      {
-         [string]$Mac = ($Mac -replace '..(?!$)', '$&:')
-      }
-      else
-      {
-         # Verbose stuff
-         $Script:line = $_.InvocationInfo.ScriptLineNumber
-
-         Write-Verbose -Message ('Error was in Line {0}' -f $line)
-
-         # Error Message
-         Write-Error -Message ('Sorry, but {0} is a format that the UniFi Controller will nor understand' -f $Mac) -ErrorAction Stop
-
-         # Only here to catch a global ErrorAction overwrite
-         break
-      }
+      [string]$Mac = (ConvertTo-UniFiValidMacAddress -Mac $Mac)
       #endregion MacHandler
 
       #region ApiRequestBodyInput
@@ -4278,6 +10715,15 @@ function Invoke-UnifiBlockClient
          mac = $Mac
       }
       #endregion ApiRequestBodyInput
+
+      # Call meta function
+		$paramGetCallerPreference = @{
+			Cmdlet	     = $PSCmdlet
+			SessionState = $ExecutionContext.SessionState
+			ErrorAction  = 'SilentlyContinue'
+			WarningAction = 'SilentlyContinue'
+		}
+		$null = (Get-CallerPreference @paramGetCallerPreference)
    }
 
    process
@@ -4498,10 +10944,6 @@ function Invoke-UnifiForgetClient
       # Cleanup
       $Session = $null
 
-      #region MacHandler
-      $Mac = $Mac.ToLower()
-      #endregion MacHandler
-
       #region SafeProgressPreference
       # Safe ProgressPreference and Setup SilentlyContinue for the function
       $ExistingProgressPreference = ($ProgressPreference)
@@ -4591,28 +11033,7 @@ function Invoke-UnifiForgetClient
       #endregion ReCheckSession
 
       #region MacHandler
-      <#
-            Make sure we have the right format
-      #>
-      $regex = '((\d|([a-f]|[A-F])){2}){6}'
-      [string]$Mac = $Mac.Trim().Replace(':', '').Replace('.', '').Replace('-', '')
-      if (($Mac.Length -eq 12) -and ($Mac -match $regex))
-      {
-         [string]$Mac = ($Mac -replace '..(?!$)', '$&:')
-      }
-      else
-      {
-         # Verbose stuff
-         $Script:line = $_.InvocationInfo.ScriptLineNumber
-
-         Write-Verbose -Message ('Error was in Line {0}' -f $line)
-
-         # Error Message
-         Write-Error -Message ('Sorry, but {0} is a format that the UniFi Controller will nor understand' -f $Mac) -ErrorAction Stop
-
-         # Only here to catch a global ErrorAction overwrite
-         break
-      }
+      [string]$Mac = (ConvertTo-UniFiValidMacAddress -Mac $Mac)
       #endregion MacHandler
 
       #region ApiRequestBodyInput
@@ -4621,6 +11042,15 @@ function Invoke-UnifiForgetClient
          macs = @($Mac)
       }
       #endregion ApiRequestBodyInput
+
+      # Call meta function
+		$paramGetCallerPreference = @{
+			Cmdlet	     = $PSCmdlet
+			SessionState = $ExecutionContext.SessionState
+			ErrorAction  = 'SilentlyContinue'
+			WarningAction = 'SilentlyContinue'
+		}
+		$null = (Get-CallerPreference @paramGetCallerPreference)
    }
 
    process
@@ -4841,10 +11271,6 @@ function Invoke-UnifiReconnectClient
       # Cleanup
       $Session = $null
 
-      #region MacHandler
-      $Mac = $Mac.ToLower()
-      #endregion MacHandler
-
       #region SafeProgressPreference
       # Safe ProgressPreference and Setup SilentlyContinue for the function
       $ExistingProgressPreference = ($ProgressPreference)
@@ -4934,28 +11360,7 @@ function Invoke-UnifiReconnectClient
       #endregion ReCheckSession
 
       #region MacHandler
-      <#
-            Make sure we have the right format
-      #>
-      $regex = '((\d|([a-f]|[A-F])){2}){6}'
-      [string]$Mac = $Mac.Trim().Replace(':', '').Replace('.', '').Replace('-', '')
-      if (($Mac.Length -eq 12) -and ($Mac -match $regex))
-      {
-         [string]$Mac = ($Mac -replace '..(?!$)', '$&:')
-      }
-      else
-      {
-         # Verbose stuff
-         $Script:line = $_.InvocationInfo.ScriptLineNumber
-
-         Write-Verbose -Message ('Error was in Line {0}' -f $line)
-
-         # Error Message
-         Write-Error -Message ('Sorry, but {0} is a format that the UniFi Controller will nor understand' -f $Mac) -ErrorAction Stop
-
-         # Only here to catch a global ErrorAction overwrite
-         break
-      }
+      [string]$Mac = (ConvertTo-UniFiValidMacAddress -Mac $Mac)
       #endregion MacHandler
 
       #region ApiRequestBodyInput
@@ -4964,6 +11369,15 @@ function Invoke-UnifiReconnectClient
          mac = $Mac
       }
       #endregion ApiRequestBodyInput
+
+      # Call meta function
+		$paramGetCallerPreference = @{
+			Cmdlet	     = $PSCmdlet
+			SessionState = $ExecutionContext.SessionState
+			ErrorAction  = 'SilentlyContinue'
+			WarningAction = 'SilentlyContinue'
+		}
+		$null = (Get-CallerPreference @paramGetCallerPreference)
    }
 
    process
@@ -5184,10 +11598,6 @@ function Invoke-UnifiUnauthorizeGuest
       # Cleanup
       $Session = $null
 
-      #region MacHandler
-      $Mac = $Mac.ToLower()
-      #endregion MacHandler
-
       #region SafeProgressPreference
       # Safe ProgressPreference and Setup SilentlyContinue for the function
       $ExistingProgressPreference = ($ProgressPreference)
@@ -5277,28 +11687,7 @@ function Invoke-UnifiUnauthorizeGuest
       #endregion ReCheckSession
 
       #region MacHandler
-      <#
-            Make sure we have the right format
-      #>
-      $regex = '((\d|([a-f]|[A-F])){2}){6}'
-      [string]$Mac = $Mac.Trim().Replace(':', '').Replace('.', '').Replace('-', '')
-      if (($Mac.Length -eq 12) -and ($Mac -match $regex))
-      {
-         [string]$Mac = ($Mac -replace '..(?!$)', '$&:')
-      }
-      else
-      {
-         # Verbose stuff
-         $Script:line = $_.InvocationInfo.ScriptLineNumber
-
-         Write-Verbose -Message ('Error was in Line {0}' -f $line)
-
-         # Error Message
-         Write-Error -Message ('Sorry, but {0} is a format that the UniFi Controller will nor understand' -f $Mac) -ErrorAction Stop
-
-         # Only here to catch a global ErrorAction overwrite
-         break
-      }
+      [string]$Mac = (ConvertTo-UniFiValidMacAddress -Mac $Mac)
       #endregion MacHandler
 
       #region ApiRequestBodyInput
@@ -5307,6 +11696,15 @@ function Invoke-UnifiUnauthorizeGuest
          mac = $Mac
       }
       #endregion ApiRequestBodyInput
+
+      # Call meta function
+		$paramGetCallerPreference = @{
+			Cmdlet	     = $PSCmdlet
+			SessionState = $ExecutionContext.SessionState
+			ErrorAction  = 'SilentlyContinue'
+			WarningAction = 'SilentlyContinue'
+		}
+		$null = (Get-CallerPreference @paramGetCallerPreference)
    }
 
    process
@@ -5532,10 +11930,6 @@ function Invoke-UnifiUnblockClient
       # Cleanup
       $Session = $null
 
-      #region MacHandler
-      $Mac = $Mac.ToLower()
-      #endregion MacHandler
-
       #region SafeProgressPreference
       # Safe ProgressPreference and Setup SilentlyContinue for the function
       $ExistingProgressPreference = ($ProgressPreference)
@@ -5625,28 +12019,7 @@ function Invoke-UnifiUnblockClient
       #endregion ReCheckSession
 
       #region MacHandler
-      <#
-            Make sure we have the right format
-      #>
-      $regex = '((\d|([a-f]|[A-F])){2}){6}'
-      [string]$Mac = $Mac.Trim().Replace(':', '').Replace('.', '').Replace('-', '')
-      if (($Mac.Length -eq 12) -and ($Mac -match $regex))
-      {
-         [string]$Mac = ($Mac -replace '..(?!$)', '$&:')
-      }
-      else
-      {
-         # Verbose stuff
-         $Script:line = $_.InvocationInfo.ScriptLineNumber
-
-         Write-Verbose -Message ('Error was in Line {0}' -f $line)
-
-         # Error Message
-         Write-Error -Message ('Sorry, but {0} is a format that the UniFi Controller will nor understand' -f $Mac) -ErrorAction Stop
-
-         # Only here to catch a global ErrorAction overwrite
-         break
-      }
+      [string]$Mac = (ConvertTo-UniFiValidMacAddress -Mac $Mac)
       #endregion MacHandler
 
       #region ApiRequestBodyInput
@@ -5655,6 +12028,15 @@ function Invoke-UnifiUnblockClient
          mac = $Mac
       }
       #endregion ApiRequestBodyInput
+
+      # Call meta function
+		$paramGetCallerPreference = @{
+			Cmdlet	     = $PSCmdlet
+			SessionState = $ExecutionContext.SessionState
+			ErrorAction  = 'SilentlyContinue'
+			WarningAction = 'SilentlyContinue'
+		}
+		$null = (Get-CallerPreference @paramGetCallerPreference)
    }
 
    process
@@ -5805,6 +12187,378 @@ function Invoke-UnifiUnblockClient
    }
 }
 
+function New-UnifiClientDevice
+{
+   <#
+         .SYNOPSIS
+         Create a new user/client-device via the API of the UniFi Controller
+
+         .DESCRIPTION
+         Create a new user/client-device via the API of the Ubiquiti UniFi Controller
+
+         .PARAMETER UnifiSite
+         UniFi Site as configured. The default is: default
+
+         .PARAMETER Mac
+         Client MAC address
+
+         .PARAMETER Group
+         Value for the user group the new user/client-device should belong to which can be obtained from the output of XXX
+
+         .PARAMETER Name
+         Name to be given to the new user/client-device (optional)
+
+         .PARAMETER Note
+         Note to be applied to the new user/client-device (optional)
+
+         .EXAMPLE
+         PS C:\> New-UnifiClientDevice -Mac '84:3a:4b:cd:88:2D' -Group 'Value2'
+
+         Create a new user/client-device
+
+         .EXAMPLE
+         PS C:\> New-UnifiClientDevice -Mac '84:3a:4b:cd:88:2D' -Group 'Value2' -UnifiSite 'Contoso'
+
+         Create a new user/client-device on Site 'Contoso'
+
+         .NOTES
+         Initial version of the Ubiquiti UniFi Controller automation function
+
+         .LINK
+         Get-UniFiConfig
+
+         .LINK
+         Set-UniFiDefaultRequestHeader
+
+         .LINK
+         Invoke-UniFiApiLogin
+
+         .LINK
+         Invoke-RestMethod
+   #>
+
+   [CmdletBinding(ConfirmImpact = 'Low',
+   SupportsShouldProcess)]
+   [OutputType([psobject])]
+   param
+   (
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 0)]
+      [ValidateNotNullOrEmpty()]
+      [Alias('Site')]
+      [string]
+      $UnifiSite = 'default',
+      [Parameter(Mandatory,
+            ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+            Position = 1,
+      HelpMessage = 'Client MAC address')]
+      [ValidateNotNullOrEmpty()]
+      [Alias('UniFiMac', 'MacAddress')]
+      [string]
+      $Mac,
+      [Parameter(Mandatory,
+            ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+            Position = 2,
+      HelpMessage = 'Value for the user group the new user/client-device should belong to')]
+      [ValidateNotNullOrEmpty()]
+      [Alias('UniFiGroup', 'ClientGroup', 'UserGroup')]
+      [string]
+      $Group,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 3)]
+      [Alias('UniFiName', 'ClientName', 'UserName')]
+      [string]
+      $Name = $null,
+      [Parameter(ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
+      Position = 4)]
+      [Alias('UnifiNote', 'UserNote', 'ClientNote')]
+      [string]
+      $Note = $null
+   )
+
+   begin
+   {
+      Write-Verbose -Message 'Start New-UnifiClientDevice'
+
+      # Cleanup
+      $Session = $null
+
+      #region SafeProgressPreference
+      # Safe ProgressPreference and Setup SilentlyContinue for the function
+      $ExistingProgressPreference = ($ProgressPreference)
+      $ProgressPreference = 'SilentlyContinue'
+      #endregion SafeProgressPreference
+
+      #region CheckSession
+      if (-not (Get-UniFiIsAlive))
+      {
+         #region LoginCheckLoop
+         # TODO: Move to config
+         [int]$NumberOfRetries = '3'
+         [int]$RetryTimer = '5'
+         # Setup the Loop itself
+         $RetryLoop = $false
+         [int]$RetryCounter = '0'
+         # Original code/idea was by Thomas Maurer
+         do
+         {
+            try
+            {
+               # Try to Logout
+               try
+               {
+                  if (-not (Get-UniFiIsAlive))
+                  {
+                     throw
+                  }
+               }
+               catch
+               {
+                  # We don't care about that
+                  Write-Verbose -Message 'Logout failed'
+               }
+
+               # Try a Session check (login is inherited here within the helper function)
+               if (-not (Get-UniFiIsAlive -ErrorAction Stop -WarningAction SilentlyContinue))
+               {
+                  Write-Error -Message 'Login failed' -ErrorAction Stop -Category AuthenticationError
+               }
+
+               # End the Loop
+               $RetryLoop = $true
+            }
+            catch
+            {
+               if ($RetryCounter -gt $NumberOfRetries)
+               {
+                  Write-Warning -Message ('Could still not login, after {0} retries.' -f $NumberOfRetries)
+
+                  # Stay in the Loop
+                  $RetryLoop = $true
+               }
+               else
+               {
+                  if ($RetryCounter -eq 0)
+                  {
+                     Write-Warning -Message ('Could not login! Retrying in {0} seconds.' -f $RetryTimer)
+                  }
+                  else
+                  {
+                     Write-Warning -Message ('Retry {0} of {1} failed. Retrying in {2} seconds.' -f $RetryCounter, $NumberOfRetries, $RetryTimer)
+                  }
+
+                  $null = (Start-Sleep -Seconds $RetryTimer)
+
+                  $RetryCounter = $RetryCounter + 1
+               }
+            }
+         }
+         while ($RetryLoop -eq $false)
+         #endregion LoginCheckLoop
+      }
+      #endregion CheckSession
+
+      #region ReCheckSession
+      if (-not ($RestSession))
+      {
+         # Restore ProgressPreference
+         $ProgressPreference = $ExistingProgressPreference
+
+         Write-Error -Message 'Unable to login! Check the connection to the controller, SSL certificates, and your credentials!' -ErrorAction Stop -Category AuthenticationError
+
+         # Only here to catch a global ErrorAction overwrite
+         break
+      }
+      #endregion ReCheckSession
+
+      #region MacHandler
+      [string]$Mac = (ConvertTo-UniFiValidMacAddress -Mac $Mac)
+      #endregion MacHandler
+
+      #region ApiRequestBodyInput
+      $Script:ApiRequestBodyInput = [PSCustomObject][ordered]@{
+         mac          = $Mac
+         usergroup_id = $Group
+      }
+
+      if ($Name)
+      {
+         $ApiRequestBodyInput.name = $Name
+      }
+
+      if ($Note)
+      {
+         $ApiRequestBodyInput.note = $Note
+         $ApiRequestBodyInput.noted = $true
+      }
+      #endregion ApiRequestBodyInput
+
+      # Call meta function
+		$paramGetCallerPreference = @{
+			Cmdlet	     = $PSCmdlet
+			SessionState = $ExecutionContext.SessionState
+			ErrorAction  = 'SilentlyContinue'
+			WarningAction = 'SilentlyContinue'
+		}
+		$null = (Get-CallerPreference @paramGetCallerPreference)
+   }
+
+   process
+   {
+      if ($PSCmdlet.ShouldProcess('user/client-device', 'Create'))
+      {
+         try
+         {
+            #region ReadConfig
+            Write-Verbose -Message 'Read the Config'
+
+            $null = (Get-UniFiConfig)
+            #endregion ReadConfig
+
+            #region CertificateHandler
+            Write-Verbose -Message ('Certificate check - Should be {0}' -f $ApiSelfSignedCert)
+
+            [Net.ServicePointManager]::ServerCertificateValidationCallback = {
+               $ApiSelfSignedCert
+            }
+            #endregion CertificateHandler
+
+            #region SetRequestHeader
+            Write-Verbose -Message 'Set the API Call default Header'
+
+            $null = (Set-UniFiDefaultRequestHeader)
+            #endregion SetRequestHeader
+
+            #region SetRequestURI
+            Write-Verbose -Message 'Create the Request URI'
+
+            $ApiRequestUri = $ApiUri + 's/' + $UnifiSite + '/group/user'
+
+            Write-Verbose -Message ('URI: {0}' -f $ApiRequestUri)
+            #endregion SetRequestURI
+
+            #region ApiRequestBody
+            $paramConvertToJson = @{
+               InputObject   = $ApiRequestBodyInput
+               Depth         = 5
+               ErrorAction   = 'Stop'
+               WarningAction = 'SilentlyContinue'
+            }
+
+            $ApiRequestBodyInput = $null
+
+            $Script:ApiRequestBody = (ConvertTo-Json @paramConvertToJson)
+            #endregion ApiRequestBody
+
+            #region Request
+            Write-Verbose -Message 'Send the Request'
+
+            $paramInvokeRestMethod = @{
+               Method        = 'Post'
+               Uri           = $ApiRequestUri
+               Headers       = $RestHeader
+               Body          = $ApiRequestBody
+               ErrorAction   = 'SilentlyContinue'
+               WarningAction = 'SilentlyContinue'
+               WebSession    = $RestSession
+            }
+            $Session = (Invoke-RestMethod @paramInvokeRestMethod)
+
+            Write-Verbose -Message "Session Meta: $(($Session.meta.rc | Out-String).Trim())"
+
+            Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+            #endregion Request
+         }
+         catch
+         {
+            # Try to Logout
+            try
+            {
+               $null = (Invoke-UniFiApiLogout -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
+            }
+            catch
+            {
+               # We don't care about that
+               Write-Verbose -Message 'Logout failed'
+            }
+
+            #region ErrorHandler
+            # get error record
+            [Management.Automation.ErrorRecord]$e = $_
+
+            # retrieve information about runtime error
+            $info = [PSCustomObject]@{
+               Exception = $e.Exception.Message
+               Reason    = $e.CategoryInfo.Reason
+               Target    = $e.CategoryInfo.TargetName
+               Script    = $e.InvocationInfo.ScriptName
+               Line      = $e.InvocationInfo.ScriptLineNumber
+               Column    = $e.InvocationInfo.OffsetInLine
+            }
+
+            Write-Verbose -Message $info
+
+            Write-Error -Message ($info.Exception) -ErrorAction Stop
+
+            # Only here to catch a global ErrorAction overwrite
+            break
+            #endregion ErrorHandler
+         }
+         finally
+         {
+            #region ResetSslTrust
+            # Reset the SSL Trust (make sure everything is back to default)
+            [Net.ServicePointManager]::ServerCertificateValidationCallback = $null
+            #endregion ResetSslTrust
+
+            #region RestoreProgressPreference
+            $ProgressPreference = $ExistingProgressPreference
+            #endregion RestoreProgressPreference
+         }
+
+         # check result
+         if ($Session.meta.rc -ne 'ok')
+         {
+            # Verbose stuff
+            $Script:line = $_.InvocationInfo.ScriptLineNumber
+
+            Write-Verbose -Message ('Error was in Line {0}' -f $line)
+
+            if ($Session.data)
+            {
+               Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+            }
+
+            # Error Message
+            Write-Error -Message 'Unable to get the network list' -ErrorAction Stop
+
+            # Only here to catch a global ErrorAction overwrite
+            break
+         }
+      }
+   }
+
+   end
+   {
+      # Dump the Result
+      Write-Output -InputObject $true
+
+      # Cleanup
+      $Session = $null
+
+      #region RestoreProgressPreference
+      $ProgressPreference = $ExistingProgressPreference
+      #endregion RestoreProgressPreference
+
+      Write-Verbose -Message 'Start New-UnifiClientDevice'
+   }
+}
+
 function New-UniFiConfig
 {
    <#
@@ -5925,6 +12679,9 @@ function New-UniFiConfig
    begin
    {
       Write-Verbose -Message 'Start New-UniFiConfig'
+
+      # Call meta function
+      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
 
       #region JsonInputData
       $JsonInputData = [PSCustomObject][ordered]@{
@@ -6080,6 +12837,9 @@ function Set-UnifiFirewallGroup
    begin
    {
       Write-Verbose -Message 'Start Set-UnifiFirewallGroup'
+
+      # Call meta function
+      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
 
       # Cleanup
       $TargetFirewallGroup = $null
@@ -6394,6 +13154,9 @@ function Set-UnifiNetworkDetails
    {
       Write-Verbose -Message 'Start Set-UnifiNetworkDetails'
 
+      # Call meta function
+      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
+
       # Cleanup
       $Session = $null
 
@@ -6610,13 +13373,246 @@ function Set-UnifiNetworkDetails
 
 #region CHANGELOG
 <#
-      Soon
+      Version: 1.0.11 - 2019-02-01
+
+      Added
+      - Get-UnifiHourlySiteStats - Get horly statistics for a complete UniFi Site
+      - Get-UnifiDailySiteStats - Get daily statistics for a complete UniFi Site
+      - Get-Unifi5minutesSiteStats - Get statistics in 5 minute segments for a complete UniFi Site
+      - Get-Unifi5minutesGatewayStats - Get statistics in 5 minute segments for the USG (UniFi Secure Gateway)
+      - Get-UnifiHourlyGatewayStats - Get hourly statistics for the USG (UniFi Secure Gateway)
+      - Get-UnifiDailyGatewayStats - Get daily statistics for the USG (UniFi Secure Gateway)
+      - Get-UnifiDailyClientStats - Get daily user/client statistics for a given user/client
+      - Get-UnifiHourlyClientStats - Get hourly user/client statistics for a given user/client
+      - Get-Unifi5minutesClientStats - Get user/client statistics in 5 minute segments for a given client
+      - Get-UnifiDailyApStats - Get daily stats for all or just one access points in a given UniFi site
+      - Get-UnifiHourlyApStats - Get hourly stats for all or just one access points in a given UniFi site
+      - Get-Unifi5minutesApStats - Get the stats in 5 minute segments for all or just one access points in a given UniFi site
+      - ConvertTo-UniFiValidMacAddress - Helper to check and make sure we have the right format (private function)
+      - Get-CallerPreference - Add private meta function
+      - CODEOWNERS - Add GitHub code owners feature file
+      - Set-UnifiClientDeviceNote - Add/modify/remove a client-device note
+      - Set-UnifiClientDeviceName - Add/modify/remove a client device name
+      - New-UnifiClientDevice - Create a new user/client-device (unfinished beta)
+      
+      Changed
+      - New-UnifiClientDevice now use ConvertTo-UniFiValidMacAddress to check and make sure we have the right format
+      - Invoke-UnifiUnblockClient now use ConvertTo-UniFiValidMacAddress to check and make sure we have the right format
+      - Invoke-UnifiUnauthorizeGuest now use ConvertTo-UniFiValidMacAddress to check and make sure we have the right format
+      - Invoke-UnifiReconnectClient now use ConvertTo-UniFiValidMacAddress to check and make sure we have the right format
+      - Invoke-UnifiForgetClient now use ConvertTo-UniFiValidMacAddress to check and make sure we have the right format
+      - Invoke-UnifiBlockClient now use ConvertTo-UniFiValidMacAddress to check and make sure we have the right format
+      - Invoke-UnifiAuthorizeGuest now use ConvertTo-UniFiValidMacAddress to check and make sure we have the right format
+      - Get-CallerPreference - Implemented private meta function usage to all (public/private) functions
+      
+      Removed
+      - Get-HostsFile should never be a part of this module. I just use them for some internal tests.
+      - Add-HostsEntry should never be a part of this module. I just use them for some internal tests.
+      - Get-HostsFile should never be a part of this module. I just use them for some internal tests.
+      
+      Fixed
+      - Fixed the Get-CallerPreference usage
+      
+      
+      Version: 1.0.10 - 2019-01-23
+
+      Deprecated
+      - Get-HostsFile should never be a part of this module. I just use them for some internal tests.
+      - Get-HostsFile should never be a part of this module. I just use them for some internal tests.
+      - Get-HostsFile should never be a part of this module. I just use them for some internal tests.
+      
+      
+      Version: 1.0.9 - 2019-01-20
+
+      Added
+      - Invoke-UnifiForgetClient - Forget one or more client devices via the API of the UniFi Controller
+      - Invoke-UnifiUnblockClient - Unblock a client device via the API of the UniFi Controller
+      - Invoke-UnifiBlockClient - Block a client device via the API of the UniFi Controller
+      - Invoke-UnifiReconnectClient - Reconnect a client device via the API of the UniFi Controller
+      - Invoke-UnifiUnauthorizeGuest - Unauthorize a client device via the API of the UniFi Controller
+      - Invoke-UnifiAuthorizeGuest - Authorize a client device via the API of the UniFi Controller
+      - Get-UnifiSpeedTestResult has now a -last parameter to get only the latest result
+      
+      Changed
+      - Change some links to the GitHub Wiki
+      - Change the Verbose output (Detailed connection details)
+      - Refactored a lot of code.
+      
+      
+      Version: 1.0.8 - 2019-01-19
+
+      Added
+      - Get-UnifiSpeedTestResult - Get the UniFi Security Gateway (USG) Speed Test results
+      - Add-HostsEntry - Add a single Hosts Entry to the HOSTS File (Helper)
+      - Remove-HostsEntry - Removes a single Hosts Entry from the HOSTS File (Helper)
+      - Get-HostsFile - Print the HOSTS File in a more clean format (Helper)
+      - ConvertFrom-UnixTimeStamp - Converts a Timestamp (Epochdate) into Datetime (Helper)
+      - ConvertTo-UnixTimeStamp - ConvertTo-UnixTimeStamp (Helper)
+      - Get-UniFiIsAlive - Use a simple API call to see if the session is alive (internal not exported function)
+      
+      Changed
+      - Refactored some of the code that handles all errors.
+      - All commands now use Get-UniFiIsAlive internally. That should make it easier for new users.
+      - Get-UnifiSpeedTestResult has now filtering and returns values human readable
+      
+      
+      Version: 1.0.7 - 2019-01-14
+
+      Added
+      - Add License.md, a Markdown version of LICENSE
+      - Editor Config
+      - Git Attributes File
+      - Get-UnifiFirewallGroupDetails - Related to #10
+      
+      Changed
+      - Moved Get-UnifiFirewallGroupBody from Public to Private (No longer exported as command)
+      - Add -name parameter to Get-UnifiNetworkDetails - Related to #9
+      - Get-UnifiNetworkDetails: For the parameter -UnifiNetworkName an ID (Network_id) must be used, necessary to make it a non breaking change
+      - Get-UnifiNetworkDetails: -UnifiNetworkName is now a legacy alias, necessary to make it a non breaking change
+      - Add -Id parameter to Get-UnifiNetworkDetails. This replaced the -UnifiNetworkName parameter - Related to #9
+      - Add Multi valued inputs to Get-UnifiNetworkDetails
+      - Git Ignore extended
+      - Markdown Documents tweaked (Header)
+      
+      Fixed
+      - Found the following issue: Even if an obejct is not found (e.g. network) the UniFi API returns OK (200) with null bytes in Data. That is OK, but we need a workaround. Added the Workaround to Get-UnifiFirewallGroupDetails and Get-UnifiNetworkDetails for testing.
+      - Position numbers corrected (Now starts with 0 instead off 1)
+      
+      
+      Version: 1.0.6 - 2019-01-13
+
+      Added
+      - New function New-UniFiConfig - #1
+      - CHANGELOG.md (this file) is back
+      - Set $ProgressPreference to 'SilentlyContinue' - #7
+      
+      
+      Version: 1.0.5 - 2019-01-12
+
+      Changed
+      - Invoke-UniFiCidrWorkaround now has the parameter -6 to handle IPv6 CIDR data - #5
+      - Describe the config.json handling #2
+      - Changed the Build System - #3
+      - Samples optimized
+      - Tweak the build system
+      
+      Removed
+      - Invoke-UniFiCidrWorkaroundV6 is now part of Invoke-UniFiCidrWorkaround - #5
+      
+      
+      Version: 1.0.4 - 2019-01-08
+
+      Changed
+      - Samples optimized
+      - Tweak the build system
+      
+      
+      Version: 1.0.3 - 2019-01-07
+
+      Added
+      - Sample: UpdateUniFiVpnPeerIP - Update a VPN PeerIp for a given UniFi Network (IPSec VPN with dynamic IP)
+      - Sample: UpdateUniFiWithLatestExchangeOnlineEndpoints - Update existing UniFi Firewall Groups with the latest Exchange Online Endpoints.
+      
+      Fixed
+      - Debug output removed
+      
+      
+      Version: 1.0.2 - 2019-01-07
+
+      Changed
+      - Internal Build Process: Initial internal release
+      
+      
+      Version: 1.0.1 - 2019-01-07
+
+      Added
+      - Invoke-UniFiCidrWorkaround for CIDR handling
+      - Invoke-UniFiCidrWorkaroundV6 for CIDR handling
+      
+      
+      Version: 1.0.0 - 2019-01-01
+
+      Added
+      - config.json instead of hardcoded configuration
+      - SYNOPSIS for all functions
+      - XML/MAML Documentation
+      - Samples
+      
+      Changed
+      - Removed all internal systems (hardcoded for internal use)
+      
+      
+      Version: 0.9.1 - 2019-01-01
+
+      Deprecated
+      - Invoke-UBNT* is now Invoke-UniFi*
+      
+      
+      Version: 0.9.0 - 2019-01-01
+
+      Added
+      - Controller Parameter (URI) in the Header of the PS1 File
+      
+      Changed
+      - Migrated Invoke-UBNTApiLogin and Invoke-UBNTApiLogout from Invoke-WebRequest to Invoke-RestMethod
+      - Better Session handling for Invoke-UBNTApiRequest
+      
+      
+      Version: 0.8.0 - 2019-01-01
+
+      Security
+      - Removed Hard coded credentials from the code
+      
+      
+      Version: 0.7.0 - 2019-01-01
+
+      Changed
+      - Internal Build Process: Initial internal release
+      
+      
+      Version: 0.6.0 - 2019-01-01
+
+      Changed
+      - Internal Build Process: Initial internal release
+      
+      
+      Version: 0.5.0 - 2019-01-01
+
+      Changed
+      - Internal Build Process: Initial internal release
+      
+      
+      Version: 0.4.0 - 2019-01-01
+
+      Changed
+      - Internal Build Process: Initial internal release
+      
+      
+      Version: 0.3.0 - 2019-01-01
+
+      Changed
+      - Internal Build Process: Initial internal release
+      
+      
+      Version: 0.2.0 - 2019-01-01
+
+      Changed
+      - Internal Build Process: Initial internal release
+      
+      
+      Version: 0.1.0 - 2019-01-01
+
+      Added
+      - Invoke-UBNTApiLogout - With harcoded Controller info
+      - Invoke-UBNTApiRequest - Universal Invoke-RestMethod wrapper, tweaked for UBNT Equipment
+      - Invoke-UBNTApiLogin - With harcoded credentials and Controller info
 #>
 #endregion CHANGELOG
 
 #region LICENSE
 <#
-      Copyright 2018 by enabling Technology - http://enatec.io
+      Copyright (c) 2019, enabling Technology
+      All rights reserved.
 
       Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
       1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.

@@ -2,11 +2,7 @@
 
 This is an beta version for an PowerShell Module for the Ubiquiti [UBNT SDN Controller API](https://unifi-sdn.ui.com/).
 
-
-
 I started this module as an internal helper for many automated updates for my UniFi Security Gateway Firewall Rules and do a few other things (automated). I migrated everything into a regular module and published it as open source after using it for a while.
-
-
 
 I plan to release versions that cover more and more functions. However, I need to refactor and document the code before doing so.
 
@@ -16,7 +12,7 @@ You will find some demo use cases within the [UseCases](https://github.com/Enate
 
 ### Version
 
-This document is based on UniFiTooling version 1.0.10
+This document is based on UniFiTooling version 1.0.11
 
 ### Status
 
@@ -26,21 +22,21 @@ Beta version - Work still in progress.
 
 ### Requirements
 
-- PowerShell 5.1, or later. Desktop or Core.
-
-  - *Tested on Windows with PowerShell Desktop Version 5.1*
-
-  - *Tested on Windows with PowerShell Core Version 6.1.1*
-
-  - *Tested on macOS with PowerShell Core Version 6.1.2*
-
-  - *Tested on CentOS Linux release 7.6 with PowerShell Core Version 6.1.2*
-
-- Ubiquiti [UBNT SDN Controller](https://unifi-sdn.ui.com/), Version 5.9.32
-
+- PowerShell 5.1, or later.
+- Desktop and Core are both supported.
+- Tested on:
+  - *Windows 10, with PowerShell Desktop Version 5.1*
+  - *Windows Server 2016, with PowerShell Desktop Version 5.1*
+  - *Windows 10, with PowerShell Core Version 6.1.2*
+  - *macOS 10.14.3, with PowerShell Core Version 6.1.2*
+  - *CentOS Linux release 7.6, with PowerShell Core Version 6.1.2*
+- Ubiquiti [UBNT SDN Controller](https://unifi-sdn.ui.com/), Version 5.10.10
   - *This is the only tested version*
+  - *Other (older, or newer) Ubiquiti [UBNT SDN Controller](https://unifi-sdn.ui.com/) Versions might work*
 
-  - *Olders Ubiquiti [UBNT SDN Controller](https://unifi-sdn.ui.com/) Versions might work*
+#### Dependencies
+
+UniFiTooling has no dependencies and it was designed to work on any operation system that runs PowerShell Desktop 5.1, or newer, or PowerShell Core Version 6.1, or newer.
 
 ### Installation
 

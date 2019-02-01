@@ -76,6 +76,9 @@
    {
       Write-Verbose -Message 'Start Set-UnifiFirewallGroup'
 
+      # Call meta function
+      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
+
       # Cleanup
       $TargetFirewallGroup = $null
       $Session = $null

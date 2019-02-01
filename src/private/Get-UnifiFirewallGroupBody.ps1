@@ -53,6 +53,9 @@
    {
       Write-Verbose -Message 'Start Get-UnifiFirewallGroupBody'
 
+      # Call meta function
+      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
+
       Write-Verbose -Message 'Cleanup exitsing Group'
       Write-Verbose -Message "Old Values: $UnfiFirewallGroup.group_members"
 

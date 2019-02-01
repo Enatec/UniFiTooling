@@ -11,11 +11,47 @@ Locale: en-US
 Ubiquiti UniFi Security Gateway automation via the API of the Ubiquiti UniFi Controller
 
 ## UniFiTooling Cmdlets
+### [Get-Unifi5minutesApStats](Get-Unifi5minutesApStats.md)
+Get Access Point stats in 5 minute segments
+
+### [Get-Unifi5minutesClientStats](Get-Unifi5minutesClientStats.md)
+Get user/client statistics in 5 minute segments
+
+### [Get-Unifi5minutesGatewayStats](Get-Unifi5minutesGatewayStats.md)
+Get statistics in 5 minute segments for the USG
+
+### [Get-Unifi5minutesSiteStats](Get-Unifi5minutesSiteStats.md)
+Get statistics in 5 minute segments for a complete Site
+
+### [Get-UnifiDailyApStats](Get-UnifiDailyApStats.md)
+Get daily stats Access Point stats
+
+### [Get-UnifiDailyClientStats](Get-UnifiDailyClientStats.md)
+Get daily user/client statistics for a given user/client
+
+### [Get-UnifiDailyGatewayStats](Get-UnifiDailyGatewayStats.md)
+Get daily statistics for the USG
+
+### [Get-UnifiDailySiteStats](Get-UnifiDailySiteStats.md)
+Get daily statistics for a complete Site
+
 ### [Get-UnifiFirewallGroupDetails](Get-UnifiFirewallGroupDetails.md)
 Get the details about one Firewall Group via the API of the UniFi Controller
 
 ### [Get-UnifiFirewallGroups](Get-UnifiFirewallGroups.md)
 Get a List Firewall Groups via the API of the UniFi Controller
+
+### [Get-UnifiHourlyApStats](Get-UnifiHourlyApStats.md)
+Get hourly stats Access Point stats
+
+### [Get-UnifiHourlyClientStats](Get-UnifiHourlyClientStats.md)
+Get hourly user/client statistics for a given user/client
+
+### [Get-UnifiHourlyGatewayStats](Get-UnifiHourlyGatewayStats.md)
+Get hourly statistics for the USG
+
+### [Get-UnifiHourlySiteStats](Get-UnifiHourlySiteStats.md)
+Get horly statistics for a complete Site
 
 ### [Get-UnifiNetworkDetails](Get-UnifiNetworkDetails.md)
 Get the details about one network via the API of the UniFi Controller
@@ -49,6 +85,9 @@ Unauthorize a client device via the API of the UniFi Controller
 
 ### [Invoke-UnifiUnblockClient](Invoke-UnifiUnblockClient.md)
 Unblock a client device via the API of the UniFi Controller
+
+### [New-UnifiClientDevice](New-UnifiClientDevice.md)
+Create a new user/client-device via the API of the UniFi Controller
 
 ### [New-UniFiConfig](New-UniFiConfig.md)
 Creates the UniFi config JSON file

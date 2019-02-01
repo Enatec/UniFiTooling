@@ -140,6 +140,9 @@
          break
       }
       #endregion ReCheckSession
+
+      # Call meta function
+      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
    }
 
    process
