@@ -23,21 +23,6 @@ Get statistics in 5 minute segments for the USG
 ### [Get-Unifi5minutesSiteStats](Get-Unifi5minutesSiteStats.md)
 Get statistics in 5 minute segments for a complete Site
 
-### [Get-UnifiAllConnectedClients](Get-UnifiAllConnectedClients.md)
-Method to fetch speed test results
-
-### [Get-UnifiAllGuests](Get-UnifiAllGuests.md)
-Method to fetch speed test results
-
-### [Get-UnifiAuthorizations](Get-UnifiAuthorizations.md)
-Method to fetch speed test results
-
-### [Get-UnifiClientDetails](Get-UnifiClientDetails.md)
-Method to fetch speed test results
-
-### [Get-UnifiClientLogins](Get-UnifiClientLogins.md)
-Method to fetch speed test results
-
 ### [Get-UnifiDailyApStats](Get-UnifiDailyApStats.md)
 Get daily stats Access Point stats
 
@@ -67,12 +52,6 @@ Get hourly statistics for the USG
 
 ### [Get-UnifiHourlySiteStats](Get-UnifiHourlySiteStats.md)
 Get horly statistics for a complete Site
-
-### [Get-UnifiIdsIpsEvents](Get-UnifiIdsIpsEvents.md)
-Method to fetch speed test results
-
-### [Get-UnifiLoginSessions](Get-UnifiLoginSessions.md)
-Method to fetch speed test results
 
 ### [Get-UnifiNetworkDetails](Get-UnifiNetworkDetails.md)
 Get the details about one network via the API of the UniFi Controller
@@ -112,18 +91,6 @@ Create a new user/client-device via the API of the UniFi Controller
 
 ### [New-UniFiConfig](New-UniFiConfig.md)
 Creates the UniFi config JSON file
-
-### [Set-UnifiClientDeviceName](Set-UnifiClientDeviceName.md)
-Add/modify/remove a client device name
-
-### [Set-UnifiClientDeviceNote](Set-UnifiClientDeviceNote.md)
-Add/modify/remove a client-device note
-
-### [Set-UniFiClientGroup](Set-UniFiClientGroup.md)
-Assign client device to another group
-
-### [Set-UniFiClientIpAddress](Set-UniFiClientIpAddress.md)
-Update client fixedip
 
 ### [Set-UnifiFirewallGroup](Set-UnifiFirewallGroup.md)
 Get a given Firewall Group via the API of the UniFi Controller

@@ -3296,10 +3296,10 @@ function Get-Unifi5minutesSiteStats
             }
 
             #region
-            if (($item.'bytes') -or ($item.'bytes' -eq '0.0')) 
+            if (($item.'bytes') -or ($item.'bytes' -eq '0.0'))
             {
                $outputAppend | Add-Member -NotePropertyName 'bytes' -NotePropertyValue $item.'bytes'
-               
+
                if ((([math]::round($item.'bytes' / 1KB, 2)) -ne '0.0') -or (([math]::round($item.'bytes' / 1KB, 2)) -ne '0.00'))
                {
                   $outputAppend | Add-Member -NotePropertyName 'kb' -NotePropertyValue ([math]::round($item.'bytes' / 1KB, 2))
@@ -3321,7 +3321,7 @@ function Get-Unifi5minutesSiteStats
                }
             }
 
-            if (($item.'wan-tx_bytes') -or ($item.'wan-tx_bytes' -eq '0.0')) 
+            if (($item.'wan-tx_bytes') -or ($item.'wan-tx_bytes' -eq '0.0'))
             {
                $outputAppend | Add-Member -NotePropertyName 'wan-tx_bytes' -NotePropertyValue $item.'wan-tx_bytes'
 
@@ -3346,10 +3346,10 @@ function Get-Unifi5minutesSiteStats
                }
             }
 
-            if (($item.'wan-rx_bytes') -or ($item.'wan-rx_bytes' -eq '0.0')) 
+            if (($item.'wan-rx_bytes') -or ($item.'wan-rx_bytes' -eq '0.0'))
             {
                $outputAppend | Add-Member -NotePropertyName 'wan-rx_bytes' -NotePropertyValue $item.'wan-rx_bytes'
-               
+
                if ((([math]::round($item.'wan-rx_bytes' / 1KB, 2)) -ne '0.0') -or (([math]::round($item.'wan-rx_bytes' / 1KB, 2)) -ne '0.00'))
                {
                   $outputAppend | Add-Member -NotePropertyName 'wan-rx_kb' -NotePropertyValue ([math]::round($item.'wan-rx_bytes' / 1KB, 2))
@@ -3370,13 +3370,13 @@ function Get-Unifi5minutesSiteStats
                   }
                }
             }
-            
-            if ((($item.'wan-tx_bytes') -or ($item.'wan-tx_bytes' -eq '0.0')) -and (($item.'wan-rx_bytes') -or ($item.'wan-rx_bytes' -eq '0.0'))) 
+
+            if ((($item.'wan-tx_bytes') -or ($item.'wan-tx_bytes' -eq '0.0')) -and (($item.'wan-rx_bytes') -or ($item.'wan-rx_bytes' -eq '0.0')))
             {
                $WanbytesSummed = ($item.'wan-tx_bytes' + $item.'wan-rx_bytes')
 
                $outputAppend | Add-Member -NotePropertyName 'wan_bytes' -NotePropertyValue $WanbytesSummed
-               
+
                if ((([math]::round($WanbytesSummed / 1KB, 2)) -ne '0.0') -or (([math]::round($WanbytesSummed / 1KB, 2)) -ne '0.00'))
                {
                   $outputAppend | Add-Member -NotePropertyName 'wan_kb' -NotePropertyValue ([math]::round($WanbytesSummed / 1KB, 2))
@@ -3396,14 +3396,14 @@ function Get-Unifi5minutesSiteStats
                      }
                   }
                }
-               
+
                $WanbytesSummed = $null
             }
 
-            if (($item.'wlan_bytes') -or ($item.'wlan_bytes' -eq '0.0')) 
+            if (($item.'wlan_bytes') -or ($item.'wlan_bytes' -eq '0.0'))
             {
                $outputAppend | Add-Member -NotePropertyName 'wlan_bytes' -NotePropertyValue $item.'wlan_bytes'
-               
+
                if ((([math]::round($item.'wlan_bytes' / 1KB, 2)) -ne '0.0') -or (([math]::round($item.'wlan_bytes' / 1KB, 2)) -ne '0.00'))
                {
                   $outputAppend | Add-Member -NotePropertyName 'wlan_kb' -NotePropertyValue ([math]::round($item.'wlan_bytes' / 1KB, 2))
@@ -3425,17 +3425,17 @@ function Get-Unifi5minutesSiteStats
                }
             }
 
-            if (($item.'num_sta') -or ($item.'num_sta' -eq '0.0')) 
+            if (($item.'num_sta') -or ($item.'num_sta' -eq '0.0'))
             {
                $outputAppend | Add-Member -NotePropertyName 'Clients' -NotePropertyValue $item.'num_sta'
             }
 
-            if (($item.'lan-num_sta') -or ($item.'lan-num_sta' -eq '0.0')) 
+            if (($item.'lan-num_sta') -or ($item.'lan-num_sta' -eq '0.0'))
             {
                $outputAppend | Add-Member -NotePropertyName 'LAN_Clients' -NotePropertyValue $item.'lan-num_sta'
             }
 
-            if (($item.'wlan-num_sta') -or ($item.'wlan-num_sta' -eq '0.0')) 
+            if (($item.'wlan-num_sta') -or ($item.'wlan-num_sta' -eq '0.0'))
             {
                $outputAppend | Add-Member -NotePropertyName 'WLAN_Clients' -NotePropertyValue $item.'wlan-num_sta'
             }
@@ -3530,397 +3530,6 @@ function Get-Unifi5minutesSiteStats
 
       Write-Verbose -Message 'Done Get-Unifi5minutesSiteStats'
    }
-}
-
-function Get-UnifiAllConnectedClients
-{
-<#
-	.SYNOPSIS
-		Method to fetch speed test results
-
-	.DESCRIPTION
-		Method to fetch speed test results
-
-	.PARAMETER UnifiSite
-		ID of the client-device to be modified
-
-	.PARAMETER Start
-		Startpoint in UniFi Unix timestamp in milliseconds
-
-	.PARAMETER End
-		Endpoint in UniFi Unix timestamp in milliseconds
-
-	.EXAMPLE
-		PS C:\> Get-UnifiAllConnectedClients
-
-	.NOTES
-TODO: Remove Start
-TODO: Remove End
-
-	.LINK
-		Get-UniFiConfig
-
-	.LINK
-		Set-UniFiDefaultRequestHeader
-
-	.LINK
-		Invoke-UniFiApiLogin
-
-	.LINK
-		Invoke-RestMethod
-#>
-
-	[CmdletBinding(ConfirmImpact = 'None')]
-	param
-	(
-		[Parameter(ValueFromPipeline,
-				   ValueFromPipelineByPropertyName,
-				   Position = 0)]
-		[ValidateNotNullOrEmpty()]
-		[Alias('Site')]
-		[string]
-		$UnifiSite = 'default',
-		[Parameter(ValueFromPipeline,
-				   ValueFromPipelineByPropertyName,
-				   Position = 1)]
-		[Alias('Startpoint', 'StartTime')]
-		[String]
-		$Start,
-		[Parameter(ValueFromPipeline,
-				   ValueFromPipelineByPropertyName,
-				   Position = 2)]
-		[Alias('EndPoint', 'EndTime')]
-		[string]
-		$End
-	)
-
-	begin
-	{
-		Write-Verbose -Message 'begin'
-	}
-
-	process
-	{
-		Write-Verbose -Message 'process'
-	}
-
-	end
-	{
-		Write-Verbose -Message 'end'
-	}
-}
-
-function Get-UnifiAllGuests
-{
-<#
-	.SYNOPSIS
-		Method to fetch speed test results
-
-	.DESCRIPTION
-		Method to fetch speed test results
-
-	.PARAMETER UnifiSite
-		ID of the client-device to be modified
-
-	.PARAMETER Start
-		Startpoint in UniFi Unix timestamp in milliseconds
-
-	.PARAMETER End
-		Endpoint in UniFi Unix timestamp in milliseconds
-
-	.EXAMPLE
-		PS C:\> Get-UnifiAllGuests
-
-	.NOTES
-TODO: Remove Start
-TODO: Remove End
-
-	.LINK
-		Get-UniFiConfig
-
-	.LINK
-		Set-UniFiDefaultRequestHeader
-
-	.LINK
-		Invoke-UniFiApiLogin
-
-	.LINK
-		Invoke-RestMethod
-#>
-
-	[CmdletBinding(ConfirmImpact = 'None')]
-	param
-	(
-		[Parameter(ValueFromPipeline,
-				   ValueFromPipelineByPropertyName,
-				   Position = 0)]
-		[ValidateNotNullOrEmpty()]
-		[Alias('Site')]
-		[string]
-		$UnifiSite = 'default',
-		[Parameter(ValueFromPipeline,
-				   ValueFromPipelineByPropertyName,
-				   Position = 1)]
-		[Alias('Startpoint', 'StartTime')]
-		[String]
-		$Start,
-		[Parameter(ValueFromPipeline,
-				   ValueFromPipelineByPropertyName,
-				   Position = 2)]
-		[Alias('EndPoint', 'EndTime')]
-		[string]
-		$End
-	)
-
-	begin
-	{
-		Write-Verbose -Message 'begin'
-	}
-
-	process
-	{
-		Write-Verbose -Message 'process'
-	}
-
-	end
-	{
-		Write-Verbose -Message 'end'
-	}
-}
-
-function Get-UnifiAuthorizations
-{
-<#
-	.SYNOPSIS
-		Method to fetch speed test results
-
-	.DESCRIPTION
-		Method to fetch speed test results
-
-	.PARAMETER UnifiSite
-		ID of the client-device to be modified
-
-	.PARAMETER Start
-		Startpoint in UniFi Unix timestamp in milliseconds
-
-	.PARAMETER End
-		Endpoint in UniFi Unix timestamp in milliseconds
-
-	.EXAMPLE
-		PS C:\> Get-UnifiAuthorizations
-
-	.NOTES
-
-	.LINK
-		Get-UniFiConfig
-
-	.LINK
-		Set-UniFiDefaultRequestHeader
-
-	.LINK
-		Invoke-UniFiApiLogin
-
-	.LINK
-		Invoke-RestMethod
-#>
-
-	[CmdletBinding(ConfirmImpact = 'None')]
-	param
-	(
-		[Parameter(ValueFromPipeline,
-				   ValueFromPipelineByPropertyName,
-				   Position = 0)]
-		[ValidateNotNullOrEmpty()]
-		[Alias('Site')]
-		[string]
-		$UnifiSite = 'default',
-		[Parameter(ValueFromPipeline,
-				   ValueFromPipelineByPropertyName,
-				   Position = 1)]
-		[Alias('Startpoint', 'StartTime')]
-		[String]
-		$Start,
-		[Parameter(ValueFromPipeline,
-				   ValueFromPipelineByPropertyName,
-				   Position = 2)]
-		[Alias('EndPoint', 'EndTime')]
-		[string]
-		$End
-	)
-
-	begin
-	{
-		Write-Verbose -Message 'begin'
-	}
-
-	process
-	{
-		Write-Verbose -Message 'process'
-	}
-
-	end
-	{
-		Write-Verbose -Message 'end'
-	}
-}
-
-function Get-UnifiClientDetails
-{
-<#
-	.SYNOPSIS
-		Method to fetch speed test results
-
-	.DESCRIPTION
-		Method to fetch speed test results
-
-	.PARAMETER UnifiSite
-		ID of the client-device to be modified
-
-	.PARAMETER Start
-		Startpoint in UniFi Unix timestamp in milliseconds
-
-	.PARAMETER End
-		Endpoint in UniFi Unix timestamp in milliseconds
-
-	.EXAMPLE
-		PS C:\> Get-UnifiClientDetails
-
-	.NOTES
-TODO: Remove Start
-TODO: Remove End
-TODO: Add client_mac client device MAC address
-
-	.LINK
-		Get-UniFiConfig
-
-	.LINK
-		Set-UniFiDefaultRequestHeader
-
-	.LINK
-		Invoke-UniFiApiLogin
-
-	.LINK
-		Invoke-RestMethod
-#>
-
-	[CmdletBinding(ConfirmImpact = 'None')]
-	param
-	(
-		[Parameter(ValueFromPipeline,
-				   ValueFromPipelineByPropertyName,
-				   Position = 0)]
-		[ValidateNotNullOrEmpty()]
-		[Alias('Site')]
-		[string]
-		$UnifiSite = 'default',
-		[Parameter(ValueFromPipeline,
-				   ValueFromPipelineByPropertyName,
-				   Position = 1)]
-		[Alias('Startpoint', 'StartTime')]
-		[String]
-		$Start,
-		[Parameter(ValueFromPipeline,
-				   ValueFromPipelineByPropertyName,
-				   Position = 2)]
-		[Alias('EndPoint', 'EndTime')]
-		[string]
-		$End
-	)
-
-	begin
-	{
-		Write-Verbose -Message 'begin'
-	}
-
-	process
-	{
-		Write-Verbose -Message 'process'
-	}
-
-	end
-	{
-		Write-Verbose -Message 'end'
-	}
-}
-
-function Get-UnifiClientLogins
-{
-<#
-	.SYNOPSIS
-		Method to fetch speed test results
-
-	.DESCRIPTION
-		Method to fetch speed test results
-
-	.PARAMETER UnifiSite
-		ID of the client-device to be modified
-
-	.PARAMETER Start
-		Startpoint in UniFi Unix timestamp in milliseconds
-
-	.PARAMETER End
-		Endpoint in UniFi Unix timestamp in milliseconds
-
-	.EXAMPLE
-		PS C:\> Get-UnifiClientLogins
-
-	.NOTES
-		TODO: mac = client MAC address
-      TODO: limit = maximum number of sessions to get (default value is 5)
-      TODO: Remove Start
-      TODO: Remove End
-
-	.LINK
-		Get-UniFiConfig
-
-	.LINK
-		Set-UniFiDefaultRequestHeader
-
-	.LINK
-		Invoke-UniFiApiLogin
-
-	.LINK
-		Invoke-RestMethod
-#>
-
-	[CmdletBinding(ConfirmImpact = 'None')]
-	param
-	(
-		[Parameter(ValueFromPipeline,
-				   ValueFromPipelineByPropertyName,
-				   Position = 0)]
-		[ValidateNotNullOrEmpty()]
-		[Alias('Site')]
-		[string]
-		$UnifiSite = 'default',
-		[Parameter(ValueFromPipeline,
-				   ValueFromPipelineByPropertyName,
-				   Position = 1)]
-		[Alias('Startpoint', 'StartTime')]
-		[String]
-		$Start,
-		[Parameter(ValueFromPipeline,
-				   ValueFromPipelineByPropertyName,
-				   Position = 2)]
-		[Alias('EndPoint', 'EndTime')]
-		[string]
-		$End
-	)
-
-	begin
-	{
-		Write-Verbose -Message 'begin'
-	}
-
-	process
-	{
-		Write-Verbose -Message 'process'
-	}
-
-	end
-	{
-		Write-Verbose -Message 'end'
-	}
 }
 
 function Get-UnifiDailyApStats
@@ -5883,10 +5492,10 @@ function Get-UnifiDailySiteStats
             }
 
             #region
-            if (($item.'bytes') -or ($item.'bytes' -eq '0.0')) 
+            if (($item.'bytes') -or ($item.'bytes' -eq '0.0'))
             {
                $outputAppend | Add-Member -NotePropertyName 'bytes' -NotePropertyValue $item.'bytes'
-               
+
                if ((([math]::round($item.'bytes' / 1KB, 2)) -ne '0.0') -or (([math]::round($item.'bytes' / 1KB, 2)) -ne '0.00'))
                {
                   $outputAppend | Add-Member -NotePropertyName 'kb' -NotePropertyValue ([math]::round($item.'bytes' / 1KB, 2))
@@ -5908,7 +5517,7 @@ function Get-UnifiDailySiteStats
                }
             }
 
-            if (($item.'wan-tx_bytes') -or ($item.'wan-tx_bytes' -eq '0.0')) 
+            if (($item.'wan-tx_bytes') -or ($item.'wan-tx_bytes' -eq '0.0'))
             {
                $outputAppend | Add-Member -NotePropertyName 'wan-tx_bytes' -NotePropertyValue $item.'wan-tx_bytes'
 
@@ -5933,10 +5542,10 @@ function Get-UnifiDailySiteStats
                }
             }
 
-            if (($item.'wan-rx_bytes') -or ($item.'wan-rx_bytes' -eq '0.0')) 
+            if (($item.'wan-rx_bytes') -or ($item.'wan-rx_bytes' -eq '0.0'))
             {
                $outputAppend | Add-Member -NotePropertyName 'wan-rx_bytes' -NotePropertyValue $item.'wan-rx_bytes'
-               
+
                if ((([math]::round($item.'wan-rx_bytes' / 1KB, 2)) -ne '0.0') -or (([math]::round($item.'wan-rx_bytes' / 1KB, 2)) -ne '0.00'))
                {
                   $outputAppend | Add-Member -NotePropertyName 'wan-rx_kb' -NotePropertyValue ([math]::round($item.'wan-rx_bytes' / 1KB, 2))
@@ -5957,13 +5566,13 @@ function Get-UnifiDailySiteStats
                   }
                }
             }
-            
-            if ((($item.'wan-tx_bytes') -or ($item.'wan-tx_bytes' -eq '0.0')) -and (($item.'wan-rx_bytes') -or ($item.'wan-rx_bytes' -eq '0.0'))) 
+
+            if ((($item.'wan-tx_bytes') -or ($item.'wan-tx_bytes' -eq '0.0')) -and (($item.'wan-rx_bytes') -or ($item.'wan-rx_bytes' -eq '0.0')))
             {
                $WanbytesSummed = ($item.'wan-tx_bytes' + $item.'wan-rx_bytes')
 
                $outputAppend | Add-Member -NotePropertyName 'wan_bytes' -NotePropertyValue $WanbytesSummed
-               
+
                if ((([math]::round($WanbytesSummed / 1KB, 2)) -ne '0.0') -or (([math]::round($WanbytesSummed / 1KB, 2)) -ne '0.00'))
                {
                   $outputAppend | Add-Member -NotePropertyName 'wan_kb' -NotePropertyValue ([math]::round($WanbytesSummed / 1KB, 2))
@@ -5983,14 +5592,14 @@ function Get-UnifiDailySiteStats
                      }
                   }
                }
-               
+
                $WanbytesSummed = $null
             }
 
-            if (($item.'wlan_bytes') -or ($item.'wlan_bytes' -eq '0.0')) 
+            if (($item.'wlan_bytes') -or ($item.'wlan_bytes' -eq '0.0'))
             {
                $outputAppend | Add-Member -NotePropertyName 'wlan_bytes' -NotePropertyValue $item.'wlan_bytes'
-               
+
                if ((([math]::round($item.'wlan_bytes' / 1KB, 2)) -ne '0.0') -or (([math]::round($item.'wlan_bytes' / 1KB, 2)) -ne '0.00'))
                {
                   $outputAppend | Add-Member -NotePropertyName 'wlan_kb' -NotePropertyValue ([math]::round($item.'wlan_bytes' / 1KB, 2))
@@ -6012,17 +5621,17 @@ function Get-UnifiDailySiteStats
                }
             }
 
-            if (($item.'num_sta') -or ($item.'num_sta' -eq '0.0')) 
+            if (($item.'num_sta') -or ($item.'num_sta' -eq '0.0'))
             {
                $outputAppend | Add-Member -NotePropertyName 'Clients' -NotePropertyValue $item.'num_sta'
             }
 
-            if (($item.'lan-num_sta') -or ($item.'lan-num_sta' -eq '0.0')) 
+            if (($item.'lan-num_sta') -or ($item.'lan-num_sta' -eq '0.0'))
             {
                $outputAppend | Add-Member -NotePropertyName 'LAN_Clients' -NotePropertyValue $item.'lan-num_sta'
             }
 
-            if (($item.'wlan-num_sta') -or ($item.'wlan-num_sta' -eq '0.0')) 
+            if (($item.'wlan-num_sta') -or ($item.'wlan-num_sta' -eq '0.0'))
             {
                $outputAppend | Add-Member -NotePropertyName 'WLAN_Clients' -NotePropertyValue $item.'wlan-num_sta'
             }
@@ -7264,9 +6873,9 @@ function Get-UnifiHourlyClientStats
 
          .NOTES
          Defaults to the past week (7*24 hours)
- 
+
          Ubiquiti announced this with the Controller version 5.8 - It will not work on older versions!
- 
+
          Make sure that "Clients Historical Data" (Collect clients' historical data) has been enabled in the UniFi controller in "Settings/Maintenance"
 
          .LINK
@@ -8735,10 +8344,10 @@ function Get-UnifiHourlySiteStats
             }
 
             #region
-            if (($item.'bytes') -or ($item.'bytes' -eq '0.0')) 
+            if (($item.'bytes') -or ($item.'bytes' -eq '0.0'))
             {
                $outputAppend | Add-Member -NotePropertyName 'bytes' -NotePropertyValue $item.'bytes'
-               
+
                if ((([math]::round($item.'bytes' / 1KB, 2)) -ne '0.0') -or (([math]::round($item.'bytes' / 1KB, 2)) -ne '0.00'))
                {
                   $outputAppend | Add-Member -NotePropertyName 'kb' -NotePropertyValue ([math]::round($item.'bytes' / 1KB, 2))
@@ -8760,7 +8369,7 @@ function Get-UnifiHourlySiteStats
                }
             }
 
-            if (($item.'wan-tx_bytes') -or ($item.'wan-tx_bytes' -eq '0.0')) 
+            if (($item.'wan-tx_bytes') -or ($item.'wan-tx_bytes' -eq '0.0'))
             {
                $outputAppend | Add-Member -NotePropertyName 'wan-tx_bytes' -NotePropertyValue $item.'wan-tx_bytes'
 
@@ -8785,10 +8394,10 @@ function Get-UnifiHourlySiteStats
                }
             }
 
-            if (($item.'wan-rx_bytes') -or ($item.'wan-rx_bytes' -eq '0.0')) 
+            if (($item.'wan-rx_bytes') -or ($item.'wan-rx_bytes' -eq '0.0'))
             {
                $outputAppend | Add-Member -NotePropertyName 'wan-rx_bytes' -NotePropertyValue $item.'wan-rx_bytes'
-               
+
                if ((([math]::round($item.'wan-rx_bytes' / 1KB, 2)) -ne '0.0') -or (([math]::round($item.'wan-rx_bytes' / 1KB, 2)) -ne '0.00'))
                {
                   $outputAppend | Add-Member -NotePropertyName 'wan-rx_kb' -NotePropertyValue ([math]::round($item.'wan-rx_bytes' / 1KB, 2))
@@ -8809,13 +8418,13 @@ function Get-UnifiHourlySiteStats
                   }
                }
             }
-            
-            if ((($item.'wan-tx_bytes') -or ($item.'wan-tx_bytes' -eq '0.0')) -and (($item.'wan-rx_bytes') -or ($item.'wan-rx_bytes' -eq '0.0'))) 
+
+            if ((($item.'wan-tx_bytes') -or ($item.'wan-tx_bytes' -eq '0.0')) -and (($item.'wan-rx_bytes') -or ($item.'wan-rx_bytes' -eq '0.0')))
             {
                $WanbytesSummed = ($item.'wan-tx_bytes' + $item.'wan-rx_bytes')
 
                $outputAppend | Add-Member -NotePropertyName 'wan_bytes' -NotePropertyValue $WanbytesSummed
-               
+
                if ((([math]::round($WanbytesSummed / 1KB, 2)) -ne '0.0') -or (([math]::round($WanbytesSummed / 1KB, 2)) -ne '0.00'))
                {
                   $outputAppend | Add-Member -NotePropertyName 'wan_kb' -NotePropertyValue ([math]::round($WanbytesSummed / 1KB, 2))
@@ -8835,14 +8444,14 @@ function Get-UnifiHourlySiteStats
                      }
                   }
                }
-               
+
                $WanbytesSummed = $null
             }
 
-            if (($item.'wlan_bytes') -or ($item.'wlan_bytes' -eq '0.0')) 
+            if (($item.'wlan_bytes') -or ($item.'wlan_bytes' -eq '0.0'))
             {
                $outputAppend | Add-Member -NotePropertyName 'wlan_bytes' -NotePropertyValue $item.'wlan_bytes'
-               
+
                if ((([math]::round($item.'wlan_bytes' / 1KB, 2)) -ne '0.0') -or (([math]::round($item.'wlan_bytes' / 1KB, 2)) -ne '0.00'))
                {
                   $outputAppend | Add-Member -NotePropertyName 'wlan_kb' -NotePropertyValue ([math]::round($item.'wlan_bytes' / 1KB, 2))
@@ -8864,17 +8473,17 @@ function Get-UnifiHourlySiteStats
                }
             }
 
-            if (($item.'num_sta') -or ($item.'num_sta' -eq '0.0')) 
+            if (($item.'num_sta') -or ($item.'num_sta' -eq '0.0'))
             {
                $outputAppend | Add-Member -NotePropertyName 'Clients' -NotePropertyValue $item.'num_sta'
             }
 
-            if (($item.'lan-num_sta') -or ($item.'lan-num_sta' -eq '0.0')) 
+            if (($item.'lan-num_sta') -or ($item.'lan-num_sta' -eq '0.0'))
             {
                $outputAppend | Add-Member -NotePropertyName 'LAN_Clients' -NotePropertyValue $item.'lan-num_sta'
             }
 
-            if (($item.'wlan-num_sta') -or ($item.'wlan-num_sta' -eq '0.0')) 
+            if (($item.'wlan-num_sta') -or ($item.'wlan-num_sta' -eq '0.0'))
             {
                $outputAppend | Add-Member -NotePropertyName 'WLAN_Clients' -NotePropertyValue $item.'wlan-num_sta'
             }
@@ -8969,162 +8578,6 @@ function Get-UnifiHourlySiteStats
 
       Write-Verbose -Message 'Done Get-UnifiHourlySiteStats'
    }
-}
-
-function Get-UnifiIdsIpsEvents
-{
-<#
-	.SYNOPSIS
-		Method to fetch speed test results
-
-	.DESCRIPTION
-		Method to fetch speed test results
-
-	.PARAMETER UnifiSite
-		ID of the client-device to be modified
-
-	.PARAMETER Start
-		Startpoint in UniFi Unix timestamp in milliseconds
-
-	.PARAMETER End
-		Endpoint in UniFi Unix timestamp in milliseconds
-
-	.EXAMPLE
-		PS C:\> Get-UnifiIdsIpsEvents
-
-	.NOTES
-		TODO: Add missing optinal limit Parameter (defaults to 10000)
-
-	.LINK
-		Get-UniFiConfig
-
-	.LINK
-		Set-UniFiDefaultRequestHeader
-
-	.LINK
-		Invoke-UniFiApiLogin
-
-	.LINK
-		Invoke-RestMethod
-#>
-
-	[CmdletBinding(ConfirmImpact = 'None')]
-	param
-	(
-		[Parameter(Mandatory = $false,
-				   ValueFromPipeline = $true,
-				   ValueFromPipelineByPropertyName = $true,
-				   Position = 0)]
-		[ValidateNotNullOrEmpty()]
-		[Alias('Site')]
-		[string]
-		$UnifiSite = 'default',
-		[Parameter(ValueFromPipeline = $true,
-				   ValueFromPipelineByPropertyName = $true,
-				   Position = 1)]
-		[Alias('Startpoint', 'StartTime')]
-		[String]
-		$Start,
-		[Parameter(ValueFromPipeline = $true,
-				   ValueFromPipelineByPropertyName = $true,
-				   Position = 2)]
-		[Alias('EndPoint', 'EndTime')]
-		[string]
-		$End
-	)
-
-	begin
-	{
-		Write-Verbose -Message 'begin'
-	}
-
-	process
-	{
-		Write-Verbose -Message 'process'
-	}
-
-	end
-	{
-		Write-Verbose -Message 'end'
-	}
-}
-
-function Get-UnifiLoginSessions
-{
-<#
-	.SYNOPSIS
-		Method to fetch speed test results
-
-	.DESCRIPTION
-		Method to fetch speed test results
-
-	.PARAMETER UnifiSite
-		ID of the client-device to be modified
-
-	.PARAMETER Start
-		Startpoint in UniFi Unix timestamp in milliseconds
-
-	.PARAMETER End
-		Endpoint in UniFi Unix timestamp in milliseconds
-
-	.EXAMPLE
-		PS C:\> Get-UnifiLoginSessions
-
-	.NOTES
-		TODO: mac = client MAC address to return sessions for (can only be used when start and end are also provided)
-      TODO: type = client type to return sessions for, can be 'all', 'guest' or 'user'; default value is 'all'
-
-	.LINK
-		Get-UniFiConfig
-
-	.LINK
-		Set-UniFiDefaultRequestHeader
-
-	.LINK
-		Invoke-UniFiApiLogin
-
-	.LINK
-		Invoke-RestMethod
-#>
-
-	[CmdletBinding(ConfirmImpact = 'None')]
-	param
-	(
-		[Parameter(ValueFromPipeline,
-				   ValueFromPipelineByPropertyName,
-				   Position = 0)]
-		[ValidateNotNullOrEmpty()]
-		[Alias('Site')]
-		[string]
-		$UnifiSite = 'default',
-		[Parameter(ValueFromPipeline,
-				   ValueFromPipelineByPropertyName,
-				   Position = 1)]
-		[Alias('Startpoint', 'StartTime')]
-		[String]
-		$Start,
-		[Parameter(ValueFromPipeline,
-				   ValueFromPipelineByPropertyName,
-				   Position = 2)]
-		[Alias('EndPoint', 'EndTime')]
-		[string]
-		$End
-	)
-
-	begin
-	{
-		Write-Verbose -Message 'begin'
-	}
-
-	process
-	{
-		Write-Verbose -Message 'process'
-	}
-
-	end
-	{
-		Write-Verbose -Message 'end'
-	}
 }
 
 function Get-UnifiNetworkDetails
@@ -13305,364 +12758,6 @@ function New-UniFiConfig
 
       Write-Verbose -Message 'Done New-UniFiConfig'
    }
-}
-
-function Set-UnifiClientDeviceName
-{
-   <#
-         .SYNOPSIS
-         Add/modify/remove a client device name
-
-         .DESCRIPTION
-         Add/modify/remove a client device name
-
-         .PARAMETER Site
-         UniFi Site as configured. The default is: default
-
-         .PARAMETER Client
-         ID of the client device to be modified
-
-         .PARAMETER Name
-         Name to be applied to the client device
-
-         .EXAMPLE
-         PS C:\> Set-UnifiClientDeviceName -Client 'Value1'
-
-         .NOTES
-         Initial version of the Ubiquiti UniFi Controller automation function
-
-         .LINK
-         Get-UniFiConfig
-
-         .LINK
-         Set-UniFiDefaultRequestHeader
-
-         .LINK
-         Invoke-UniFiApiLogin
-
-         .LINK
-         Invoke-RestMethod
-   #>
-
-   [CmdletBinding(ConfirmImpact = 'Low',
-   SupportsShouldProcess)]
-   param
-   (
-      [Parameter(ValueFromPipeline,
-            ValueFromPipelineByPropertyName,
-      Position = 0)]
-      [ValidateNotNullOrEmpty()]
-      [Alias('Site')]
-      [string]
-      $UnifiSite = 'default',
-      [Parameter(Mandatory,
-            ValueFromPipeline,
-            ValueFromPipelineByPropertyName,
-            Position = 1,
-      HelpMessage = 'ID of the client-device to be modified')]
-      [ValidateNotNullOrEmpty()]
-      [Alias('UniFiClient', 'UniFiUser', 'UniFiID')]
-      [string]
-      $Client,
-      [Parameter(ValueFromPipeline,
-            ValueFromPipelineByPropertyName,
-      Position = 2)]
-      [Alias('UniFiName', 'UniFiClientName', 'UniFiUserName')]
-      [string]
-      $Name
-   )
-
-   begin
-   {
-		Write-Verbose -Message 'begin'
-   }
-
-   process
-   {
-      if ($pscmdlet.ShouldProcess('client-device', 'Add/modify/remove'))
-      {
-         Write-Verbose -Message 'process'
-      }
-   }
-
-   end
-   {
-		Write-Verbose -Message 'end'
-   }
-}
-
-function Set-UnifiClientDeviceNote
-{
-<#
-	.SYNOPSIS
-		Add/modify/remove a client-device note
-
-	.DESCRIPTION
-		Add/modify/remove a client-device note
-
-	.PARAMETER UnifiSite
-		A description of the UnifiSite parameter.
-
-	.PARAMETER Client
-		ID of the client-device to be modified
-
-	.PARAMETER Note
-		Note to be applied to the client-device (optional)
-
-	.EXAMPLE
-		PS C:\> Set-UnifiClientDeviceNote -Client 'Value1'
-
-	.NOTES
-		Initial version of the Ubiquiti UniFi Controller automation function
-
-         .LINK
-         Get-UniFiConfig
-
-         .LINK
-         Set-UniFiDefaultRequestHeader
-
-         .LINK
-         Invoke-UniFiApiLogin
-
-         .LINK
-         Invoke-RestMethod
-#>
-
-	[CmdletBinding(ConfirmImpact = 'Low',
-				   SupportsShouldProcess)]
-	param
-	(
-		[Parameter(ValueFromPipeline,
-				   ValueFromPipelineByPropertyName,
-				   Position = 0)]
-		[ValidateNotNullOrEmpty()]
-		[Alias('Site')]
-		[string]
-		$UnifiSite = 'default',
-		[Parameter(Mandatory,
-				   ValueFromPipeline,
-				   ValueFromPipelineByPropertyName,
-				   Position = 1,
-				   HelpMessage = 'ID of the client-device to be modified')]
-		[ValidateNotNullOrEmpty()]
-		[Alias('UniFiClient', 'UniFiUser', 'UniFiID')]
-		[string]
-		$Client,
-		[Parameter(ValueFromPipeline,
-				   ValueFromPipelineByPropertyName,
-				   Position = 2)]
-		[Alias('UniFiNote', 'UniFiClientNote', 'UniFiUserNote')]
-		[string]
-		$Note = $null
-	)
-
-	begin
-	{
-
-	}
-
-	process
-	{
-		if ($pscmdlet.ShouldProcess("client-device", "Add/modify/remove"))
-		{
-			#TODO: Place script here
-		}
-	}
-
-	end
-	{
-
-	}
-}
-
-function Set-UniFiClientGroup
-{
-<#
-	.SYNOPSIS
-		Assign client device to another group
-
-	.DESCRIPTION
-		Assign client device to another group
-
-	.PARAMETER UnifiSite
-		ID of the client-device to be modified
-
-	.PARAMETER Client
-		id of the user device to be modified
-
-	.PARAMETER Group
-		id of the user group to assign user to
-
-	.EXAMPLE
-		PS C:\> Set-UniFiClientGroup
-
-	.NOTES
-		TBD
-
-	.LINK
-		Get-UniFiConfig
-
-	.LINK
-		Set-UniFiDefaultRequestHeader
-
-	.LINK
-		Invoke-UniFiApiLogin
-
-	.LINK
-		Invoke-RestMethod
-#>
-
-	[CmdletBinding(ConfirmImpact = 'None',
-				   SupportsShouldProcess)]
-	param
-	(
-		[Parameter(ValueFromPipeline,
-				   ValueFromPipelineByPropertyName,
-				   Position = 0)]
-		[ValidateNotNullOrEmpty()]
-		[Alias('Site')]
-		[string]
-		$UnifiSite = 'default',
-		[Parameter(Mandatory,
-				   ValueFromPipeline,
-				   ValueFromPipelineByPropertyName,
-				   Position = 1,
-				   HelpMessage = 'id of the user device to be modified')]
-		[ValidateNotNullOrEmpty()]
-		[Alias('ClientID', 'UniFiClient')]
-		[string]
-		$Client,
-		[Parameter(Mandatory,
-				   ValueFromPipeline,
-				   ValueFromPipelineByPropertyName,
-				   Position = 2,
-				   HelpMessage = 'id of the user group to assign user to')]
-		[ValidateNotNullOrEmpty()]
-		[Alias('GroupId', 'UniFiGroup')]
-		[string]
-		$Group
-	)
-
-	begin
-	{
-		Write-Verbose -Message 'begin'
-	}
-
-	process
-	{
-		if ($pscmdlet.ShouldProcess('client-device', 'Move to Group_ID'))
-		{
-			Write-Verbose -Message 'process'
-		}
-	}
-
-	end
-	{
-		Write-Verbose -Message 'end'
-	}
-}
-
-function Set-UniFiClientIpAddress
-{
-<#
-	.SYNOPSIS
-		Update client fixedip
-
-	.DESCRIPTION
-		Update client fixedip
-
-	.PARAMETER UnifiSite
-		ID of the client-device to be modified
-
-	.PARAMETER Client
-		id of the user device to be modified
-
-	.PARAMETER UseFixedIp
-		boolean defining whether if use_fixedip is true or false
-
-	.PARAMETER Network
-		network id where the ip belongs to
-
-	.PARAMETER FixedIp
-		value of client fixed_ip field
-
-	.EXAMPLE
-		PS C:\> Set-UniFiClientGroup
-
-	.NOTES
-		TBD
-
-	.LINK
-		Get-UniFiConfig
-
-	.LINK
-		Set-UniFiDefaultRequestHeader
-
-	.LINK
-		Invoke-UniFiApiLogin
-
-	.LINK
-		Invoke-RestMethod
-#>
-
-	[CmdletBinding(ConfirmImpact = 'None',
-				   SupportsShouldProcess = $true)]
-	param
-	(
-		[Parameter(Mandatory = $false,
-				   ValueFromPipeline = $true,
-				   ValueFromPipelineByPropertyName = $true,
-				   Position = 0)]
-		[ValidateNotNullOrEmpty()]
-		[Alias('Site')]
-		[string]
-		$UnifiSite = 'default',
-		[Parameter(Mandatory = $true,
-				   ValueFromPipeline = $true,
-				   ValueFromPipelineByPropertyName = $true,
-				   Position = 1,
-				   HelpMessage = 'id of the user device to be modified')]
-		[ValidateNotNullOrEmpty()]
-		[Alias('ClientID', 'UniFiClient')]
-		[string]
-		$Client,
-		[Parameter(ValueFromPipeline = $true,
-				   ValueFromPipelineByPropertyName = $true,
-				   Position = 2)]
-		[Alias('UniFiUseFixedIp')]
-		[switch]
-		$UseFixedIp = $false,
-		[Parameter(ValueFromPipeline = $true,
-				   ValueFromPipelineByPropertyName = $true,
-				   Position = 3)]
-		[Alias('UniFiNetwork')]
-		[string]
-		$Network,
-		[Parameter(ValueFromPipeline = $true,
-				   ValueFromPipelineByPropertyName = $true,
-				   Position = 4)]
-		[Alias('UniFiFixedIp')]
-		[ipaddress]
-		$FixedIp
-	)
-
-	begin
-	{
-		Write-Verbose -Message 'begin'
-	}
-
-	process
-	{
-		if ($pscmdlet.ShouldProcess('client-device', 'Move to Group_ID'))
-		{
-			Write-Verbose -Message 'process'
-		}
-	}
-
-	end
-	{
-		Write-Verbose -Message 'end'
-	}
 }
 
 function Set-UnifiFirewallGroup

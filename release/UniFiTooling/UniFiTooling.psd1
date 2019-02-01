@@ -71,24 +71,19 @@ PowerShellVersion = '5.1'
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
 FunctionsToExport = 'Get-Unifi5minutesApStats', 'Get-Unifi5minutesClientStats', 
                'Get-Unifi5minutesGatewayStats', 'Get-Unifi5minutesSiteStats', 
-               'Get-UnifiAllConnectedClients', 'Get-UnifiAllGuests', 
-               'Get-UnifiAuthorizations', 'Get-UnifiClientDetails', 
-               'Get-UnifiClientLogins', 'Get-UnifiDailyApStats', 
-               'Get-UnifiDailyClientStats', 'Get-UnifiDailyGatewayStats', 
-               'Get-UnifiDailySiteStats', 'Get-UnifiFirewallGroupDetails', 
-               'Get-UnifiFirewallGroups', 'Get-UnifiHourlyApStats', 
-               'Get-UnifiHourlyClientStats', 'Get-UnifiHourlyGatewayStats', 
-               'Get-UnifiHourlySiteStats', 'Get-UnifiIdsIpsEvents', 
-               'Get-UnifiLoginSessions', 'Get-UnifiNetworkDetails', 
-               'Get-UnifiNetworkList', 'Get-UnifiSpeedTestResult', 
-               'Invoke-UniFiApiLogin', 'Invoke-UniFiApiLogout', 
-               'Invoke-UnifiAuthorizeGuest', 'Invoke-UnifiBlockClient', 
-               'Invoke-UnifiForgetClient', 'Invoke-UnifiReconnectClient', 
-               'Invoke-UnifiUnauthorizeGuest', 'Invoke-UnifiUnblockClient', 
-               'New-UnifiClientDevice', 'New-UniFiConfig', 
-               'Set-UnifiClientDeviceName', 'Set-UnifiClientDeviceNote', 
-               'Set-UniFiClientGroup', 'Set-UniFiClientIpAddress', 
-               'Set-UnifiFirewallGroup', 'Set-UnifiNetworkDetails'
+               'Get-UnifiDailyApStats', 'Get-UnifiDailyClientStats', 
+               'Get-UnifiDailyGatewayStats', 'Get-UnifiDailySiteStats', 
+               'Get-UnifiFirewallGroupDetails', 'Get-UnifiFirewallGroups', 
+               'Get-UnifiHourlyApStats', 'Get-UnifiHourlyClientStats', 
+               'Get-UnifiHourlyGatewayStats', 'Get-UnifiHourlySiteStats', 
+               'Get-UnifiNetworkDetails', 'Get-UnifiNetworkList', 
+               'Get-UnifiSpeedTestResult', 'Invoke-UniFiApiLogin', 
+               'Invoke-UniFiApiLogout', 'Invoke-UnifiAuthorizeGuest', 
+               'Invoke-UnifiBlockClient', 'Invoke-UnifiForgetClient', 
+               'Invoke-UnifiReconnectClient', 'Invoke-UnifiUnauthorizeGuest', 
+               'Invoke-UnifiUnblockClient', 'New-UnifiClientDevice', 
+               'New-UniFiConfig', 'Set-UnifiFirewallGroup', 
+               'Set-UnifiNetworkDetails'
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 CmdletsToExport = @()
