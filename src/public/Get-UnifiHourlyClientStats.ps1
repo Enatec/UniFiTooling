@@ -82,8 +82,10 @@
          Get all Values from the API
 
          .NOTES
-         defaults to the past week (7*24 hours)
+         Defaults to the past week (7*24 hours)
+
          Ubiquiti announced this with the Controller version 5.8 - It will not work on older versions!
+
          Make sure that "Clients Historical Data" (Collect clients' historical data) has been enabled in the UniFi controller in "Settings/Maintenance"
 
          .LINK

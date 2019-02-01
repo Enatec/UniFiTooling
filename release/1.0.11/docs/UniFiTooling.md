@@ -18,10 +18,10 @@ Get Access Point stats in 5 minute segments
 Get user/client statistics in 5 minute segments
 
 ### [Get-Unifi5minutesGatewayStats](Get-Unifi5minutesGatewayStats.md)
-Get user/client statistics in 5 minute segments for the USG
+Get statistics in 5 minute segments for the USG
 
 ### [Get-Unifi5minutesSiteStats](Get-Unifi5minutesSiteStats.md)
-5 minutes site stats method, defaults to the past 12 hours
+Get statistics in 5 minute segments for a complete Site
 
 ### [Get-UnifiAllConnectedClients](Get-UnifiAllConnectedClients.md)
 Method to fetch speed test results
@@ -45,10 +45,10 @@ Get daily stats Access Point stats
 Get daily user/client statistics for a given user/client
 
 ### [Get-UnifiDailyGatewayStats](Get-UnifiDailyGatewayStats.md)
-Daily stats method for a single access point or all access points
+Get daily statistics for the USG
 
 ### [Get-UnifiDailySiteStats](Get-UnifiDailySiteStats.md)
-Daily site stats method
+Get daily statistics for a complete Site
 
 ### [Get-UnifiFirewallGroupDetails](Get-UnifiFirewallGroupDetails.md)
 Get the details about one Firewall Group via the API of the UniFi Controller
@@ -63,10 +63,10 @@ Get hourly stats Access Point stats
 Get hourly user/client statistics for a given user/client
 
 ### [Get-UnifiHourlyGatewayStats](Get-UnifiHourlyGatewayStats.md)
-Hourly stats method for a single access point or all access points
+Get hourly statistics for the USG
 
 ### [Get-UnifiHourlySiteStats](Get-UnifiHourlySiteStats.md)
-Hourly site stats method
+Get horly statistics for a complete Site
 
 ### [Get-UnifiIdsIpsEvents](Get-UnifiIdsIpsEvents.md)
 Method to fetch speed test results

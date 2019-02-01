@@ -11,7 +11,7 @@ schema: 2.0.0
 # Get-Unifi5minutesGatewayStats
 
 ## SYNOPSIS
-Get user/client statistics in 5 minute segments for the USG
+Get statistics in 5 minute segments for the USG
 
 ## SYNTAX
 
@@ -21,7 +21,7 @@ Get-Unifi5minutesGatewayStats [[-UnifiSite] <String>] [[-Start] <String>] [[-End
 ```
 
 ## DESCRIPTION
-Get user/client statistics in 5 minute segments for the USG (UniFi Secure Gateway)
+Get statistics in 5 minute segments for the USG (UniFi Secure Gateway)
 
 For convenience, we return the a bit more then the API, e.g.
 everything in KB, MB, GB, and TB instead of just bytes
@@ -30,7 +30,7 @@ We also return real timestamps instead of the unix timestaps in miliseconds that
 Sample output:
 Time           : 2/1/2019 6:20:00 PM
 gateway        : 78:8a:20:59:e6:88
-mem2           : 33.00
+mem            : 33.00
 cpu            : 0.13
 lan-rx_errors  : 0
 lan-rx_bytes   : 1373037.08
@@ -69,28 +69,28 @@ The UniFi SDN Controller does not return any values for them!
 Get-Unifi5minutesGatewayStats
 ```
 
-Get user/client statistics in 5 minute segments for the USG (UniFi Secure Gateway) in the default site
+Get statistics in 5 minute segments for the USG (UniFi Secure Gateway) in the default site
 
 ### EXAMPLE 2
 ```
 (Get-Unifi5minutesGatewayStats -Start '1548971935421' -End '1548975579019')
 ```
 
-Get user/client statistics in 5 minute segments for the USG (UniFi Secure Gateway) in the default site for a given time period.
+Get statistics in 5 minute segments for the USG (UniFi Secure Gateway) in the default site for a given time period.
 
 ### EXAMPLE 3
 ```
 (Get-Unifi5minutesGatewayStats -Start '1548980058135')
 ```
 
-Get user/client statistics in 5 minute segments for the USG (UniFi Secure Gateway) in the default site for the last 60 minutes (was the timestamp while the sample was created)
+Get statistics in 5 minute segments for the USG (UniFi Secure Gateway) in the default site for the last 60 minutes (was the timestamp while the sample was created)
 
 ### EXAMPLE 4
 ```
 (Get-Unifi5minutesGatewayStats -UnifiSite 'contoso')[-1]
 ```
 
-Get user/client statistics in 5 minute segments for the USG (UniFi Secure Gateway) in the site 'contoso'
+Get statistics in 5 minute segments for the USG (UniFi Secure Gateway) in the site 'contoso'
 
 ### EXAMPLE 5
 ```

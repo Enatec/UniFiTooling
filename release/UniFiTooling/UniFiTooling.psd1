@@ -128,6 +128,12 @@ PrivateData = @{
         # ReleaseNotes of this module
         ReleaseNotes = '
 ### Added
+- Get-UnifiHourlySiteStats - Get horly statistics for a complete UniFi Site
+- Get-UnifiDailySiteStats - Get daily statistics for a complete UniFi Site
+- Get-Unifi5minutesSiteStats - Get statistics in 5 minute segments for a complete UniFi Site
+- Get-Unifi5minutesGatewayStats - Get statistics in 5 minute segments for the USG (UniFi Secure Gateway)
+- Get-UnifiHourlyGatewayStats - Get hourly statistics for the USG (UniFi Secure Gateway)
+- Get-UnifiDailyGatewayStats - Get daily statistics for the USG (UniFi Secure Gateway)
 - Get-UnifiDailyClientStats - Get daily user/client statistics for a given user/client
 - Get-UnifiHourlyClientStats - Get hourly user/client statistics for a given user/client
 - Get-Unifi5minutesClientStats - Get user/client statistics in 5 minute segments for a given client

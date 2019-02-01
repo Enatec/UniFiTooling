@@ -2,10 +2,10 @@
 {
    <#
          .SYNOPSIS
-         Get user/client statistics in 5 minute segments for the USG
+         Get statistics in 5 minute segments for the USG
 
          .DESCRIPTION
-         Get user/client statistics in 5 minute segments for the USG (UniFi Secure Gateway)
+         Get statistics in 5 minute segments for the USG (UniFi Secure Gateway)
 
          For convenience, we return the a bit more then the API, e.g. everything in KB, MB, GB, and TB instead of just bytes
          We also return real timestamps instead of the unix timestaps in miliseconds that the UniFi returns
@@ -13,7 +13,7 @@
          Sample output:
          Time           : 2/1/2019 6:20:00 PM
          gateway        : 78:8a:20:59:e6:88
-         mem2           : 33.00
+         mem            : 33.00
          cpu            : 0.13
          lan-rx_errors  : 0
          lan-rx_bytes   : 1373037.08
@@ -58,22 +58,22 @@
          .EXAMPLE
          PS C:\> Get-Unifi5minutesGatewayStats
 
-         Get user/client statistics in 5 minute segments for the USG (UniFi Secure Gateway) in the default site
+         Get statistics in 5 minute segments for the USG (UniFi Secure Gateway) in the default site
 
          .EXAMPLE
          (Get-Unifi5minutesGatewayStats -Start '1548971935421' -End '1548975579019')
 
-         Get user/client statistics in 5 minute segments for the USG (UniFi Secure Gateway) in the default site for a given time period.
+         Get statistics in 5 minute segments for the USG (UniFi Secure Gateway) in the default site for a given time period.
 
          .EXAMPLE
          (Get-Unifi5minutesGatewayStats -Start '1548980058135')
 
-         Get user/client statistics in 5 minute segments for the USG (UniFi Secure Gateway) in the default site for the last 60 minutes (was the timestamp while the sample was created)
+         Get statistics in 5 minute segments for the USG (UniFi Secure Gateway) in the default site for the last 60 minutes (was the timestamp while the sample was created)
 
          .EXAMPLE
          PS C:\> (Get-Unifi5minutesGatewayStats -UnifiSite 'contoso')[-1]
 
-         Get user/client statistics in 5 minute segments for the USG (UniFi Secure Gateway) in the site 'contoso'
+         Get statistics in 5 minute segments for the USG (UniFi Secure Gateway) in the site 'contoso'
 
          .EXAMPLE
          PS C:\> Get-Unifi5minutesGatewayStats -Attributes 'mem','cpu','loadavg_5','lan-rx_errors','wan-rx_errors','lan-tx_errors','wan-tx_errors','lan-rx_bytes','wan-rx_bytes','lan-tx_bytes','wan-tx_bytes','lan-rx_packets','wan-rx_packets','lan-tx_packets','wan-tx_packets','lan-rx_dropped','wan-rx_dropped','lan-tx_dropped','wan-tx_dropped')
@@ -348,14 +348,14 @@
          foreach ($item in $Session.data)
          {
             $outputAppend = [PSCustomObject][ordered]@{
-               Time = ((ConvertFrom-UnixTimeStamp -TimeStamp ($item.time) -Milliseconds).ToLocalTime())
+               Time    = ((ConvertFrom-UnixTimeStamp -TimeStamp ($item.time) -Milliseconds).ToLocalTime())
                gateway = $item.gw
             }
 
             #region Default
             if ($item.mem)
             {
-               $outputAppend | Add-Member -NotePropertyName mem2 -NotePropertyValue ('{0:N2}' -f ([math]::Round($item.mem,2,'AwayFromZero')))
+               $outputAppend | Add-Member -NotePropertyName mem -NotePropertyValue ('{0:N2}' -f ([math]::Round($item.mem,2,'AwayFromZero')))
             }
 
             if ($item.cpu)
@@ -365,14 +365,14 @@
 
             if ($item.loadavg_5)
             {
-            $outputAppend | Add-Member -NotePropertyName loadavg_5 -NotePropertyValue ([INT]$item.loadavg_5)
+               $outputAppend | Add-Member -NotePropertyName loadavg_5 -NotePropertyValue ([INT]$item.loadavg_5)
             }
             #endregion Default
 
             #region RX
             if (($item.'lan-rx_errors') -or ($item.'lan-rx_errors' -eq '0.0'))
             {
-            $outputAppend | Add-Member -NotePropertyName 'lan-rx_errors' -NotePropertyValue ([int]($item.'lan-rx_errors'))
+               $outputAppend | Add-Member -NotePropertyName 'lan-rx_errors' -NotePropertyValue ([int]($item.'lan-rx_errors'))
             }
 
             if (($item.'lan-rx_bytes') -or ($item.'lan-rx_bytes' -eq '0.0'))
@@ -402,7 +402,7 @@
 
             if (($item.'lan-rx_packets') -or ($item.'lan-rx_packets' -eq '0.0'))
             {
-            $outputAppend | Add-Member -NotePropertyName 'lan-rx_packets' -NotePropertyValue $item.'lan-rx_packets'
+               $outputAppend | Add-Member -NotePropertyName 'lan-rx_packets' -NotePropertyValue $item.'lan-rx_packets'
             }
 
             if (($item.'lan-rx_dropped') -or ($item.'lan-rx_dropped' -eq '0.0'))
@@ -442,19 +442,19 @@
 
             if (($item.'wan-rx_packets') -or ($item.'wan-rx_packets' -eq '0.0'))
             {
-            $outputAppend | Add-Member -NotePropertyName 'wan-rx_packets' -NotePropertyValue $item.'wan-rx_packets'
+               $outputAppend | Add-Member -NotePropertyName 'wan-rx_packets' -NotePropertyValue $item.'wan-rx_packets'
             }
 
             if (($item.'wan-rx_dropped') -or ($item.'wan-rx_dropped' -eq '0.0'))
             {
-            $outputAppend | Add-Member -NotePropertyName 'wan-rx_dropped' -NotePropertyValue ([int]($item.'wan-rx_dropped'))
+               $outputAppend | Add-Member -NotePropertyName 'wan-rx_dropped' -NotePropertyValue ([int]($item.'wan-rx_dropped'))
             }
             #endregion RX
 
             #region TX
             if (($item.'lan-tx_errors') -or ($item.'lan-tx_errors' -eq '0.0'))
             {
-            $outputAppend | Add-Member -NotePropertyName 'lan-tx_errors' -NotePropertyValue ([int]($item.'lan-tx_errors'))
+               $outputAppend | Add-Member -NotePropertyName 'lan-tx_errors' -NotePropertyValue ([int]($item.'lan-tx_errors'))
             }
 
             if (($item.'lan-tx_bytes') -or ($item.'lan-tx_bytes' -eq '0.0'))
@@ -484,17 +484,17 @@
 
             if (($item.'lan-tx_packets') -or ($item.'lan-tx_packets' -eq '0.0'))
             {
-            $outputAppend | Add-Member -NotePropertyName 'lan-tx_packets' -NotePropertyValue $item.'lan-tx_packets'
+               $outputAppend | Add-Member -NotePropertyName 'lan-tx_packets' -NotePropertyValue $item.'lan-tx_packets'
             }
 
             if (($item.'lan-tx_dropped') -or ($item.'lan-tx_dropped' -eq '0.0'))
             {
-            $outputAppend | Add-Member -NotePropertyName 'lan-tx_dropped' -NotePropertyValue ([int]($item.'lan-tx_dropped'))
+               $outputAppend | Add-Member -NotePropertyName 'lan-tx_dropped' -NotePropertyValue ([int]($item.'lan-tx_dropped'))
             }
 
             if (($item.'wan-tx_errors') -or ($item.'wan-tx_errors' -eq '0.0'))
             {
-            $outputAppend | Add-Member -NotePropertyName 'wan-tx_errors' -NotePropertyValue ([int]($item.'wan-tx_errors'))
+               $outputAppend | Add-Member -NotePropertyName 'wan-tx_errors' -NotePropertyValue ([int]($item.'wan-tx_errors'))
             }
 
             if (($item.'wan-tx_bytes') -or ($item.'wan-tx_bytes' -eq '0.0'))
@@ -524,12 +524,12 @@
 
             if (($item.'wan-tx_packets') -or ($item.'wan-tx_packets' -eq '0.0'))
             {
-            $outputAppend | Add-Member -NotePropertyName 'wan-tx_packets' -NotePropertyValue $item.'wan-tx_packets'
+               $outputAppend | Add-Member -NotePropertyName 'wan-tx_packets' -NotePropertyValue $item.'wan-tx_packets'
             }
 
             if (($item.'wan-tx_dropped') -or ($item.'wan-tx_dropped' -eq '0.0'))
             {
-            $outputAppend | Add-Member -NotePropertyName 'wan-tx_dropped' -NotePropertyValue ([int]($item.'wan-tx_dropped'))
+               $outputAppend | Add-Member -NotePropertyName 'wan-tx_dropped' -NotePropertyValue ([int]($item.'wan-tx_dropped'))
             }
             #endregion TX
 
