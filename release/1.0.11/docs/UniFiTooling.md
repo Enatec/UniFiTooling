@@ -42,7 +42,7 @@ Method to fetch speed test results
 Get daily stats Access Point stats
 
 ### [Get-UnifiDailyClientStats](Get-UnifiDailyClientStats.md)
-Daily stats method for a single access point or all access points
+Get daily user/client statistics for a given user/client
 
 ### [Get-UnifiDailyGatewayStats](Get-UnifiDailyGatewayStats.md)
 Daily stats method for a single access point or all access points
@@ -60,7 +60,7 @@ Get a List Firewall Groups via the API of the UniFi Controller
 Get hourly stats Access Point stats
 
 ### [Get-UnifiHourlyClientStats](Get-UnifiHourlyClientStats.md)
-Hourly stats method for a single access point or all access points
+Get hourly user/client statistics for a given user/client
 
 ### [Get-UnifiHourlyGatewayStats](Get-UnifiHourlyGatewayStats.md)
 Hourly stats method for a single access point or all access points

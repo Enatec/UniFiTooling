@@ -6,9 +6,40 @@
 
          .DESCRIPTION
          Get user/client statistics in 5 minute segments for a given client
-         For convenience, we return the TX/RX traffic in bytes (as the UniFi does it) and Megabytes.
-         We return a summed traffic (based on the combined TX and RX traffic) in Megabytes.
-         We also return real timestamps instead of the unix timestaps that the UniFi returns
+
+         For convenience, we return the a bit more then the API, e.g. everything in KB, MB, GB, and TB instead of just bytes
+         We also return real timestamps instead of the unix timestaps in miliseconds that the UniFi returns
+
+         Sample output:
+         Time          : 2/1/2019 3:45:00 PM
+         rx_bytes      : 105.0
+         rx_kb         : 0.10
+         rx_mb         : 0.00
+         rx_gb         : 0.00
+         rx_tb         : 0.00
+         rx_rate       : 650000.0
+         rx_rate_mbps  : 634.77
+         rx_retries    : 0
+         rx_packets    : 2.5
+         tx_bytes      : 213.0
+         tx_kb         : 0.21
+         tx_mb         : 0.00
+         tx_gb         : 0.00
+         tx_tb         : 0.00
+         tx_rate       : 650000.0
+         tx_rate_mbps  : 634.77
+         tx_retries    : 1
+         tx_packets    : 4.5
+         Traffic_bytes : 318
+         Traffic_kb    : 0.31
+         Traffic_mb    : 0.00
+         Traffic_gb    : 0.00
+         Traffic_tb    : 0.00
+         Signal        : -65
+         Signal_plain  : -65.0
+
+         In reality, we filter out all 0.00 values (e.g. tx_mb above)
+         You can Filter for whatever parameter you like (e.g. with Select-Object)
 
          .PARAMETER UnifiSite
          ID of the client-device to be modified
@@ -45,19 +76,16 @@
 
          Get user/client statistics in 5 minute segments for a given (78:8a:20:59:e6:88) user/client in the site 'contoso'
 
+         .EXAMPLE
+         PS C:\> Get-Unifi5minutesClientStats -Mac '78:8a:20:59:e6:88' -Attributes 'rx_bytes', 'tx_bytes', 'signal', 'rx_rate', 'tx_rate', 'rx_retries', 'tx_retries', 'rx_packets', 'tx_packets')
+
+         Get all Values from the API
+
          .NOTES
          Defaults to the past 12 hours.
          Make sure that the retention policy for 5 minutes stats is set to the correct value in the controller settings
          Ubiquiti announced this with the Controller version 5.8 - It will not work on older versions!
          Make sure that "Clients Historical Data" (Collect clients' historical data) has been enabled in the UniFi controller in "Settings/Maintenance"
-
-         Sample Output:
-         rx_bytes : 18384.0
-         rx_mb    : 0.02
-         tx_bytes : 30438.559999999998
-         tx_mb    : 0.03
-         Traffic  : 0.05
-         time     : 2/1/2019 1:15:00 AM
 
          .LINK
          Get-UniFiConfig
@@ -328,15 +356,139 @@
          foreach ($item in $Session.data)
          {
             $outputAppend = [PSCustomObject][ordered]@{
-               rx_bytes    = $item.rx_bytes
-               rx_mb       = ([math]::round($item.rx_bytes / 1MB, 2))
-               tx_bytes    = $item.tx_bytes
-               tx_mb       = ([math]::round($item.tx_bytes / 1MB, 2))
-               Traffic     = ([math]::round(($item.rx_bytes + $item.tx_bytes) / 1MB, 2))
-               time        = ((ConvertFrom-UnixTimeStamp -TimeStamp ($item.time) -Milliseconds).ToLocalTime())
+               Time = ((ConvertFrom-UnixTimeStamp -TimeStamp ($item.time) -Milliseconds).ToLocalTime())
             }
-            # TODO: WE ARE NOT DONE HERE
-            # TODO: A IF Loop is still needed for the other attributes
+
+            #region RX
+            if ($item.rx_bytes)
+            {
+               $outputAppend | Add-Member -NotePropertyName rx_bytes -NotePropertyValue $item.rx_bytes
+
+               if ((([math]::round($item.rx_bytes / 1KB, 2)) -ne '0.0') -or (([math]::round($item.rx_bytes / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName rx_kb -NotePropertyValue ([math]::round($item.rx_bytes / 1KB, 2))
+
+                  if ((([math]::round($item.rx_bytes / 1MB, 2)) -ne '0.0') -or (([math]::round($item.rx_bytes / 1MB, 2)) -ne '0.00'))
+                  {
+                     $outputAppend | Add-Member -NotePropertyName rx_mb -NotePropertyValue ([math]::round($item.rx_bytes / 1MB, 2))
+
+                     if ((([math]::round($item.rx_bytes / 1GB, 2)) -ne '0.0') -or (([math]::round($item.rx_bytes / 1GB, 2)) -ne '0.00'))
+                     {
+                        $outputAppend | Add-Member -NotePropertyName rx_gb -NotePropertyValue ([math]::round($item.rx_bytes / 1GB, 2))
+
+                        if ((([math]::round($item.rx_bytes / 1TB, 2)) -ne '0.0') -or (([math]::round($item.rx_bytes / 1TB, 2)) -ne '0.00'))
+                        {
+                           $outputAppend | Add-Member -NotePropertyName rx_tb -NotePropertyValue ([math]::round($item.rx_bytes / 1TB, 2))
+                        }
+                     }
+                  }
+               }
+            }
+
+            if ($item.rx_rate)
+            {
+               $outputAppend | Add-Member -NotePropertyName rx_rate -NotePropertyValue $item.rx_rate
+
+               if ((([math]::round($item.rx_rate / 1KB, 2)) -ne '0.0') -or (([math]::round($item.rx_rate / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName rx_rate_mbps -NotePropertyValue ([math]::round($item.rx_rate / 1KB, 2))
+               }
+            }
+
+            # If 0.0 handler added
+            if (($item.rx_retries) -or ($item.rx_retries -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName rx_retries -NotePropertyValue ([INT]$item.rx_retries)
+            }
+
+            if ($item.rx_packets)
+            {
+               $outputAppend | Add-Member -NotePropertyName rx_packets -NotePropertyValue $item.rx_packets
+            }
+            #endregion RX
+
+            #region TX
+            if ($item.tx_bytes)
+            {
+               $outputAppend | Add-Member -NotePropertyName tx_bytes -NotePropertyValue $item.tx_bytes
+
+               if ((([math]::round($item.tx_bytes / 1KB, 2)) -ne '0.0') -or (([math]::round($item.tx_bytes / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName tx_kb -NotePropertyValue ([math]::round($item.tx_bytes / 1KB, 2))
+
+                  if ((([math]::round($item.tx_bytes / 1MB, 2)) -ne '0.0') -or (([math]::round($item.tx_bytes / 1MB, 2)) -ne '0.00'))
+                  {
+                     $outputAppend | Add-Member -NotePropertyName tx_mb -NotePropertyValue ([math]::round($item.tx_bytes / 1MB, 2))
+
+                     if ((([math]::round($item.tx_bytes / 1GB, 2)) -ne '0.0') -or (([math]::round($item.tx_bytes / 1GB, 2)) -ne '0.00'))
+                     {
+                        $outputAppend | Add-Member -NotePropertyName tx_gb -NotePropertyValue ([math]::round($item.tx_bytes / 1GB, 2))
+
+                        if ((([math]::round($item.tx_bytes / 1TB, 2)) -ne '0.0') -or (([math]::round($item.tx_bytes / 1TB, 2)) -ne '0.00'))
+                        {
+                           $outputAppend | Add-Member -NotePropertyName tx_tb -NotePropertyValue ([math]::round($item.tx_bytes / 1TB, 2))
+                        }
+                     }
+                  }
+               }
+            }
+
+            if ($item.tx_rate)
+            {
+               $outputAppend | Add-Member -NotePropertyName tx_rate -NotePropertyValue $item.tx_rate
+               if ((([math]::round($item.tx_rate / 1KB, 2)) -ne '0.0') -or (([math]::round($item.tx_rate / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName tx_rate_mbps -NotePropertyValue ([math]::round($item.tx_rate / 1KB, 2))
+               }
+            }
+
+            # If 0.0 handler added
+            if (($item.tx_retries) -or ($item.tx_retries -eq '0.0'))
+            {
+               $outputAppend | Add-Member -NotePropertyName tx_retries -NotePropertyValue ([INT]$item.tx_retries)
+            }
+
+            if ($item.tx_packets)
+            {
+               $outputAppend | Add-Member -NotePropertyName tx_packets -NotePropertyValue $item.tx_packets
+            }
+            #endregion TX
+
+            #region Traffic
+            if (($item.rx_bytes) -and ($item.tx_bytes))
+            {
+               $outputAppend | Add-Member -NotePropertyName Traffic_bytes -NotePropertyValue ([math]::round(($item.rx_bytes + $item.tx_bytes)))
+
+               if ((([math]::round(($item.rx_bytes + $item.tx_bytes) / 1KB, 2)) -ne '0.0') -or (([math]::round(($item.rx_bytes + $item.tx_bytes) / 1KB, 2)) -ne '0.00'))
+               {
+                  $outputAppend | Add-Member -NotePropertyName Traffic_kb -NotePropertyValue ([math]::round(($item.rx_bytes + $item.tx_bytes) / 1KB, 2))
+
+                  if ((([math]::round(($item.rx_bytes + $item.tx_bytes) / 1MB, 2)) -ne '0.0') -or (([math]::round(($item.rx_bytes + $item.tx_bytes) / 1MB, 2)) -ne '0.00'))
+                  {
+                     $outputAppend | Add-Member -NotePropertyName Traffic_mb -NotePropertyValue ([math]::round(($item.rx_bytes + $item.tx_bytes) / 1MB, 2))
+
+                     if ((([math]::round(($item.rx_bytes + $item.tx_bytes) / 1GB, 2)) -ne '0.0') -or (([math]::round(($item.rx_bytes + $item.tx_bytes) / 1GB, 2)) -ne '0.00'))
+                     {
+                        $outputAppend | Add-Member -NotePropertyName Traffic_gb -NotePropertyValue ([math]::round(($item.rx_bytes + $item.tx_bytes) / 1GB, 2))
+
+                        if ((([math]::round(($item.rx_bytes + $item.tx_bytes) / 1TB, 2)) -ne '0.0') -or (([math]::round(($item.rx_bytes + $item.tx_bytes) / 1TB, 2)) -ne '0.00'))
+                        {
+                           $outputAppend | Add-Member -NotePropertyName Traffic_tb -NotePropertyValue ([math]::round(($item.rx_bytes + $item.tx_bytes) / 1TB, 2))
+                        }
+                     }
+                  }
+               }
+            }
+            #endregion Traffic
+
+            #region Signal
+            if ($item.signal)
+            {
+               $outputAppend | Add-Member -NotePropertyName Signal -NotePropertyValue ([math]::Truncate($item.signal))
+               $outputAppend | Add-Member -NotePropertyName Signal_plain -NotePropertyValue $item.signal
+            }
+            #endregion Signal
+
             # Sppend to the output
             $output += $outputAppend
 

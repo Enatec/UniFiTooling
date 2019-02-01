@@ -22,9 +22,43 @@ Get-Unifi5minutesClientStats [[-UnifiSite] <String>] [-Mac] <String> [[-Start] <
 
 ## DESCRIPTION
 Get user/client statistics in 5 minute segments for a given client
-For convenience, we return the TX/RX traffic in bytes (as the UniFi does it) and Megabytes.
-We return a summed traffic (based on the combined TX and RX traffic) in Megabytes.
-We also return real timestamps instead of the unix timestaps that the UniFi returns
+
+For convenience, we return the a bit more then the API, e.g.
+everything in KB, MB, GB, and TB instead of just bytes
+We also return real timestamps instead of the unix timestaps in miliseconds that the UniFi returns
+
+Sample output:
+Time          : 2/1/2019 3:45:00 PM
+rx_bytes      : 105.0
+rx_kb         : 0.10
+rx_mb         : 0.00
+rx_gb         : 0.00
+rx_tb         : 0.00
+rx_rate       : 650000.0
+rx_rate_mbps  : 634.77
+rx_retries    : 0
+rx_packets    : 2.5
+tx_bytes      : 213.0
+tx_kb         : 0.21
+tx_mb         : 0.00
+tx_gb         : 0.00
+tx_tb         : 0.00
+tx_rate       : 650000.0
+tx_rate_mbps  : 634.77
+tx_retries    : 1
+tx_packets    : 4.5
+Traffic_bytes : 318
+Traffic_kb    : 0.31
+Traffic_mb    : 0.00
+Traffic_gb    : 0.00
+Traffic_tb    : 0.00
+Signal        : -65
+Signal_plain  : -65.0
+
+In reality, we filter out all 0.00 values (e.g.
+tx_mb above)
+You can Filter for whatever parameter you like (e.g.
+with Select-Object)
 
 ## EXAMPLES
 
@@ -55,6 +89,13 @@ Get user/client statistics in 5 minute segments for a given (78:8a:20:59:e6:88) 
 ```
 
 Get user/client statistics in 5 minute segments for a given (78:8a:20:59:e6:88) user/client in the site 'contoso'
+
+### EXAMPLE 5
+```
+Get-Unifi5minutesClientStats -Mac '78:8a:20:59:e6:88' -Attributes 'rx_bytes', 'tx_bytes', 'signal', 'rx_rate', 'tx_rate', 'rx_retries', 'tx_retries', 'rx_packets', 'tx_packets')
+```
+
+Get all Values from the API
 
 ## PARAMETERS
 
@@ -147,14 +188,6 @@ Defaults to the past 12 hours.
 Make sure that the retention policy for 5 minutes stats is set to the correct value in the controller settings
 Ubiquiti announced this with the Controller version 5.8 - It will not work on older versions!
 Make sure that "Clients Historical Data" (Collect clients' historical data) has been enabled in the UniFi controller in "Settings/Maintenance"
-
-Sample Output:
-rx_bytes : 18384.0
-rx_mb    : 0.02
-tx_bytes : 30438.559999999998
-tx_mb    : 0.03
-Traffic  : 0.05
-time     : 2/1/2019 1:15:00 AM
 
 ## RELATED LINKS
 

@@ -128,6 +128,9 @@ PrivateData = @{
         # ReleaseNotes of this module
         ReleaseNotes = '
 ### Added
+- Get-UnifiDailyClientStats - Get daily user/client statistics for a given user/client
+- Get-UnifiHourlyClientStats - Get hourly user/client statistics for a given user/client
+- Get-Unifi5minutesClientStats - Get user/client statistics in 5 minute segments for a given client
 - Get-UnifiDailyApStats - Get daily stats for all or just one access points in a given UniFi site
 - Get-UnifiHourlyApStats - Get hourly stats for all or just one access points in a given UniFi site
 - Get-Unifi5minutesApStats - Get the stats in 5 minute segments for all or just one access points in a given UniFi site
