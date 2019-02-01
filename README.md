@@ -12,7 +12,7 @@ You will find some demo use cases within the [UseCases](https://github.com/Enate
 
 ### Version
 
-This document is based on UniFiTooling version 1.0.11
+This document is based on UniFiTooling version 1.1.0 - Unreleased
 
 ### Status
 
