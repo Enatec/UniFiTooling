@@ -22,6 +22,8 @@ Get-UnifiDailyApStats [[-UnifiSite] <String>] [[-Mac] <String>] [[-Start] <Strin
 
 ## DESCRIPTION
 Get daily stats for all or just one access points in a given UniFi site
+For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).
+We also return real timestamps instead of the unix timestaps that the UniFi returns
 
 ## EXAMPLES
 

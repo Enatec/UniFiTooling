@@ -39,7 +39,7 @@ Method to fetch speed test results
 Method to fetch speed test results
 
 ### [Get-UnifiDailyApStats](Get-UnifiDailyApStats.md)
-Daily stats method for a single access point or all access points
+Get daily stats Access Point stats
 
 ### [Get-UnifiDailyClientStats](Get-UnifiDailyClientStats.md)
 Daily stats method for a single access point or all access points

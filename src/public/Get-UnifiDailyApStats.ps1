@@ -6,6 +6,8 @@
 
          .DESCRIPTION
          Get daily stats for all or just one access points in a given UniFi site
+         For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).
+         We also return real timestamps instead of the unix timestaps that the UniFi returns
 
          .PARAMETER UnifiSite
          ID of the client-device to be modified

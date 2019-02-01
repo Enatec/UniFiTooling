@@ -6,6 +6,8 @@
 
          .DESCRIPTION
          Get the stats in 5 minute segments for all or just one access points in a given UniFi site
+         For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).
+         We also return real timestamps instead of the unix timestaps that the UniFi returns
 
          .PARAMETER UnifiSite
          ID of the client-device to be modified
@@ -40,9 +42,9 @@
          Get the statistics for the last 60 minutes (was the timestamp while the sample was created)
 
          .EXAMPLE
-         PS C:\> Get-Unifi5minutesApStats -UnifiSite 'contoso' | Where-Object { ($_.ConnectedClients -ne '0') -and ($_.Traffic -ne '0.00') }
+         PS C:\> Get-Unifi5minutesApStats -UnifiSite 'contoso' | Where-Object { $_.Traffic -ne '0.00' }
 
-         Get the stats in 5 minute segments for all access points in the site 'contoso', results are filtered and display only if clients are connected and traffic is generated.
+         Get the stats in 5 minute segments for all access points in the site 'contoso', if traffic is generated.
 
          .EXAMPLE
          PS C:\> (Get-Unifi5minutesApStats -UnifiSite 'contoso')[-1]
@@ -288,6 +290,7 @@
 
          #region Request
          Write-Verbose -Message 'Send the Request'
+
          $paramInvokeRestMethod = @{
             Method        = 'Post'
             Uri           = $ApiRequestUri

@@ -22,6 +22,8 @@ Get-Unifi5minutesApStats [[-UnifiSite] <String>] [[-Mac] <String>] [[-Start] <St
 
 ## DESCRIPTION
 Get the stats in 5 minute segments for all or just one access points in a given UniFi site
+For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).
+We also return real timestamps instead of the unix timestaps that the UniFi returns
 
 ## EXAMPLES
 
@@ -55,10 +57,10 @@ Get the statistics for the last 60 minutes (was the timestamp while the sample w
 
 ### EXAMPLE 5
 ```
-Get-Unifi5minutesApStats -UnifiSite 'contoso' | Where-Object { ($_.ConnectedClients -ne '0') -and ($_.Traffic -ne '0.00') }
+Get-Unifi5minutesApStats -UnifiSite 'contoso' | Where-Object { $_.Traffic -ne '0.00' }
 ```
 
-Get the stats in 5 minute segments for all access points in the site 'contoso', results are filtered and display only if clients are connected and traffic is generated.
+Get the stats in 5 minute segments for all access points in the site 'contoso', if traffic is generated.
 
 ### EXAMPLE 6
 ```
