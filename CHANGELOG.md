@@ -6,6 +6,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [1.0.11] - 2019-02-01
+### Added
 - `Get-UnifiHourlySiteStats` - Get horly statistics for a complete UniFi Site
 - `Get-UnifiDailySiteStats` - Get daily statistics for a complete UniFi Site
 - `Get-Unifi5minutesSiteStats` - Get statistics in 5 minute segments for a complete UniFi Site
@@ -35,8 +48,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Invoke-UnifiAuthorizeGuest` now use `ConvertTo-UniFiValidMacAddress` to check and make sure we have the right format
 - `Get-CallerPreference` - Implemented private meta function usage to all (public/private) functions
 
-### Deprecated
-
 ### Removed
 - `Get-HostsFile` should never be a part of this module. I just use them for some internal tests.
 - `Add-HostsEntry` should never be a part of this module. I just use them for some internal tests.
@@ -44,8 +55,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Fixed the `Get-CallerPreference` usage
-
-### Security
 
 ## [1.0.10] - 2019-01-23
 ### Deprecated
@@ -199,7 +208,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Invoke-UBNTApiRequest` - Universal Invoke-RestMethod wrapper, tweaked for UBNT Equipment
 - `Invoke-UBNTApiLogin` - With harcoded credentials and Controller info
 
-[Unreleased]: https://github.com/Enatec/UniFiTooling/compare/v1.0.10..HEAD
+[Unreleased]: https://github.com/Enatec/UniFiTooling/compare/v1.0.11..HEAD
+[1.0.11]: https://github.com/Enatec/UniFiTooling/compare/v1.0.10..v1.0.11
 [1.0.10]: https://github.com/Enatec/UniFiTooling/compare/v1.0.9..v1.0.10
 [1.0.9]: https://github.com/Enatec/UniFiTooling/compare/v1.0.8..v1.0.9
 [1.0.8]: https://github.com/Enatec/UniFiTooling/compare/v1.0.7..v1.0.8

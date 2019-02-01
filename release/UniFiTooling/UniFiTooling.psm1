@@ -13373,6 +13373,47 @@ function Set-UnifiNetworkDetails
 
 #region CHANGELOG
 <#
+      Version: 1.0.11 - 2019-02-01
+
+      Added
+      - Get-UnifiHourlySiteStats - Get horly statistics for a complete UniFi Site
+      - Get-UnifiDailySiteStats - Get daily statistics for a complete UniFi Site
+      - Get-Unifi5minutesSiteStats - Get statistics in 5 minute segments for a complete UniFi Site
+      - Get-Unifi5minutesGatewayStats - Get statistics in 5 minute segments for the USG (UniFi Secure Gateway)
+      - Get-UnifiHourlyGatewayStats - Get hourly statistics for the USG (UniFi Secure Gateway)
+      - Get-UnifiDailyGatewayStats - Get daily statistics for the USG (UniFi Secure Gateway)
+      - Get-UnifiDailyClientStats - Get daily user/client statistics for a given user/client
+      - Get-UnifiHourlyClientStats - Get hourly user/client statistics for a given user/client
+      - Get-Unifi5minutesClientStats - Get user/client statistics in 5 minute segments for a given client
+      - Get-UnifiDailyApStats - Get daily stats for all or just one access points in a given UniFi site
+      - Get-UnifiHourlyApStats - Get hourly stats for all or just one access points in a given UniFi site
+      - Get-Unifi5minutesApStats - Get the stats in 5 minute segments for all or just one access points in a given UniFi site
+      - ConvertTo-UniFiValidMacAddress - Helper to check and make sure we have the right format (private function)
+      - Get-CallerPreference - Add private meta function
+      - CODEOWNERS - Add GitHub code owners feature file
+      - Set-UnifiClientDeviceNote - Add/modify/remove a client-device note
+      - Set-UnifiClientDeviceName - Add/modify/remove a client device name
+      - New-UnifiClientDevice - Create a new user/client-device (unfinished beta)
+      
+      Changed
+      - New-UnifiClientDevice now use ConvertTo-UniFiValidMacAddress to check and make sure we have the right format
+      - Invoke-UnifiUnblockClient now use ConvertTo-UniFiValidMacAddress to check and make sure we have the right format
+      - Invoke-UnifiUnauthorizeGuest now use ConvertTo-UniFiValidMacAddress to check and make sure we have the right format
+      - Invoke-UnifiReconnectClient now use ConvertTo-UniFiValidMacAddress to check and make sure we have the right format
+      - Invoke-UnifiForgetClient now use ConvertTo-UniFiValidMacAddress to check and make sure we have the right format
+      - Invoke-UnifiBlockClient now use ConvertTo-UniFiValidMacAddress to check and make sure we have the right format
+      - Invoke-UnifiAuthorizeGuest now use ConvertTo-UniFiValidMacAddress to check and make sure we have the right format
+      - Get-CallerPreference - Implemented private meta function usage to all (public/private) functions
+      
+      Removed
+      - Get-HostsFile should never be a part of this module. I just use them for some internal tests.
+      - Add-HostsEntry should never be a part of this module. I just use them for some internal tests.
+      - Get-HostsFile should never be a part of this module. I just use them for some internal tests.
+      
+      Fixed
+      - Fixed the Get-CallerPreference usage
+      
+      
       Version: 1.0.10 - 2019-01-23
 
       Deprecated
