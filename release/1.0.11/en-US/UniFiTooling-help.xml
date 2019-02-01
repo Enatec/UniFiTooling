@@ -438,11 +438,16 @@
       <command:verb>Get</command:verb>
       <command:noun>Unifi5minutesGatewayStats</command:noun>
       <maml:description>
-        <maml:para>5 minutes stats method for a single user/client device</maml:para>
+        <maml:para>Get user/client statistics in 5 minute segments for the USG</maml:para>
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>5 minutes stats method for a single user/client device</maml:para>
+      <maml:para>Get user/client statistics in 5 minute segments for the USG (UniFi Secure Gateway)</maml:para>
+      <maml:para>For convenience, we return the a bit more then the API, e.g. everything in KB, MB, GB, and TB instead of just bytes We also return real timestamps instead of the unix timestaps in miliseconds that the UniFi returns</maml:para>
+      <maml:para>Sample output: Time           : 2/1/2019 6:20:00 PM gateway        : 78:8a:20:59:e6:88 mem2           : 33.00 cpu            : 0.13 lan-rx_errors  : 0 lan-rx_bytes   : 1373037.08 lan-rx_kb      : 1340.86 lan-rx_mb      : 1.31 lan-rx_packets : 8410.58 lan-rx_dropped : 0 wan-rx_errors  : 0 wan-rx_packets : 1413.88 wan-rx_dropped : 0 lan-tx_errors  : 0 lan-tx_bytes   : 1908328.2 lan-tx_kb      : 1863.60 lan-tx_mb      : 1.82 lan-tx_packets : 8597.439999999999 lan-tx_dropped : 0 wan-tx_errors  : 0 wan-tx_bytes   : 391328.44 wan-tx_kb      : 382.16 wan-tx_mb      : 0.37 wan-tx_packets : 979.14 wan-tx_dropped : 0</maml:para>
+      <maml:para>You might filter out all the 0 values, we keep them to prevent any null pointer expetions!</maml:para>
+      <maml:para>You can Filter for whatever parameter you like (e.g. with Select-Object)</maml:para>
+      <maml:para>BUG: The loadavg_ attributes are not working at the moment. The UniFi SDN Controller does not return any values for them!</maml:para>
     </maml:description>
     <command:syntax>
       <command:syntaxItem>
@@ -479,6 +484,18 @@
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
             <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="4" aliases="attribs, UniFiAttributes">
+          <maml:name>Attributes</maml:name>
+          <maml:Description>
+            <maml:para>array containing attributes (strings) to be returned, defaults to mem, cpu, and zime (Time is mandatory)</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <dev:type>
+            <maml:name>String[]</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -522,12 +539,34 @@
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="4" aliases="attribs, UniFiAttributes">
+        <maml:name>Attributes</maml:name>
+        <maml:Description>
+          <maml:para>array containing attributes (strings) to be returned, defaults to mem, cpu, and zime (Time is mandatory)</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <dev:type>
+          <maml:name>String[]</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
     </command:parameters>
     <command:inputTypes />
-    <command:returnValues />
+    <command:returnValues>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>System.Management.Automation.PSObject</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+    </command:returnValues>
     <maml:alertSet>
       <maml:alert>
-        <maml:para>Defaults to the past 12 hours. Make sure that the retention policy for 5 minutes stats is set to the correct value in the controller settings TODO: Add missing MAC Parameter TODO: Add missing attribs Parameter</maml:para>
+        <maml:para>Defaults to the past 12 hours. Make sure that the retention policy for 5 minutes stats is set to the correct value in the controller settings Ubiquiti announced this with the Controller version 5.8 - It will not work on older versions!</maml:para>
+        <maml:para>A USG (UniFi Secure Gateway) is required on the site you querry!</maml:para>
       </maml:alert>
     </maml:alertSet>
     <command:examples>
@@ -535,7 +574,35 @@
         <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
         <dev:code>Get-Unifi5minutesGatewayStats</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>Get user/client statistics in 5 minute segments for the USG (UniFi Secure Gateway) in the default site</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 2 --------------------------</maml:title>
+        <dev:code>(Get-Unifi5minutesGatewayStats -Start '1548971935421' -End '1548975579019')</dev:code>
+        <dev:remarks>
+          <maml:para>Get user/client statistics in 5 minute segments for the USG (UniFi Secure Gateway) in the default site for a given time period.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 3 --------------------------</maml:title>
+        <dev:code>(Get-Unifi5minutesGatewayStats -Start '1548980058135')</dev:code>
+        <dev:remarks>
+          <maml:para>Get user/client statistics in 5 minute segments for the USG (UniFi Secure Gateway) in the default site for the last 60 minutes (was the timestamp while the sample was created)</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 4 --------------------------</maml:title>
+        <dev:code>(Get-Unifi5minutesGatewayStats -UnifiSite 'contoso')[-1]</dev:code>
+        <dev:remarks>
+          <maml:para>Get user/client statistics in 5 minute segments for the USG (UniFi Secure Gateway) in the site 'contoso'</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 5 --------------------------</maml:title>
+        <dev:code>Get-Unifi5minutesGatewayStats -Attributes 'mem','cpu','loadavg_5','lan-rx_errors','wan-rx_errors','lan-tx_errors','wan-tx_errors','lan-rx_bytes','wan-rx_bytes','lan-tx_bytes','wan-tx_bytes','lan-rx_packets','wan-rx_packets','lan-tx_packets','wan-tx_packets','lan-rx_dropped','wan-rx_dropped','lan-tx_dropped','wan-tx_dropped')</dev:code>
+        <dev:remarks>
+          <maml:para>Get all Values from the API</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>
@@ -558,6 +625,14 @@
       </maml:navigationLink>
       <maml:navigationLink>
         <maml:linkText>Invoke-RestMethod</maml:linkText>
+        <maml:uri></maml:uri>
+      </maml:navigationLink>
+      <maml:navigationLink>
+        <maml:linkText>ConvertFrom-UnixTimeStamp</maml:linkText>
+        <maml:uri></maml:uri>
+      </maml:navigationLink>
+      <maml:navigationLink>
+        <maml:linkText>ConvertTo-UnixTimeStamp</maml:linkText>
         <maml:uri></maml:uri>
       </maml:navigationLink>
     </command:relatedLinks>

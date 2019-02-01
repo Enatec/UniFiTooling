@@ -18,7 +18,7 @@ Get Access Point stats in 5 minute segments
 Get user/client statistics in 5 minute segments
 
 ### [Get-Unifi5minutesGatewayStats](Get-Unifi5minutesGatewayStats.md)
-5 minutes stats method for a single user/client device
+Get user/client statistics in 5 minute segments for the USG
 
 ### [Get-Unifi5minutesSiteStats](Get-Unifi5minutesSiteStats.md)
 5 minutes site stats method, defaults to the past 12 hours
