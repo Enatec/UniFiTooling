@@ -68,9 +68,9 @@
     },
     "tasks": [
         {
-            "label": "Clean",
+            "label": "CompareModuleVersions",
             "type": "shell",
-            "command": "${cwd}/../build.ps1 -Project 'UniFiTooling' -Task 'Clean'",
+            "command": "${cwd}/../etBuildTooling.ps1 -Project 'UniFiTooling' -Task 'CompareModuleVersions'",
             "presentation": {
                 "reveal": "never",
                 "panel": "shared",
@@ -81,7 +81,7 @@
         {
             "label": "Build",
             "type": "shell",
-            "command": "${cwd}/../build.ps1  -Project 'UniFiTooling' -Task 'Build'",
+            "command": "${cwd}/../etBuildTooling.ps1  -Project 'UniFiTooling' -Task 'Build'",
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -94,9 +94,9 @@
             }
         },
         {
-            "label": "Test",
+            "label": "UpdateModuleHelpFiles",
             "type": "shell",
-            "command": "${cwd}/../build.ps1 -Project 'UniFiTooling' -Task 'Build 'Test'",
+            "command": "${cwd}/../etBuildTooling.ps1 -Project 'UniFiTooling' -Task 'Build 'UpdateModuleHelpFiles'",
             "group": {
                 "kind": "test",
                 "isDefault": true
@@ -112,9 +112,9 @@
             ]
         },
         {
-            "label": "Publish",
+            "label": "NewModuleManifestFromJson",
             "type": "shell",
-            "command": "${cwd}/../build.ps1 -Project 'UniFiTooling' -Task 'Publish'",
+            "command": "${cwd}/../etBuildTooling.ps1 -Project 'UniFiTooling' -Task 'NewModuleManifestFromJson'",
             "presentation": {
                 "reveal": "silent",
                 "panel": "shared",
@@ -123,9 +123,9 @@
             }
         },
         {
-            "label": "Release",
+            "label": "NuGetApiUpload",
             "type": "shell",
-            "command": "${cwd}/../build.ps1 -Project 'UniFiTooling' -Task 'Release'",
+            "command": "${cwd}/../etBuildTooling.ps1 -Project 'UniFiTooling' -Task 'NuGetApiUpload'",
             "presentation": {
                 "reveal": "silent",
                 "panel": "shared",

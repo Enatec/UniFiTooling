@@ -1,19 +1,100 @@
 {
-   //-------- Files configuration --------
-   // When enabled, will trim trailing whitespace when you save a file.
+   // No Telemetry
+   "telemetry.enableTelemetry": false,
+   "telemetry.enableCrashReporter": false,
+   "rest-client.enableTelemetry": false,
+   "gitlens.advanced.telemetry.enabled": false,
+   "code-runner.enableAppInsights": false,
+   // Files
    "files.trimTrailingWhitespace": true,
-   "search.exclude": {
-      "release": true,
-      "": true
+   "files.exclude": {
+      "**/.git": true,
+      "**/.svn": true,
+      "**/.hg": true,
+      "**/.DS_Store": true
    },
-   //-------- PowerShell Configuration --------
-   // Use a custom PowerShell Script Analyzer settings file for this workspace.
-   // Relative paths for this setting are always relative to the workspace root dir.
+   "files.encoding": "utf8",
+   "files.eol": "\n",
+   "files.autoSave": "off",
+   "files.autoSaveDelay": 1000,
+   "files.watcherExclude": {
+      "**/.git/objects/**": true,
+      "**/node_modules/**": true
+   },
+   // Windows Settings
+   "window.nativeTabs": true,
+   "window.zoomLevel": 0,
+   // Misc Settings
+   "problems.autoReveal": true,
+   "vsicons.dontShowNewVersionMessage": true,
+   "guides.enabled": false,
+   "explorer.enableDragAndDrop": true,
+   // terminal settings
+   "terminal.integrated.commandsToSkipShell": [
+      "editor.action.toggleTabFocusMode",
+      "workbench.action.quickOpen",
+      "workbench.action.showCommands",
+      "workbench.action.terminal.copySelection",
+      "workbench.action.terminal.focus",
+      "workbench.action.terminal.focusNext",
+      "workbench.action.terminal.focusPrevious",
+      "workbench.action.terminal.kill",
+      "workbench.action.terminal.new",
+      "workbench.action.terminal.paste",
+      "workbench.action.terminal.runSelectedText",
+      "workbench.action.terminal.scrollDown",
+      "workbench.action.terminal.scrollUp",
+      "workbench.action.terminal.toggleTerminal"
+   ],
+   // VSCode Files settings
+   "files.hotExit": "onExit",
+   "files.defaultLanguage": "powershell",
+   // Markdown settings
+   "markdown.extension.toc.levels": "6",
+   "markdown.extension.toc.updateOnSave": true,
+   "markdown.extension.toc.githubCompatibility": true,
+   // Markdown TOC
+   "markdown-toc.anchorMode": "github.com",
+   "markdown-toc.depthTo": 6,
+   "markdown-toc.updateOnSave": true,
+   "markdown-toc.withLinks": true,
+   // Trailing Spaces
+   "trailing-spaces.highlightCurrentLine": true,
+   "trailing-spaces.includeEmptyLines": true,
+   "trailing-spaces.saveAfterTrim": false,
+   "trailing-spaces.trimOnSave": false,
+   "trailing-spaces.syntaxIgnore": [
+      "markdown"
+   ],
+   // Path Intellisense
+   "path-intellisense.extensionOnImport": true,
+   "path-intellisense.showHiddenFiles": true,
+   "path-intellisense.absolutePathToWorkspace": false,
+   // PowerShell Settings
+   "powershell.codeFolding.enable": true,
+   "powershell.codeFormatting.alignPropertyValuePairs": true,
+   "powershell.codeFormatting.ignoreOneLineBlock": false,
+   "powershell.codeFormatting.openBraceOnSameLine": false,
+   "powershell.codeFormatting.whitespaceBeforeOpenBrace": true,
+   "powershell.codeFormatting.preset": "Allman",
+   "powershell.helpCompletion": "BlockComment",
+   "powershell.scriptAnalysis.enable": true,
    "powershell.scriptAnalysis.settingsPath": "ScriptAnalyzerSettings.psd1",
-   // TNo focus on console when executing
-   "powershell.integratedConsole.focusConsoleOnExecute": false,
-   // Don't start integrated console on startup
-   "powershell.integratedConsole.showOnStartup": false,
-   // Assume files are PowerShell by default
-   "files.defaultLanguage": "powershell"
+   "powershell.codeFormatting.newLineAfterCloseBrace": true,
+   "powershell.codeFormatting.newLineAfterOpenBrace": true,
+   "powershell.codeFormatting.whitespaceAfterSeparator": true,
+   "powershell.codeFormatting.whitespaceAroundOperator": true,
+   "powershell.codeFormatting.whitespaceBeforeOpenParen": true,
+   // Git Settings
+   "git.enabled": true,
+   "git.path": null,
+   "git.autorefresh": true,
+   "git.autofetch": true,
+   "git.confirmSync": false,
+   "git.countBadge": "all",
+   "git.autoRepositoryDetection": true,
+   "git.decorations.enabled": true,
+   "git.enableSmartCommit": true,
+   // JSON
+   "json.format.enable": true,
 }
