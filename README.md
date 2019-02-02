@@ -2,9 +2,8 @@
 
 This is an beta version for an PowerShell Module for the Ubiquiti [UBNT SDN Controller API](https://unifi-sdn.ui.com/).
 
-I started this module as an internal helper for many automated updates for my UniFi Security Gateway Firewall Rules and do a few other things (automated). I migrated everything into a regular module and published it as open source after using it for a while.
-
-I plan to release versions that cover more and more functions. However, I need to refactor and document the code before doing so.
+It was started this module as an internal helper for many automated updates for UniFi Security Gateway Firewall Rules and do a few other things (automated).
+We migrated everything into a regular module and published it as open source after using it for a while.
 
 ### Use Cases
 
@@ -145,7 +144,7 @@ Please read our [Contribution Guide](https://github.com/Enatec/UniFiTooling/blob
 
 ### Note
 
-Early beta version, use at your own risk! Not ready for showtime (production) yet...
+Still an early stage. This is not a finished product but it's generally working
 
 ### Config
 
@@ -195,9 +194,13 @@ The Ubiquiti UniFi Controller you want to use. You can use a Fully-Qualified Hos
 
 The port number that you have configured on your Ubiquiti UniFi Controller.
 
+### Roadmap
+
+We have an public [Roadmap](https://github.com/Enatec/UniFiTooling/wiki/ROADMAP) published.
+
 ### Authors
 
-Joerg Hochwald - [http://hochwald.net](http://hochwald.net)
+Joerg Hochwald - [http://hochwald.net](http://jhochwald.com)
 
 ### Contributors
 

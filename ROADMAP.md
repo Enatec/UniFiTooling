@@ -1,6 +1,8 @@
 # Roadmap
 
-This is our release planning document. Everything is subject to change anytime.
+This is our public release planning document.
+
+Everything is subject to change anytime.
 
 ## 1.1.0 - Maintenance (started)
 
@@ -20,14 +22,23 @@ We want to update a few things within the documentation and refactor a bit of th
 ### Work in progress
 
 `Get-UnifiAllConnectedClients` - Get all connected Clients
+
 `Get-UnifiAllGuests` - Get all connected Guests
+
 `Get-UnifiAuthorizations`
+
 `Get-UnifiClientDetails`
+
 `Get-UnifiClientLogins`
+
 `Get-UnifiLoginSessions`
+
 `Set-UnifiClientDeviceName` - Add/change/remove a client device name
+
 `Set-UnifiClientDeviceNote` - Add/change/remove a client-device note
+
 `Set-UniFiClientGroup` - Assign client device to another group
+
 `Set-UniFiClientIpAddress` - Update client fixed ip
 
 ## Other planned features
@@ -35,6 +46,8 @@ We want to update a few things within the documentation and refactor a bit of th
 The following features are planned but not part of a release planning yet!
 
 ### More Use Cases
+
+We use an internal function that creates Guest vouchers for upcoming meetings from within Microsoft Teams. We plan to make this available as generic use case soon.
 
 We would like to add more generic use cases.
 
