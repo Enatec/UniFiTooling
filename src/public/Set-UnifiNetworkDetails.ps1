@@ -2,10 +2,10 @@
 {
    <#
          .SYNOPSIS
-         Modifies one network via the API of the UniFi Controller
+         It modifies a given network via the API of the UniFi Controller.
 
          .DESCRIPTION
-         Modifies one network via the API of the UniFi Controller
+         It modifies a given network via the via Ubiquiti (UBNT) UniFi RESTful API of the UniFi SDN Controller.
 
          .PARAMETER UnifiNetwork
          The ID (network_id) of the network you would like to get detailed information about.
@@ -76,9 +76,6 @@
    begin
    {
       Write-Verbose -Message 'Start Set-UnifiNetworkDetails'
-
-      # Call meta function
-      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
 
       # Cleanup
       $Session = $null
@@ -167,6 +164,9 @@
          break
       }
       #endregion ReCheckSession
+
+      # Call meta function
+      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
    }
 
    process

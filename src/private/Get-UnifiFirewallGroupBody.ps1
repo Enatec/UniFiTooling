@@ -2,10 +2,10 @@
 {
    <#
          .SYNOPSIS
-         Build a Body for Set-UnifiFirewallGroup call
+         It builds a request body for Set-UnifiFirewallGroup function
 
          .DESCRIPTION
-         Build a JSON based Body for Set-UnifiFirewallGroup call
+         It builds a JSON based request body for Set-UnifiFirewallGroup function
 
          .PARAMETER UnfiFirewallGroup
          Existing Unfi Firewall Group
@@ -19,10 +19,16 @@
          Build a Body for Set-UnifiFirewallGroup call
 
          .NOTES
-         This is an internal helper function only
+         This is an internal helper function, only to reduce the code duplication and maintenance within our other functions.
 
          . LINK
          Set-UnifiFirewallGroup
+
+         .LINK
+         Add-Member
+
+         .LINK
+         ConvertTo-Json
    #>
 
    [CmdletBinding(ConfirmImpact = 'None')]
@@ -53,13 +59,13 @@
    {
       Write-Verbose -Message 'Start Get-UnifiFirewallGroupBody'
 
-      # Call meta function
-      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
-
       Write-Verbose -Message 'Cleanup exitsing Group'
       Write-Verbose -Message "Old Values: $UnfiFirewallGroup.group_members"
 
       $UnfiFirewallGroup.group_members = $null
+
+      # Call meta function
+      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
    }
 
    process

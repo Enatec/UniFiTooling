@@ -11,7 +11,7 @@ schema: 2.0.0
 # Invoke-UnifiUnblockClient
 
 ## SYNOPSIS
-Unblock a client device via the API of the UniFi Controller
+It unblocks a given user/client via API on the UniFi SDN Controller.
 
 ## SYNTAX
 
@@ -20,7 +20,7 @@ Invoke-UnifiUnblockClient [[-UnifiSite] <String>] [-Mac] <String> [<CommonParame
 ```
 
 ## DESCRIPTION
-Unblock a client device via the API of the Ubiquiti UniFi Controller
+It unblocks a given user/client via via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
 ## EXAMPLES
 

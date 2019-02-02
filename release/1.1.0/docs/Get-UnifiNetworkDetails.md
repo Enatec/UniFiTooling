@@ -11,7 +11,7 @@ schema: 2.0.0
 # Get-UnifiNetworkDetails
 
 ## SYNOPSIS
-Get the details about one network via the API of the UniFi Controller
+Get the details about a given network via API on the UniFi SDN Controller.
 
 ## SYNTAX
 
@@ -26,7 +26,7 @@ Get-UnifiNetworkDetails [-Name] <String[]> [[-UnifiSite] <String>] [<CommonParam
 ```
 
 ## DESCRIPTION
-Get the details about one network via the API of the UniFi Controller
+Get the details about a given network via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
 ## EXAMPLES
 

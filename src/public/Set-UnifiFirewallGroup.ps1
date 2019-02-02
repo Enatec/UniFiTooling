@@ -2,10 +2,10 @@
 {
    <#
          .SYNOPSIS
-         Get a given Firewall Group via the API of the UniFi Controller
+         Get information about a given Firewall Group via API of the UniFi SDN Controller.
 
          .DESCRIPTION
-         Get a given Firewall Group via the API of the Ubiquiti UniFi Controller
+         Get information about a given Firewall Group via Ubiquiti (UBNT) UniFi RESTful API of the UniFi SDN Controller.
 
          .PARAMETER UnfiFirewallGroup
          Unfi Firewall Group

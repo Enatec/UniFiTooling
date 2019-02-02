@@ -30,7 +30,7 @@ CompanyName = 'enabling Technology'
 Copyright = '(c) 2019 by enabling Technology. All rights reserved.'
 
 # Description of the functionality provided by this module
-Description = 'Ubiquiti (UBNT) UniFi Security Gateway automation via the API of the Ubiquiti UniFi Controller'
+Description = 'PowerShell Module to configure, manage, and automate Ubiquiti (UBNT) UniFi [SDN Controller API](https://unifi-sdn.ui.com/) processes.'
 
 # Minimum version of the Windows PowerShell engine required by this module
 PowerShellVersion = '5.1'

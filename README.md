@@ -1,6 +1,8 @@
 # UniFiTooling
 
-This is an beta version for an PowerShell Module for the Ubiquiti [UBNT SDN Controller API](https://unifi-sdn.ui.com/).
+PowerShell Module to configure, manage, and automate Ubiquiti (UBNT) UniFi [SDN Controller](https://unifi-sdn.ui.com/) API processes.
+
+It supports all the main features to configure, manage, and automate the UBNT Access Points, the Secure Gateway (USG), and a lot of other features around the [SDN Controller](https://unifi-sdn.ui.com/). It also supports the Management of Users/Clients and Guests.
 
 It was started this module as an internal helper for many automated updates for UniFi Security Gateway Firewall Rules and do a few other things (automated).
 We migrated everything into a regular module and published it as open source after using it for a while.

@@ -2,10 +2,10 @@
 {
    <#
          .SYNOPSIS
-         Get the UniFi Security Gateway (USG) Speed Test results
+         Get USG speed test results via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         Get the UniFi Security Gateway (USG) Speed Test results
+         Get UniFi Secure Gateway (USG) speed test results via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
          .PARAMETER Timeframe
          Timeframe in hours, default is 24
@@ -67,7 +67,10 @@
 
          .NOTES
          Initial version that makes it more human readable.
-         The filetring needs a few more tests
+
+         The filetring needs a few more tests.
+
+         A UniFi Secure Gateway (USG) is required in the UniFi site!
 
          .LINK
          Get-UniFiConfig

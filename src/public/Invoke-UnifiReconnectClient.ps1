@@ -2,10 +2,10 @@
 {
    <#
          .SYNOPSIS
-         Reconnect a client device via the API of the UniFi Controller
+         It reconnects a given user/client via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         Reconnect a client device via the API of the Ubiquiti UniFi Controller
+         It reconnects a given user/client via via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
          .PARAMETER UnifiSite
          UniFi Site as configured. The default is: default

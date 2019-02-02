@@ -2,12 +2,14 @@
 {
    <#
          .SYNOPSIS
-         Get hourly stats Access Point stats
+         Get hourly statistics for all or a given access point via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         Get hourly stats for all or just one access points in a given UniFi site
+         Get hourly statistics for all or a given access point via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
+
          For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).
-         We also return real timestamps instead of the unix timestaps that the UniFi returns
+
+         We also return real timestamps instead of the epoc/unix timestaps that the UniFi API returns.
 
          .PARAMETER UnifiSite
          ID of the client-device to be modified

@@ -11,7 +11,7 @@ schema: 2.0.0
 # New-UniFiConfig
 
 ## SYNOPSIS
-Creates the UniFi config JSON file
+It creates the JSON configuration file for the UniFiTooling Module.
 
 ## SYNTAX
 
@@ -22,8 +22,8 @@ New-UniFiConfig [[-UniFiUsername] <String>] [[-UniFiPassword] <String>] [[-UniFi
 ```
 
 ## DESCRIPTION
-Creates the UniFi config JSON file.
-If no input is given it creates one with all the defaults.
+It creates the JSON configuration file for the UniFiTooling PowerShell Module.
+If no input is given it creates one with all the default settings, and you should modify the file with you favorite editor.
 
 ## EXAMPLES
 

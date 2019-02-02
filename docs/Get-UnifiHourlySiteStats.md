@@ -11,7 +11,7 @@ schema: 2.0.0
 # Get-UnifiHourlySiteStats
 
 ## SYNOPSIS
-Get horly statistics for a complete Site
+Get hourly statistics for a complete UniFi Site via API on the UniFi SDN Controller.
 
 ## SYNTAX
 
@@ -21,12 +21,11 @@ Get-UnifiHourlySiteStats [[-UnifiSite] <String>] [[-Start] <String>] [[-End] <St
 ```
 
 ## DESCRIPTION
-Get horly statistics for a complete UniFi Site
+Get hourly statistics for a complete UniFi Site via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
-For convenience, we return the a bit more then the API, e.g.
-everything in KB, MB, GB, and TB instead of just bytes
+For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).
 
-We also return real timestamps instead of the unix timestaps in miliseconds that the UniFi returns
+We also return real timestamps instead of the epoc/unix timestaps that the UniFi API returns.
 
 Sample output:
 Time         : 1/28/2019 8:00:00 AM
@@ -62,28 +61,28 @@ with Select-Object)
 Get-UnifiHourlySiteStats
 ```
 
-Get horly statistics for a complete UniFi for the default site
+Get hourly statistics for a complete UniFi for the default site
 
 ### EXAMPLE 2
 ```
 (Get-UnifiHourlySiteStats -Start '1548971935421' -End '1548975579019')
 ```
 
-Get horly statistics for a complete UniFi for the default site for a given time period.
+Get hourly statistics for a complete UniFi for the default site for a given time period.
 
 ### EXAMPLE 3
 ```
 (Get-UnifiHourlySiteStats -Start '1548980058135')
 ```
 
-Get horly statistics for a complete UniFi for the default site for the last 60 minutes (was the timestamp while the sample was created)
+Get hourly statistics for a complete UniFi for the default site for the last 60 minutes (was the timestamp while the sample was created)
 
 ### EXAMPLE 4
 ```
 (Get-UnifiHourlySiteStats -UnifiSite 'contoso')[-1]
 ```
 
-Get horly statistics for a complete UniFi for the site 'contoso'
+Get hourly statistics for a complete UniFi for the site 'contoso'
 
 ### EXAMPLE 5
 ```

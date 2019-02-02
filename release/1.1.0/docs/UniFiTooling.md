@@ -12,90 +12,90 @@ Ubiquiti UniFi Security Gateway automation via the API of the Ubiquiti UniFi Con
 
 ## UniFiTooling Cmdlets
 ### [Get-Unifi5minutesApStats](Get-Unifi5minutesApStats.md)
-Get Access Point stats in 5 minute segments
+Get statistics in five-minute segments for all or a given access point via API on the UniFi SDN Controller.
 
 ### [Get-Unifi5minutesClientStats](Get-Unifi5minutesClientStats.md)
-Get user/client statistics in 5 minute segments
+Get statistics in five-minute segments for a given user/client via API on the UniFi SDN Controller.
 
 ### [Get-Unifi5minutesGatewayStats](Get-Unifi5minutesGatewayStats.md)
-Get statistics in 5 minute segments for the USG
+Get statistics in five-minute segments for a USG via API on the UniFi SDN Controller.
 
 ### [Get-Unifi5minutesSiteStats](Get-Unifi5minutesSiteStats.md)
-Get statistics in 5 minute segments for a complete Site
+Get statistics in five-minute segments for a complete Site via API on the UniFi SDN Controller.
 
 ### [Get-UnifiDailyApStats](Get-UnifiDailyApStats.md)
-Get daily stats Access Point stats
+Get daily statistics for all or a given access point via API on the UniFi SDN Controller.
 
 ### [Get-UnifiDailyClientStats](Get-UnifiDailyClientStats.md)
-Get daily user/client statistics for a given user/client
+Get daily statistics for a given user/client via API on the UniFi SDN Controller.
 
 ### [Get-UnifiDailyGatewayStats](Get-UnifiDailyGatewayStats.md)
-Get daily statistics for the USG
+Get daily statistics for a USG via API on the UniFi SDN Controller.
 
 ### [Get-UnifiDailySiteStats](Get-UnifiDailySiteStats.md)
-Get daily statistics for a complete Site
+Get daily statistics for a complete Site via API on the UniFi SDN Controller.
 
 ### [Get-UnifiFirewallGroupDetails](Get-UnifiFirewallGroupDetails.md)
-Get the details about one Firewall Group via the API of the UniFi Controller
+Get details about one given USG firewall groups via API on the UniFi SDN Controller.
 
 ### [Get-UnifiFirewallGroups](Get-UnifiFirewallGroups.md)
-Get a List Firewall Groups via the API of the UniFi Controller
+Get a list of configured USG firewall groups via API on the UniFi SDN Controller.
 
 ### [Get-UnifiHourlyApStats](Get-UnifiHourlyApStats.md)
-Get hourly stats Access Point stats
+Get hourly statistics for all or a given access point via API on the UniFi SDN Controller.
 
 ### [Get-UnifiHourlyClientStats](Get-UnifiHourlyClientStats.md)
-Get hourly user/client statistics for a given user/client
+Get hourly statistics for a given user/client via API on the UniFi SDN Controller.
 
 ### [Get-UnifiHourlyGatewayStats](Get-UnifiHourlyGatewayStats.md)
-Get hourly statistics for the USG
+Get hourly statistics for a USG via API on the UniFi SDN Controller.
 
 ### [Get-UnifiHourlySiteStats](Get-UnifiHourlySiteStats.md)
-Get horly statistics for a complete Site
+Get hourly statistics for a complete UniFi Site via API on the UniFi SDN Controller.
 
 ### [Get-UnifiNetworkDetails](Get-UnifiNetworkDetails.md)
-Get the details about one network via the API of the UniFi Controller
+Get the details about a given network via API on the UniFi SDN Controller.
 
 ### [Get-UnifiNetworkList](Get-UnifiNetworkList.md)
-Get a List Networks via the API of the UniFi Controller
+Get a list of configured networks via API on the UniFi SDN Controller.
 
 ### [Get-UnifiSpeedTestResult](Get-UnifiSpeedTestResult.md)
-Get the UniFi Security Gateway (USG) Speed Test results
+Get USG speed test results via API on the UniFi SDN Controller.
 
 ### [Invoke-UniFiApiLogin](Invoke-UniFiApiLogin.md)
-Login to API of the UniFi Controller
+It sends a login request via API on the UniFi SDN Controller.
 
 ### [Invoke-UniFiApiLogout](Invoke-UniFiApiLogout.md)
-Logout from the API of the UniFi Controller
+It sends a logout request via API on the UniFi SDN Controller.
 
 ### [Invoke-UnifiAuthorizeGuest](Invoke-UnifiAuthorizeGuest.md)
-Authorize a client device via the API of the UniFi Controller
+It authorizes a given user/client via API on the UniFi SDN Controller.
 
 ### [Invoke-UnifiBlockClient](Invoke-UnifiBlockClient.md)
-Block a client device via the API of the UniFi Controller
+It blocks a given user/client via API on the UniFi SDN Controller.
 
 ### [Invoke-UnifiForgetClient](Invoke-UnifiForgetClient.md)
-Forget one or more client devices via the API of the UniFi Controller
+It forgets one or more given users/clients via API on the UniFi SDN Controller.
 
 ### [Invoke-UnifiReconnectClient](Invoke-UnifiReconnectClient.md)
-Reconnect a client device via the API of the UniFi Controller
+It reconnects a given user/client via API on the UniFi SDN Controller.
 
 ### [Invoke-UnifiUnauthorizeGuest](Invoke-UnifiUnauthorizeGuest.md)
-Unauthorize a client device via the API of the UniFi Controller
+It uauthorizes a user/client via API on the UniFi SDN Controller.
 
 ### [Invoke-UnifiUnblockClient](Invoke-UnifiUnblockClient.md)
-Unblock a client device via the API of the UniFi Controller
+It unblocks a given user/client via API on the UniFi SDN Controller.
 
 ### [New-UnifiClientDevice](New-UnifiClientDevice.md)
-Create a new user/client-device via the API of the UniFi Controller
+It creates a new user/client via API on the UniFi SDN Controller.
 
 ### [New-UniFiConfig](New-UniFiConfig.md)
-Creates the UniFi config JSON file
+It creates the JSON configuration file for the UniFiTooling Module.
 
 ### [Set-UnifiFirewallGroup](Set-UnifiFirewallGroup.md)
-Get a given Firewall Group via the API of the UniFi Controller
+Get information about a given Firewall Group via API of the UniFi SDN Controller.
 
 ### [Set-UnifiNetworkDetails](Set-UnifiNetworkDetails.md)
-Modifies one network via the API of the UniFi Controller
+It modifies a given network via the API of the UniFi Controller.
 
 

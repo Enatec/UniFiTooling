@@ -2,10 +2,11 @@
 {
    <#
          .SYNOPSIS
-         IPv4 and IPv6 CIDR Workaround for UBNT USG Firewall Rules
+         These are a IPv4 and IPv6 CIDR Host route workarounds for UBNT USG firewall rules.
 
          .DESCRIPTION
-         IPv4 and IPv6 CIDR Workaround for UBNT USG Firewall Rules (Single IPv4 has to be without /32 OR single IPv6 has to be without /128)
+         These are a IPv4 and IPv6 CIDR Host route workarounds for Ubiquiti (UBNT) UniFi Secure Gateway (USG) firewall rules.
+         Single IPv4 has to be without /32 OR single IPv6 has to be without /128
 
          .PARAMETER CidrList
          Existing CIDR List Object
@@ -34,10 +35,10 @@
          IPv6 CIDR Workaround for UBNT USG Firewall Rules via Pipeline
 
          .NOTES
-         This is an internal helper function only (Will be moved to the private functions soon)
+         This is an internal helper function, only to reduce the code duplication and maintenance within our other functions.
 
          .LINK
-         https://github.com/jhochwald/UniFiTooling/issues/5
+         https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing
    #>
 
    [CmdletBinding(ConfirmImpact = 'None')]

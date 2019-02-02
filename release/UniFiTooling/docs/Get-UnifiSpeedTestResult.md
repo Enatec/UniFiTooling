@@ -11,7 +11,7 @@ schema: 2.0.0
 # Get-UnifiSpeedTestResult
 
 ## SYNOPSIS
-Get the UniFi Security Gateway (USG) Speed Test results
+Get USG speed test results via API on the UniFi SDN Controller.
 
 ## SYNTAX
 
@@ -28,7 +28,7 @@ Get-UnifiSpeedTestResult [[-StartDate] <DateTime>] [[-Timeframe] <Int32>] [[-Uni
 ```
 
 ## DESCRIPTION
-Get the UniFi Security Gateway (USG) Speed Test results
+Get UniFi Secure Gateway (USG) speed test results via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
 ## EXAMPLES
 
@@ -202,7 +202,10 @@ For more information, see about_CommonParameters (http://go.microsoft.com/fwlink
 ### System.Management.Automation.PSObject
 ## NOTES
 Initial version that makes it more human readable.
-The filetring needs a few more tests
+
+The filetring needs a few more tests.
+
+A UniFi Secure Gateway (USG) is required in the UniFi site!
 
 ## RELATED LINKS
 

@@ -2,10 +2,10 @@
 {
    <#
          .SYNOPSIS
-         Login to API of the UniFi Controller
+         It sends a login request via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         Login to API of the Ubiquiti UniFi Controller
+         It sends a login request via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
          .EXAMPLE
          PS C:\> Invoke-UniFiApiLogin

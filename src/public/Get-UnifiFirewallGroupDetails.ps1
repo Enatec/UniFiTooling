@@ -2,16 +2,16 @@
 {
    <#
          .SYNOPSIS
-         Get the details about one Firewall Group via the API of the UniFi Controller
+         Get details about one given USG firewall groups via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         Get the details about one Firewall Group via the API of the UniFi Controller
+         Get details about one given UniFi Secure Gateway (USG) firewall groups via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
          .PARAMETER Id
-         The ID (_id) of the Firewall Group you would like to get detaild information about. Multiple values are supported.
+         The ID (_id) of the Firewall Group, you would like to get detailed information about. Multiple values are supported.
 
          .PARAMETER Name
-         The Name (not the _id) of the Firewall Group you would like to get detaild information about. Multiple values are supported.
+         The Name (not the _id) of the Firewall Group you would like to get detailed information about. Multiple values are supported.
 
          .PARAMETER UnifiSite
          UniFi Site as configured. The default is: default

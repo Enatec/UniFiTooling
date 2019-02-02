@@ -2,10 +2,10 @@
 {
    <#
          .SYNOPSIS
-         Get a List Networks via the API of the UniFi Controller
+         Get a list of configured networks via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         Get a List Networks via the API of the Ubiquiti UniFi Controller
+         Get a list of configured networks via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
          .PARAMETER UnifiSite
          UniFi Site as configured. The default is: default

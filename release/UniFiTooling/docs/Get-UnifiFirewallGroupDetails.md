@@ -11,7 +11,7 @@ schema: 2.0.0
 # Get-UnifiFirewallGroupDetails
 
 ## SYNOPSIS
-Get the details about one Firewall Group via the API of the UniFi Controller
+Get details about one given USG firewall groups via API on the UniFi SDN Controller.
 
 ## SYNTAX
 
@@ -26,7 +26,7 @@ Get-UnifiFirewallGroupDetails [-Name] <String[]> [[-UnifiSite] <String>] [<Commo
 ```
 
 ## DESCRIPTION
-Get the details about one Firewall Group via the API of the UniFi Controller
+Get details about one given UniFi Secure Gateway (USG) firewall groups via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
 ## EXAMPLES
 
@@ -75,7 +75,7 @@ Get the details about the Firewall Groups MailHost on Site 'Contoso' via the API
 ## PARAMETERS
 
 ### -Id
-The ID (_id) of the Firewall Group you would like to get detaild information about.
+The ID (_id) of the Firewall Group, you would like to get detailed information about.
 Multiple values are supported.
 
 ```yaml
@@ -91,7 +91,7 @@ Accept wildcard characters: False
 ```
 
 ### -Name
-The Name (not the _id) of the Firewall Group you would like to get detaild information about.
+The Name (not the _id) of the Firewall Group you would like to get detailed information about.
 Multiple values are supported.
 
 ```yaml

@@ -2,10 +2,10 @@
 {
    <#
          .SYNOPSIS
-         Converts a Timestamp (Epochdate) into Datetime
+         It converts a Timestamp (Epochdate) into Datetime.
 
          .DESCRIPTION
-         Converts a Timestamp (Epochdate) into Datetime
+         It converts a Timestamp (Epochdate) into a PowerShell compatible Datetime format.
 
          .PARAMETER TimeStamp
          Timestamp (Epochdate)
@@ -25,6 +25,24 @@
 
          .NOTES
          Added the 'UniFi' (Alias for the switch 'Milliseconds') because the API returns miliseconds instead of seconds
+
+         .LINK
+         ConvertTo-UnixTimeStamp
+
+         .LINK
+         Get-Date
+
+         .LINK
+         New-TimeSpan
+
+         .LINK
+         https://docs.microsoft.com/en-us/dotnet/api/system.datetime
+
+         .LINK
+         https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/get-date
+
+         .LINK
+         https://en.wikipedia.org/wiki/Epoch_(reference_date)
    #>
 
    [CmdletBinding(ConfirmImpact = 'None')]

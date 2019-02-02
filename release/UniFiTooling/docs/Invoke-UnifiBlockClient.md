@@ -11,7 +11,7 @@ schema: 2.0.0
 # Invoke-UnifiBlockClient
 
 ## SYNOPSIS
-Block a client device via the API of the UniFi Controller
+It blocks a given user/client via API on the UniFi SDN Controller.
 
 ## SYNTAX
 
@@ -20,7 +20,7 @@ Invoke-UnifiBlockClient [[-UnifiSite] <String>] [-Mac] <String> [<CommonParamete
 ```
 
 ## DESCRIPTION
-Block a client device via the API of the Ubiquiti UniFi Controller
+It blocks a given user/client via via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
 ## EXAMPLES
 

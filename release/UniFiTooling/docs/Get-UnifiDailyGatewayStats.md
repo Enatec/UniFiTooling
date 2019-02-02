@@ -11,7 +11,7 @@ schema: 2.0.0
 # Get-UnifiDailyGatewayStats
 
 ## SYNOPSIS
-Get daily statistics for the USG
+Get daily statistics for a USG via API on the UniFi SDN Controller.
 
 ## SYNTAX
 
@@ -21,11 +21,11 @@ Get-UnifiDailyGatewayStats [[-UnifiSite] <String>] [[-Start] <String>] [[-End] <
 ```
 
 ## DESCRIPTION
-Get daily statistics for the USG (UniFi Secure Gateway)
+Get daily statistics for a UniFi Secure Gateway (USG) via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
-For convenience, we return the a bit more then the API, e.g.
-everything in KB, MB, GB, and TB instead of just bytes
-We also return real timestamps instead of the unix timestaps in miliseconds that the UniFi returns
+For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).
+
+We also return real timestamps instead of the epoc/unix timestaps that the UniFi API returns.
 
 Sample output:
 Time           : 2/1/2019 1:00:00 AM

@@ -11,7 +11,7 @@ schema: 2.0.0
 # Set-UnifiNetworkDetails
 
 ## SYNOPSIS
-Modifies one network via the API of the UniFi Controller
+It modifies a given network via the API of the UniFi Controller.
 
 ## SYNTAX
 
@@ -21,7 +21,7 @@ Set-UnifiNetworkDetails [-UnifiNetwork] <String> [-UniFiBody] <String> [[-UnifiS
 ```
 
 ## DESCRIPTION
-Modifies one network via the API of the UniFi Controller
+It modifies a given network via the via Ubiquiti (UBNT) UniFi RESTful API of the UniFi SDN Controller.
 
 ## EXAMPLES
 

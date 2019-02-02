@@ -10,13 +10,13 @@
       .EXAMPLE
       PS C:\> Install-Module -Name 'UniFiTooling' -Scope CurrentUser
 
-      Install the module for the Current User with PowerShellGet directly from the Powershell Gallery, Preferred method
+      Install the module for the Current User with PowerShellGet directly from the PowerShell Gallery, this is the preferred method.
 
       .EXAMPLE
       PS C:\> Install-Module -Name 'UniFiTooling' -Scope AllUsers
 
-      Install the module for the All Users with PowerShellGet directly from the Powershell Gallery, Preferred method.
-      Run this in an administrative PowerShell prompt (Elevated).
+      Install the module for the all users with PowerShellGet directly from the PowerShell Gallery, this is the preferred method.
+      Run this in a administrative PowerShell prompt (Elevated).
 
       .EXAMPLE
       PS C:\> .\Install.ps1
@@ -32,7 +32,10 @@
       This is a unsupported method to install the UniFiTooling PowerShell Module!
 
       .LINK
+      https://github.com/Enatec/UniFiTooling/raw/master/Install.ps1
 
+      .LINK
+      https://github.com/Enatec/UniFiTooling/raw/master/release/UniFiTooling-current.zip
 #>
 [CmdletBinding(ConfirmImpact = 'Low')]
 param ()
@@ -48,7 +51,7 @@ process
 {
    try
    {
-      # Download and install the module
+      # Download and install the PowerShell module from GitHub
       $webclient = (New-Object -TypeName System.Net.WebClient)
       $file = "$($env:TEMP)\$($ModuleName).zip"
 

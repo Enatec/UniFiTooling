@@ -2,10 +2,11 @@
 {
    <#
          .SYNOPSIS
-         Creates the UniFi config JSON file
+         It creates the JSON configuration file for the UniFiTooling Module.
 
          .DESCRIPTION
-         Creates the UniFi config JSON file. If no input is given it creates one with all the defaults.
+         It creates the JSON configuration file for the UniFiTooling PowerShell Module.
+         If no input is given it creates one with all the default settings, and you should modify the file with you favorite editor.
 
          .PARAMETER UniFiUsername
          The login of a UniFi User with admin rights

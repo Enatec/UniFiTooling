@@ -2,10 +2,10 @@
       {
          <#
                .SYNOPSIS
-               Create the request body for the UniFi Login
+               It creates a request body for the UniFi API Login.
 
                .DESCRIPTION
-               Creates the JSON based request body for the UniFi Login
+               It creates a JSON based request body for the Ubiquiti (UBNT) UniFi RESTful API Login.
 
                .EXAMPLE
                Set-UniFiApiLoginBody
@@ -13,7 +13,16 @@
                Creates the JSON based request body for the UniFi Login
 
                .NOTES
-               This is an internal helper function only
+               This is an internal helper function, only to reduce the code duplication and maintenance within our other functions.
+
+               .LINK
+               ConvertTo-Json
+
+               .LINK
+               Invoke-UniFiApiLogin
+
+               .LINK
+               Get-UniFiCredentials
          #>
          [CmdletBinding(ConfirmImpact = 'None')]
          param ()
@@ -22,14 +31,11 @@
          {
             Write-Verbose -Message 'Start Set-UniFiApiLoginBody'
 
-            # Call meta function
-            $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
-
             # Cleanup
             $RestBody = $null
-            $JsonBody = $null
 
             Write-Verbose -Message 'Check for API Credentials'
+
             if ((-not $ApiUsername) -or (-not $ApiPassword))
             {
                Write-Error -Message 'Please set the UniFi API Credentials' -ErrorAction Stop
@@ -37,6 +43,9 @@
                # Only here to catch a global ErrorAction overwrite
                break
             }
+
+            # Call meta function
+            $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
          }
 
          process

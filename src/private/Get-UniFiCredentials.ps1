@@ -2,10 +2,10 @@
 {
    <#
          .SYNOPSIS
-         Read the API Credentials from the UniFi config file
+         It reads the API Credentials from the UniFiTooling Module configuration file.
 
          .DESCRIPTION
-         Read the API Credentials from the UniFi config file
+         It reads the API Credentials from the JSON based UniFiTooling Module configuration file and saves it into variables.
 
          .EXAMPLE
          PS C:\> Get-UniFiCredentials
@@ -14,9 +14,16 @@
 
          .NOTES
          Only import/read the username and password
+         This is an internal helper function, only to reduce the code duplication and maintenance within our other functions.
 
          .LINK
          Get-UniFiConfig
+
+         .LINK
+         Get-Content
+
+         .LINK
+         ConvertFrom-Json
    #>
    [CmdletBinding(ConfirmImpact = 'None')]
    param
@@ -34,12 +41,12 @@
    {
       Write-Verbose -Message 'Start Get-UniFiCredentials'
 
-      # Call meta function
-      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
-
       # Cleanup
       $RawJson = $null
       $UnifiConfig = $null
+
+      # Call meta function
+      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
    }
 
    process
@@ -47,9 +54,11 @@
       try
       {
          Write-Verbose -Message 'Read the Config File'
+
          $RawJson = (Get-Content -Path $Path -Force -ErrorAction Stop -WarningAction SilentlyContinue)
 
          Write-Verbose -Message 'Convert the JSON config File to a PSObject'
+
          $UnifiConfig = ($RawJson | ConvertFrom-Json -ErrorAction Stop -WarningAction SilentlyContinue)
       }
       catch

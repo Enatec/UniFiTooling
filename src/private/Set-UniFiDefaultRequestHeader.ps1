@@ -2,18 +2,18 @@
 {
    <#
          .SYNOPSIS
-         Set the default Header for all UniFi Requests
+         Set the default Header for all UniFi API requests.
 
          .DESCRIPTION
-         Set the default Header for all UniFi Requests
+         Set the default Header for all Ubiquiti (UBNT) UniFi RESTful API requests.
 
          .EXAMPLE
          PS C:\> Set-UniFiDefaultRequestHeader
 
-         Set the default Header for all UniFi Requests
+         Set the default Header for all Ubiquiti (UBNT) UniFi RESTful API requests.
 
          .NOTES
-         This is an internal helper function only
+         This is an internal helper function, only to reduce the code duplication and maintenance within our other functions.
    #>
    [CmdletBinding(ConfirmImpact = 'None')]
    param ()

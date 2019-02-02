@@ -11,7 +11,7 @@ schema: 2.0.0
 # Set-UnifiFirewallGroup
 
 ## SYNOPSIS
-Get a given Firewall Group via the API of the UniFi Controller
+Get information about a given Firewall Group via API of the UniFi SDN Controller.
 
 ## SYNTAX
 
@@ -21,7 +21,7 @@ Set-UnifiFirewallGroup [-UnfiFirewallGroup] <String> [-UnifiCidrInput] <PSObject
 ```
 
 ## DESCRIPTION
-Get a given Firewall Group via the API of the Ubiquiti UniFi Controller
+Get information about a given Firewall Group via Ubiquiti (UBNT) UniFi RESTful API of the UniFi SDN Controller.
 
 ## EXAMPLES
 

@@ -2,12 +2,14 @@
 {
    <#
          .SYNOPSIS
-         Get Access Point stats in 5 minute segments
+         Get statistics in five-minute segments for all or a given access point via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         Get the stats in 5 minute segments for all or just one access points in a given UniFi site
+         Get statistics in five-minute segments for all or a given access point via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
+
          For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).
-         We also return real timestamps instead of the unix timestaps that the UniFi returns
+
+         We also return real timestamps instead of the epoc/unix timestaps that the UniFi API returns.
 
          .PARAMETER UnifiSite
          ID of the client-device to be modified
@@ -24,7 +26,7 @@
          .EXAMPLE
          PS C:\> Get-Unifi5minutesApStats
 
-         Get the stats in 5 minute segments for all access points in the default site
+         Get statistics in five-minute segments for all access points in the default site.
 
          .EXAMPLE
          PS C:\> Get-Unifi5minutesApStats -Mac '78:8a:20:59:e6:88'
@@ -53,7 +55,9 @@
 
          .NOTES
          Defaults to the past 12 hours.
-         Make sure that the retention policy for 5 minutes stats is set to the correct value in the controller settings
+
+         Make sure that the retention policy for 5 minutes, statistics is set to the correct value in the controller settings.
+
          Ubiquiti announced this with the Controller version 5.5 - It will not work on older versions!
 
          .LINK

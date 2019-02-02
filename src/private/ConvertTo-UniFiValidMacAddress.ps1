@@ -2,10 +2,11 @@
 {
    <#
          .SYNOPSIS
-         Check and transform the given Mac addess for UniFi API usage
+         It checks if the given MAC address has the right format for UniFi API requests.
 
          .DESCRIPTION
-         Check and transform, if needed, the given Mac addess for UniFi API usage
+         It checks if the given MAC address has the right format for Ubiquiti (UBNT) UniFi RESTful API requests.
+         An it also transforms it into the correct format if needed.
 
          .PARAMETER Mac
          Client MAC address
@@ -15,6 +16,19 @@
 
          .NOTES
          Helper to check and make sure we have the right format
+         This is an internal helper function, only to reduce the code duplication and maintenance within our other functions.
+
+         .LINK
+         https://docs.microsoft.com/en-us/previous-versions/dotnet/netframework-1.1/3206d374(v=vs.71)
+
+         .LINK
+         https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_regular_expressions
+
+         .LINK
+         https://en.wikipedia.org/wiki/MAC_address
+
+         .LINK
+         https://aruljohn.com/mac.pl
    #>
 
    [CmdletBinding(ConfirmImpact = 'None')]

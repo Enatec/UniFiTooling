@@ -2,10 +2,10 @@
 {
    <#
          .SYNOPSIS
-         Read the UniFi config file
+         It reads the UniFiTooling Module configuration file.
 
          .DESCRIPTION
-         Get the default values from the  UniFi config file
+         It reads the JSON based UniFiTooling Module configuration file and saves it into variables.
 
          .PARAMETER Path
          Path to the config file
@@ -17,9 +17,16 @@
 
          .NOTES
          We do not import/read the username and password
+         This is an internal helper function, only to reduce the code duplication and maintenance within our other functions.
 
          .LINK
          Get-UniFiCredentials
+
+         .LINK
+         Get-Content
+
+         .LINK
+         ConvertFrom-Json
    #>
    [CmdletBinding(ConfirmImpact = 'None')]
    param
@@ -37,12 +44,12 @@
    {
       Write-Verbose -Message 'Start Get-UniFiConfig'
 
-      # Call meta function
-      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
-
       # Cleanup
       $RawJson = $null
       $UnifiConfig = $null
+
+      # Call meta function
+      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
    }
 
    process

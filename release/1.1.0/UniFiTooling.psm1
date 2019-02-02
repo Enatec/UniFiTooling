@@ -196,10 +196,10 @@ function ConvertFrom-UnixTimeStamp
 {
    <#
          .SYNOPSIS
-         Converts a Timestamp (Epochdate) into Datetime
+         It converts a Timestamp (Epochdate) into Datetime.
 
          .DESCRIPTION
-         Converts a Timestamp (Epochdate) into Datetime
+         It converts a Timestamp (Epochdate) into a PowerShell compatible Datetime format.
 
          .PARAMETER TimeStamp
          Timestamp (Epochdate)
@@ -219,6 +219,24 @@ function ConvertFrom-UnixTimeStamp
 
          .NOTES
          Added the 'UniFi' (Alias for the switch 'Milliseconds') because the API returns miliseconds instead of seconds
+
+         .LINK
+         ConvertTo-UnixTimeStamp
+
+         .LINK
+         Get-Date
+
+         .LINK
+         New-TimeSpan
+
+         .LINK
+         https://docs.microsoft.com/en-us/dotnet/api/system.datetime
+
+         .LINK
+         https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/get-date
+
+         .LINK
+         https://en.wikipedia.org/wiki/Epoch_(reference_date)
    #>
 
    [CmdletBinding(ConfirmImpact = 'None')]
@@ -315,10 +333,11 @@ function ConvertTo-UniFiValidMacAddress
 {
    <#
          .SYNOPSIS
-         Check and transform the given Mac addess for UniFi API usage
+         It checks if the given MAC address has the right format for UniFi API requests.
 
          .DESCRIPTION
-         Check and transform, if needed, the given Mac addess for UniFi API usage
+         It checks if the given MAC address has the right format for Ubiquiti (UBNT) UniFi RESTful API requests.
+         An it also transforms it into the correct format if needed.
 
          .PARAMETER Mac
          Client MAC address
@@ -328,6 +347,19 @@ function ConvertTo-UniFiValidMacAddress
 
          .NOTES
          Helper to check and make sure we have the right format
+         This is an internal helper function, only to reduce the code duplication and maintenance within our other functions.
+
+         .LINK
+         https://docs.microsoft.com/en-us/previous-versions/dotnet/netframework-1.1/3206d374(v=vs.71)
+
+         .LINK
+         https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_regular_expressions
+
+         .LINK
+         https://en.wikipedia.org/wiki/MAC_address
+
+         .LINK
+         https://aruljohn.com/mac.pl
    #>
 
    [CmdletBinding(ConfirmImpact = 'None')]
@@ -402,10 +434,10 @@ function ConvertTo-UnixTimeStamp
 {
    <#
          .SYNOPSIS
-         Converts a Datetime into a Unix Timestamp (Epochdate)
+         It converts a Datetime into a Timestamp (Epochdate).
 
          .DESCRIPTION
-         Converts a Datetime into a Unix Timestamp (Epochdate)
+         It converts a PowerShell compatible Datetime into a Timestamp (Epochdate) format.
 
          .PARAMETER Date
          The Date String that shoul be converted, default is now (if none is given)
@@ -435,6 +467,24 @@ function ConvertTo-UnixTimeStamp
 
          .NOTES
          Added the 'UniFi' (Alias for the switch 'Milliseconds') because the API returns miliseconds instead of seconds
+
+         .LINK
+         ConvertFrom-UnixTimeStamp
+
+         .LINK
+         Get-Date
+
+         .LINK
+         New-TimeSpan
+
+         .LINK
+         https://docs.microsoft.com/en-us/dotnet/api/system.datetime
+
+         .LINK
+         https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/get-date
+
+         .LINK
+         https://en.wikipedia.org/wiki/Epoch_(reference_date)
    #>
 
    [CmdletBinding(ConfirmImpact = 'None')]
@@ -522,10 +572,10 @@ function Get-UniFiConfig
 {
    <#
          .SYNOPSIS
-         Read the UniFi config file
+         It reads the UniFiTooling Module configuration file.
 
          .DESCRIPTION
-         Get the default values from the  UniFi config file
+         It reads the JSON based UniFiTooling Module configuration file and saves it into variables.
 
          .PARAMETER Path
          Path to the config file
@@ -537,9 +587,16 @@ function Get-UniFiConfig
 
          .NOTES
          We do not import/read the username and password
+         This is an internal helper function, only to reduce the code duplication and maintenance within our other functions.
 
          .LINK
          Get-UniFiCredentials
+
+         .LINK
+         Get-Content
+
+         .LINK
+         ConvertFrom-Json
    #>
    [CmdletBinding(ConfirmImpact = 'None')]
    param
@@ -557,12 +614,12 @@ function Get-UniFiConfig
    {
       Write-Verbose -Message 'Start Get-UniFiConfig'
 
-      # Call meta function
-      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
-
       # Cleanup
       $RawJson = $null
       $UnifiConfig = $null
+
+      # Call meta function
+      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
    }
 
    process
@@ -642,10 +699,10 @@ function Get-UniFiCredentials
 {
    <#
          .SYNOPSIS
-         Read the API Credentials from the UniFi config file
+         It reads the API Credentials from the UniFiTooling Module configuration file.
 
          .DESCRIPTION
-         Read the API Credentials from the UniFi config file
+         It reads the API Credentials from the JSON based UniFiTooling Module configuration file and saves it into variables.
 
          .EXAMPLE
          PS C:\> Get-UniFiCredentials
@@ -654,9 +711,16 @@ function Get-UniFiCredentials
 
          .NOTES
          Only import/read the username and password
+         This is an internal helper function, only to reduce the code duplication and maintenance within our other functions.
 
          .LINK
          Get-UniFiConfig
+
+         .LINK
+         Get-Content
+
+         .LINK
+         ConvertFrom-Json
    #>
    [CmdletBinding(ConfirmImpact = 'None')]
    param
@@ -674,12 +738,12 @@ function Get-UniFiCredentials
    {
       Write-Verbose -Message 'Start Get-UniFiCredentials'
 
-      # Call meta function
-      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
-
       # Cleanup
       $RawJson = $null
       $UnifiConfig = $null
+
+      # Call meta function
+      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
    }
 
    process
@@ -687,9 +751,11 @@ function Get-UniFiCredentials
       try
       {
          Write-Verbose -Message 'Read the Config File'
+
          $RawJson = (Get-Content -Path $Path -Force -ErrorAction Stop -WarningAction SilentlyContinue)
 
          Write-Verbose -Message 'Convert the JSON config File to a PSObject'
+
          $UnifiConfig = ($RawJson | ConvertFrom-Json -ErrorAction Stop -WarningAction SilentlyContinue)
       }
       catch
@@ -757,10 +823,10 @@ function Get-UnifiFirewallGroupBody
 {
    <#
          .SYNOPSIS
-         Build a Body for Set-UnifiFirewallGroup call
+         It builds a request body for Set-UnifiFirewallGroup function
 
          .DESCRIPTION
-         Build a JSON based Body for Set-UnifiFirewallGroup call
+         It builds a JSON based request body for Set-UnifiFirewallGroup function
 
          .PARAMETER UnfiFirewallGroup
          Existing Unfi Firewall Group
@@ -774,10 +840,16 @@ function Get-UnifiFirewallGroupBody
          Build a Body for Set-UnifiFirewallGroup call
 
          .NOTES
-         This is an internal helper function only
+         This is an internal helper function, only to reduce the code duplication and maintenance within our other functions.
 
          . LINK
          Set-UnifiFirewallGroup
+
+         .LINK
+         Add-Member
+
+         .LINK
+         ConvertTo-Json
    #>
 
    [CmdletBinding(ConfirmImpact = 'None')]
@@ -808,13 +880,13 @@ function Get-UnifiFirewallGroupBody
    {
       Write-Verbose -Message 'Start Get-UnifiFirewallGroupBody'
 
-      # Call meta function
-      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
-
       Write-Verbose -Message 'Cleanup exitsing Group'
       Write-Verbose -Message "Old Values: $UnfiFirewallGroup.group_members"
 
       $UnfiFirewallGroup.group_members = $null
+
+      # Call meta function
+      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
    }
 
    process
@@ -890,10 +962,10 @@ function Get-UniFiIsAlive
 {
    <#
          .SYNOPSIS
-         Use a simple API call to see if the session is alive
+         It uses a simple API call to see if the API session is (still) alive.
 
          .DESCRIPTION
-         Use a simple API call to see if the session is alive
+         It uses a simple RESTful API call to see if the API session is (still) alive.
 
          .PARAMETER UnifiSite
          UniFi Site as configured. The default is: default
@@ -901,15 +973,15 @@ function Get-UniFiIsAlive
          .EXAMPLE
          PS C:\> Get-UniFiIsAlive
 
-         Use a simple API call to see if the session is alive
+         It uses a simple API call to see if the API session is (still) alive.
 
          .EXAMPLE
          PS C:\> Get-UniFiIsAlive -UnifiSite 'Contoso'
 
-         Use a simple API call to see if the session is alive on Site 'Contoso'
+         It uses a simple API call to see if the API session is (still) alive on Site 'Contoso'
 
          .NOTES
-         Internal Helper Function
+         This is an internal helper function, only to reduce the code duplication and maintenance within our other functions.
 
          .LINK
          Get-UniFiConfig
@@ -941,9 +1013,6 @@ function Get-UniFiIsAlive
    {
       Write-Verbose -Message 'Start Get-UniFiIsAlive'
 
-      # Call meta function
-      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
-
       # Cleanup
       $Session = $null
 
@@ -955,6 +1024,9 @@ function Get-UniFiIsAlive
 
       # Set the default to FALSE
       $SessionStatus = $false
+
+      # Call meta function
+      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
    }
 
    process
@@ -1075,10 +1147,11 @@ function Invoke-UniFiCidrWorkaround
 {
    <#
          .SYNOPSIS
-         IPv4 and IPv6 CIDR Workaround for UBNT USG Firewall Rules
+         These are a IPv4 and IPv6 CIDR Host route workarounds for UBNT USG firewall rules.
 
          .DESCRIPTION
-         IPv4 and IPv6 CIDR Workaround for UBNT USG Firewall Rules (Single IPv4 has to be without /32 OR single IPv6 has to be without /128)
+         These are a IPv4 and IPv6 CIDR Host route workarounds for Ubiquiti (UBNT) UniFi Secure Gateway (USG) firewall rules.
+         Single IPv4 has to be without /32 OR single IPv6 has to be without /128
 
          .PARAMETER CidrList
          Existing CIDR List Object
@@ -1107,10 +1180,10 @@ function Invoke-UniFiCidrWorkaround
          IPv6 CIDR Workaround for UBNT USG Firewall Rules via Pipeline
 
          .NOTES
-         This is an internal helper function only (Will be moved to the private functions soon)
+         This is an internal helper function, only to reduce the code duplication and maintenance within our other functions.
 
          .LINK
-         https://github.com/jhochwald/UniFiTooling/issues/5
+         https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing
    #>
 
    [CmdletBinding(ConfirmImpact = 'None')]
@@ -1188,10 +1261,10 @@ function Set-UniFiApiLoginBody
       {
          <#
                .SYNOPSIS
-               Create the request body for the UniFi Login
+               It creates a request body for the UniFi API Login.
 
                .DESCRIPTION
-               Creates the JSON based request body for the UniFi Login
+               It creates a JSON based request body for the Ubiquiti (UBNT) UniFi RESTful API Login.
 
                .EXAMPLE
                Set-UniFiApiLoginBody
@@ -1199,7 +1272,16 @@ function Set-UniFiApiLoginBody
                Creates the JSON based request body for the UniFi Login
 
                .NOTES
-               This is an internal helper function only
+               This is an internal helper function, only to reduce the code duplication and maintenance within our other functions.
+
+               .LINK
+               ConvertTo-Json
+
+               .LINK
+               Invoke-UniFiApiLogin
+
+               .LINK
+               Get-UniFiCredentials
          #>
          [CmdletBinding(ConfirmImpact = 'None')]
          param ()
@@ -1208,14 +1290,11 @@ function Set-UniFiApiLoginBody
          {
             Write-Verbose -Message 'Start Set-UniFiApiLoginBody'
 
-            # Call meta function
-            $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
-
             # Cleanup
             $RestBody = $null
-            $JsonBody = $null
 
             Write-Verbose -Message 'Check for API Credentials'
+
             if ((-not $ApiUsername) -or (-not $ApiPassword))
             {
                Write-Error -Message 'Please set the UniFi API Credentials' -ErrorAction Stop
@@ -1223,6 +1302,9 @@ function Set-UniFiApiLoginBody
                # Only here to catch a global ErrorAction overwrite
                break
             }
+
+            # Call meta function
+            $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
          }
 
          process
@@ -1284,18 +1366,18 @@ function Set-UniFiDefaultRequestHeader
 {
    <#
          .SYNOPSIS
-         Set the default Header for all UniFi Requests
+         Set the default Header for all UniFi API requests.
 
          .DESCRIPTION
-         Set the default Header for all UniFi Requests
+         Set the default Header for all Ubiquiti (UBNT) UniFi RESTful API requests.
 
          .EXAMPLE
          PS C:\> Set-UniFiDefaultRequestHeader
 
-         Set the default Header for all UniFi Requests
+         Set the default Header for all Ubiquiti (UBNT) UniFi RESTful API requests.
 
          .NOTES
-         This is an internal helper function only
+         This is an internal helper function, only to reduce the code duplication and maintenance within our other functions.
    #>
    [CmdletBinding(ConfirmImpact = 'None')]
    param ()
@@ -1334,12 +1416,14 @@ function Get-Unifi5minutesApStats
 {
    <#
          .SYNOPSIS
-         Get Access Point stats in 5 minute segments
+         Get statistics in five-minute segments for all or a given access point via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         Get the stats in 5 minute segments for all or just one access points in a given UniFi site
+         Get statistics in five-minute segments for all or a given access point via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
+
          For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).
-         We also return real timestamps instead of the unix timestaps that the UniFi returns
+
+         We also return real timestamps instead of the epoc/unix timestaps that the UniFi API returns.
 
          .PARAMETER UnifiSite
          ID of the client-device to be modified
@@ -1356,7 +1440,7 @@ function Get-Unifi5minutesApStats
          .EXAMPLE
          PS C:\> Get-Unifi5minutesApStats
 
-         Get the stats in 5 minute segments for all access points in the default site
+         Get statistics in five-minute segments for all access points in the default site.
 
          .EXAMPLE
          PS C:\> Get-Unifi5minutesApStats -Mac '78:8a:20:59:e6:88'
@@ -1385,7 +1469,9 @@ function Get-Unifi5minutesApStats
 
          .NOTES
          Defaults to the past 12 hours.
-         Make sure that the retention policy for 5 minutes stats is set to the correct value in the controller settings
+
+         Make sure that the retention policy for 5 minutes, statistics is set to the correct value in the controller settings.
+
          Ubiquiti announced this with the Controller version 5.5 - It will not work on older versions!
 
          .LINK
@@ -1745,13 +1831,14 @@ function Get-Unifi5minutesClientStats
 {
    <#
          .SYNOPSIS
-         Get user/client statistics in 5 minute segments
+         Get statistics in five-minute segments for a given user/client via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         Get user/client statistics in 5 minute segments for a given client
+         Get statistics in five-minute segments for a given user/client via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
-         For convenience, we return the a bit more then the API, e.g. everything in KB, MB, GB, and TB instead of just bytes
-         We also return real timestamps instead of the unix timestaps in miliseconds that the UniFi returns
+         For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).
+
+         We also return real timestamps instead of the epoc/unix timestaps that the UniFi API returns.
 
          Sample output:
          Time          : 2/1/2019 3:45:00 PM
@@ -2327,13 +2414,14 @@ function Get-Unifi5minutesGatewayStats
 {
    <#
          .SYNOPSIS
-         Get statistics in 5 minute segments for the USG
+         Get statistics in five-minute segments for a USG via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         Get statistics in 5 minute segments for the USG (UniFi Secure Gateway)
+         Get statistics in five-minute segments for a UniFi Secure Gateway (USG) via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
-         For convenience, we return the a bit more then the API, e.g. everything in KB, MB, GB, and TB instead of just bytes
-         We also return real timestamps instead of the unix timestaps in miliseconds that the UniFi returns
+         For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).
+
+         We also return real timestamps instead of the epoc/unix timestaps that the UniFi API returns.
 
          Sample output:
          Time           : 2/1/2019 6:20:00 PM
@@ -2954,14 +3042,14 @@ function Get-Unifi5minutesSiteStats
 {
    <#
          .SYNOPSIS
-         Get statistics in 5 minute segments for a complete Site
+         Get statistics in five-minute segments for a complete Site via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         Get statistics in 5 minute segments for a complete UniFi Site
+         Get statistics in five-minute segments for a complete Site via API on the UniFi SDN Controller.
 
-         For convenience, we return the a bit more then the API, e.g. everything in KB, MB, GB, and TB instead of just bytes
+         For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).
 
-         We also return real timestamps instead of the unix timestaps in miliseconds that the UniFi returns
+         We also return real timestamps instead of the epoc/unix timestaps that the UniFi API returns.
 
          Sample output:
          Time         : 1/28/2019 8:00:00 AM
@@ -3536,12 +3624,14 @@ function Get-UnifiDailyApStats
 {
    <#
          .SYNOPSIS
-         Get daily stats Access Point stats
+         Get daily statistics for all or a given access point via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         Get daily stats for all or just one access points in a given UniFi site
+         Get daily statistics for all or a given access point via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
+
          For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).
-         We also return real timestamps instead of the unix timestaps that the UniFi returns
+
+         We also return real timestamps instead of the epoc/unix timestaps that the UniFi API returns.
 
          .PARAMETER UnifiSite
          ID of the client-device to be modified
@@ -3941,13 +4031,14 @@ function Get-UnifiDailyClientStats
 {
    <#
          .SYNOPSIS
-         Get daily user/client statistics for a given user/client
+         Get daily statistics for a given user/client via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         Get daily user/client statistics for a given user/client
+         Get daily statistics for a given user/client via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
-         For convenience, we return the a bit more then the API, e.g. everything in KB, MB, GB, and TB instead of just bytes
-         We also return real timestamps instead of the unix timestaps in miliseconds that the UniFi returns
+         For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).
+
+         We also return real timestamps instead of the epoc/unix timestaps that the UniFi API returns.
 
          Sample output:
          Time          : 2/1/2019 1:00:00 AM
@@ -4522,13 +4613,14 @@ function Get-UnifiDailyGatewayStats
 {
    <#
          .SYNOPSIS
-         Get daily statistics for the USG
+         Get daily statistics for a USG via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         Get daily statistics for the USG (UniFi Secure Gateway)
+         Get daily statistics for a UniFi Secure Gateway (USG) via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
-         For convenience, we return the a bit more then the API, e.g. everything in KB, MB, GB, and TB instead of just bytes
-         We also return real timestamps instead of the unix timestaps in miliseconds that the UniFi returns
+         For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).
+
+         We also return real timestamps instead of the epoc/unix timestaps that the UniFi API returns.
 
          Sample output:
          Time           : 2/1/2019 1:00:00 AM
@@ -5150,14 +5242,14 @@ function Get-UnifiDailySiteStats
 {
    <#
          .SYNOPSIS
-         Get daily statistics for a complete Site
+         Get daily statistics for a complete Site via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         Get daily statistics for a complete UniFi Site
+         Get daily statistics for a complete Site via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
-         For convenience, we return the a bit more then the API, e.g. everything in KB, MB, GB, and TB instead of just bytes
+         For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).
 
-         We also return real timestamps instead of the unix timestaps in miliseconds that the UniFi returns
+         We also return real timestamps instead of the epoc/unix timestaps that the UniFi API returns.
 
          Sample output:
          Time         : 1/28/2019 7:00:00 AM
@@ -5732,16 +5824,16 @@ function Get-UnifiFirewallGroupDetails
 {
    <#
          .SYNOPSIS
-         Get the details about one Firewall Group via the API of the UniFi Controller
+         Get details about one given USG firewall groups via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         Get the details about one Firewall Group via the API of the UniFi Controller
+         Get details about one given UniFi Secure Gateway (USG) firewall groups via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
          .PARAMETER Id
-         The ID (_id) of the Firewall Group you would like to get detaild information about. Multiple values are supported.
+         The ID (_id) of the Firewall Group, you would like to get detailed information about. Multiple values are supported.
 
          .PARAMETER Name
-         The Name (not the _id) of the Firewall Group you would like to get detaild information about. Multiple values are supported.
+         The Name (not the _id) of the Firewall Group you would like to get detailed information about. Multiple values are supported.
 
          .PARAMETER UnifiSite
          UniFi Site as configured. The default is: default
@@ -6111,10 +6203,10 @@ function Get-UnifiFirewallGroups
 {
    <#
          .SYNOPSIS
-         Get a List Firewall Groups via the API of the UniFi Controller
+         Get a list of configured USG firewall groups via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         Get a List Firewall Groups via the API of the Ubiquiti UniFi Controller
+         Get a list of configured UniFi Secure Gateway (USG) firewall groups via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
          .PARAMETER UnifiSite
          UniFi Site as configured. The default is: default
@@ -6382,12 +6474,14 @@ function Get-UnifiHourlyApStats
 {
    <#
          .SYNOPSIS
-         Get hourly stats Access Point stats
+         Get hourly statistics for all or a given access point via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         Get hourly stats for all or just one access points in a given UniFi site
+         Get hourly statistics for all or a given access point via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
+
          For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).
-         We also return real timestamps instead of the unix timestaps that the UniFi returns
+
+         We also return real timestamps instead of the epoc/unix timestaps that the UniFi API returns.
 
          .PARAMETER UnifiSite
          ID of the client-device to be modified
@@ -6792,13 +6886,14 @@ function Get-UnifiHourlyClientStats
 {
    <#
          .SYNOPSIS
-         Get hourly user/client statistics for a given user/client
+         Get hourly statistics for a given user/client via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         Get hourly user/client statistics for a given user/client
+         Get hourly statistics for a given user/client via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
-         For convenience, we return the a bit more then the API, e.g. everything in KB, MB, GB, and TB instead of just bytes
-         We also return real timestamps instead of the unix timestaps in miliseconds that the UniFi returns
+         For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).
+
+         We also return real timestamps instead of the epoc/unix timestaps that the UniFi API returns.
 
          Sample output:
          Time          : 2/1/2019 4:00:00 PM
@@ -7375,13 +7470,14 @@ function Get-UnifiHourlyGatewayStats
 {
    <#
          .SYNOPSIS
-         Get hourly statistics for the USG
+         Get hourly statistics for a USG via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         Get hourly statistics for the USG (UniFi Secure Gateway)
+         Get hourly statistics for a UniFi Secure Gateway (USG) via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
-         For convenience, we return the a bit more then the API, e.g. everything in KB, MB, GB, and TB instead of just bytes
-         We also return real timestamps instead of the unix timestaps in miliseconds that the UniFi returns
+         For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).
+
+         We also return real timestamps instead of the epoc/unix timestaps that the UniFi API returns.
 
          Sample output:
          Time           : 2/1/2019 6:00:00 PM
@@ -8002,14 +8098,14 @@ function Get-UnifiHourlySiteStats
 {
    <#
          .SYNOPSIS
-         Get horly statistics for a complete Site
+         Get hourly statistics for a complete UniFi Site via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         Get horly statistics for a complete UniFi Site
+         Get hourly statistics for a complete UniFi Site via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
-         For convenience, we return the a bit more then the API, e.g. everything in KB, MB, GB, and TB instead of just bytes
+         For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).
 
-         We also return real timestamps instead of the unix timestaps in miliseconds that the UniFi returns
+         We also return real timestamps instead of the epoc/unix timestaps that the UniFi API returns.
 
          Sample output:
          Time         : 1/28/2019 8:00:00 AM
@@ -8052,22 +8148,22 @@ function Get-UnifiHourlySiteStats
          .EXAMPLE
          PS C:\> Get-UnifiHourlySiteStats
 
-         Get horly statistics for a complete UniFi for the default site
+         Get hourly statistics for a complete UniFi for the default site
 
          .EXAMPLE
          (Get-UnifiHourlySiteStats -Start '1548971935421' -End '1548975579019')
 
-         Get horly statistics for a complete UniFi for the default site for a given time period.
+         Get hourly statistics for a complete UniFi for the default site for a given time period.
 
          .EXAMPLE
          (Get-UnifiHourlySiteStats -Start '1548980058135')
 
-         Get horly statistics for a complete UniFi for the default site for the last 60 minutes (was the timestamp while the sample was created)
+         Get hourly statistics for a complete UniFi for the default site for the last 60 minutes (was the timestamp while the sample was created)
 
          .EXAMPLE
          PS C:\> (Get-UnifiHourlySiteStats -UnifiSite 'contoso')[-1]
 
-         Get horly statistics for a complete UniFi for the site 'contoso'
+         Get hourly statistics for a complete UniFi for the site 'contoso'
 
          .EXAMPLE
          PS C:\> Get-UnifiHourlySiteStats -Attributes 'bytes','wan-tx_bytes','wan-rx_bytes','wlan_bytes','num_sta','lan-num_sta','wlan-num_sta')
@@ -8584,10 +8680,10 @@ function Get-UnifiNetworkDetails
 {
    <#
          .SYNOPSIS
-         Get the details about one network via the API of the UniFi Controller
+         Get the details about a given network via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         Get the details about one network via the API of the UniFi Controller
+         Get the details about a given network via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
          .PARAMETER Id
          The ID (network_id) of the network you would like to get detaild information about. Multiple values are supported.
@@ -8977,10 +9073,10 @@ function Get-UnifiNetworkList
 {
    <#
          .SYNOPSIS
-         Get a List Networks via the API of the UniFi Controller
+         Get a list of configured networks via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         Get a List Networks via the API of the Ubiquiti UniFi Controller
+         Get a list of configured networks via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
          .PARAMETER UnifiSite
          UniFi Site as configured. The default is: default
@@ -9253,10 +9349,10 @@ function Get-UnifiSpeedTestResult
 {
    <#
          .SYNOPSIS
-         Get the UniFi Security Gateway (USG) Speed Test results
+         Get USG speed test results via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         Get the UniFi Security Gateway (USG) Speed Test results
+         Get UniFi Secure Gateway (USG) speed test results via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
          .PARAMETER Timeframe
          Timeframe in hours, default is 24
@@ -9318,7 +9414,10 @@ function Get-UnifiSpeedTestResult
 
          .NOTES
          Initial version that makes it more human readable.
-         The filetring needs a few more tests
+
+         The filetring needs a few more tests.
+
+         A UniFi Secure Gateway (USG) is required in the UniFi site!
 
          .LINK
          Get-UniFiConfig
@@ -9745,10 +9844,10 @@ function Invoke-UniFiApiLogin
 {
    <#
          .SYNOPSIS
-         Login to API of the UniFi Controller
+         It sends a login request via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         Login to API of the Ubiquiti UniFi Controller
+         It sends a login request via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
          .EXAMPLE
          PS C:\> Invoke-UniFiApiLogin
@@ -9938,10 +10037,10 @@ function Invoke-UniFiApiLogout
 {
    <#
          .SYNOPSIS
-         Logout from the API of the UniFi Controller
+         It sends a logout request via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         Logout from the API of the Ubiquiti UniFi Controller
+         It sends a logout request via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
          .EXAMPLE
 
@@ -10102,10 +10201,10 @@ function Invoke-UnifiAuthorizeGuest
 {
    <#
          .SYNOPSIS
-         Authorize a client device via the API of the UniFi Controller
+         It authorizes a given user/client via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         Authorize a client device via the API of the Ubiquiti UniFi Controller
+         It authorizes a given user/client via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
          .PARAMETER UnifiSite
          UniFi Site as configured. The default is: default
@@ -10551,10 +10650,10 @@ function Invoke-UnifiBlockClient
 {
    <#
          .SYNOPSIS
-         Block a client device via the API of the UniFi Controller
+         It blocks a given user/client via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         Block a client device via the API of the Ubiquiti UniFi Controller
+         It blocks a given user/client via via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
          .PARAMETER UnifiSite
          UniFi Site as configured. The default is: default
@@ -10878,10 +10977,10 @@ function Invoke-UnifiForgetClient
 {
    <#
          .SYNOPSIS
-         Forget one or more client devices via the API of the UniFi Controller
+         It forgets one or more given users/clients via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         Forget one or more client devices via the API of the Ubiquiti UniFi Controller
+         It forgets one or more given users/clients via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
          .PARAMETER UnifiSite
          UniFi Site as configured. The default is: default
@@ -11205,10 +11304,10 @@ function Invoke-UnifiReconnectClient
 {
    <#
          .SYNOPSIS
-         Reconnect a client device via the API of the UniFi Controller
+         It reconnects a given user/client via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         Reconnect a client device via the API of the Ubiquiti UniFi Controller
+         It reconnects a given user/client via via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
          .PARAMETER UnifiSite
          UniFi Site as configured. The default is: default
@@ -11532,10 +11631,10 @@ function Invoke-UnifiUnauthorizeGuest
 {
    <#
          .SYNOPSIS
-         Unauthorize a client device via the API of the UniFi Controller
+         It uauthorizes a user/client via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         Unauthorize a client device via the API of the Ubiquiti UniFi Controller
+         It uauthorizes a user/client via via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
          .PARAMETER UnifiSite
          UniFi Site as configured. The default is: default
@@ -11864,10 +11963,10 @@ function Invoke-UnifiUnblockClient
 {
    <#
          .SYNOPSIS
-         Unblock a client device via the API of the UniFi Controller
+         It unblocks a given user/client via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         Unblock a client device via the API of the Ubiquiti UniFi Controller
+         It unblocks a given user/client via via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
          .PARAMETER UnifiSite
          UniFi Site as configured. The default is: default
@@ -12191,10 +12290,10 @@ function New-UnifiClientDevice
 {
    <#
          .SYNOPSIS
-         Create a new user/client-device via the API of the UniFi Controller
+         It creates a new user/client via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         Create a new user/client-device via the API of the Ubiquiti UniFi Controller
+         It creates a new user/client via via Ubiquiti (UBNT) UniFi RESTful API on the UniFi SDN Controller.
 
          .PARAMETER UnifiSite
          UniFi Site as configured. The default is: default
@@ -12563,10 +12662,11 @@ function New-UniFiConfig
 {
    <#
          .SYNOPSIS
-         Creates the UniFi config JSON file
+         It creates the JSON configuration file for the UniFiTooling Module.
 
          .DESCRIPTION
-         Creates the UniFi config JSON file. If no input is given it creates one with all the defaults.
+         It creates the JSON configuration file for the UniFiTooling PowerShell Module.
+         If no input is given it creates one with all the default settings, and you should modify the file with you favorite editor.
 
          .PARAMETER UniFiUsername
          The login of a UniFi User with admin rights
@@ -12764,10 +12864,10 @@ function Set-UnifiFirewallGroup
 {
    <#
          .SYNOPSIS
-         Get a given Firewall Group via the API of the UniFi Controller
+         Get information about a given Firewall Group via API of the UniFi SDN Controller.
 
          .DESCRIPTION
-         Get a given Firewall Group via the API of the Ubiquiti UniFi Controller
+         Get information about a given Firewall Group via Ubiquiti (UBNT) UniFi RESTful API of the UniFi SDN Controller.
 
          .PARAMETER UnfiFirewallGroup
          Unfi Firewall Group
@@ -13079,10 +13179,10 @@ function Set-UnifiNetworkDetails
 {
    <#
          .SYNOPSIS
-         Modifies one network via the API of the UniFi Controller
+         It modifies a given network via the API of the UniFi Controller.
 
          .DESCRIPTION
-         Modifies one network via the API of the UniFi Controller
+         It modifies a given network via the via Ubiquiti (UBNT) UniFi RESTful API of the UniFi SDN Controller.
 
          .PARAMETER UnifiNetwork
          The ID (network_id) of the network you would like to get detailed information about.
@@ -13153,9 +13253,6 @@ function Set-UnifiNetworkDetails
    begin
    {
       Write-Verbose -Message 'Start Set-UnifiNetworkDetails'
-
-      # Call meta function
-      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
 
       # Cleanup
       $Session = $null
@@ -13244,6 +13341,9 @@ function Set-UnifiNetworkDetails
          break
       }
       #endregion ReCheckSession
+
+      # Call meta function
+      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
    }
 
    process

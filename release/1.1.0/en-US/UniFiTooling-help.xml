@@ -6,11 +6,13 @@
       <command:verb>Get</command:verb>
       <command:noun>Unifi5minutesApStats</command:noun>
       <maml:description>
-        <maml:para>Get Access Point stats in 5 minute segments</maml:para>
+        <maml:para>Get statistics in five-minute segments for all or a given access point via API on the UniFi SDN Controller.</maml:para>
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>Get the stats in 5 minute segments for all or just one access points in a given UniFi site For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it). We also return real timestamps instead of the unix timestaps that the UniFi returns</maml:para>
+      <maml:para>Get statistics in five-minute segments for all or a given access point via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.</maml:para>
+      <maml:para>For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).</maml:para>
+      <maml:para>We also return real timestamps instead of the epoc/unix timestaps that the UniFi API returns.</maml:para>
     </maml:description>
     <command:syntax>
       <command:syntaxItem>
@@ -128,7 +130,9 @@
     </command:returnValues>
     <maml:alertSet>
       <maml:alert>
-        <maml:para>Defaults to the past 12 hours. Make sure that the retention policy for 5 minutes stats is set to the correct value in the controller settings Ubiquiti announced this with the Controller version 5.5 - It will not work on older versions!</maml:para>
+        <maml:para>Defaults to the past 12 hours.</maml:para>
+        <maml:para>Make sure that the retention policy for 5 minutes, statistics is set to the correct value in the controller settings.</maml:para>
+        <maml:para>Ubiquiti announced this with the Controller version 5.5 - It will not work on older versions!</maml:para>
       </maml:alert>
     </maml:alertSet>
     <command:examples>
@@ -136,7 +140,7 @@
         <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
         <dev:code>Get-Unifi5minutesApStats</dev:code>
         <dev:remarks>
-          <maml:para>Get the stats in 5 minute segments for all access points in the default site</maml:para>
+          <maml:para>Get statistics in five-minute segments for all access points in the default site.</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
@@ -212,12 +216,13 @@
       <command:verb>Get</command:verb>
       <command:noun>Unifi5minutesClientStats</command:noun>
       <maml:description>
-        <maml:para>Get user/client statistics in 5 minute segments</maml:para>
+        <maml:para>Get statistics in five-minute segments for a given user/client via API on the UniFi SDN Controller.</maml:para>
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>Get user/client statistics in 5 minute segments for a given client</maml:para>
-      <maml:para>For convenience, we return the a bit more then the API, e.g. everything in KB, MB, GB, and TB instead of just bytes We also return real timestamps instead of the unix timestaps in miliseconds that the UniFi returns</maml:para>
+      <maml:para>Get statistics in five-minute segments for a given user/client via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.</maml:para>
+      <maml:para>For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).</maml:para>
+      <maml:para>We also return real timestamps instead of the epoc/unix timestaps that the UniFi API returns.</maml:para>
       <maml:para>Sample output: Time          : 2/1/2019 3:45:00 PM rx_bytes      : 105.0 rx_kb         : 0.10 rx_mb         : 0.00 rx_gb         : 0.00 rx_tb         : 0.00 rx_rate       : 650000.0 rx_rate_mbps  : 634.77 rx_retries    : 0 rx_packets    : 2.5 tx_bytes      : 213.0 tx_kb         : 0.21 tx_mb         : 0.00 tx_gb         : 0.00 tx_tb         : 0.00 tx_rate       : 650000.0 tx_rate_mbps  : 634.77 tx_retries    : 1 tx_packets    : 4.5 Traffic_bytes : 318 Traffic_kb    : 0.31 Traffic_mb    : 0.00 Traffic_gb    : 0.00 Traffic_tb    : 0.00 Signal        : -65 Signal_plain  : -65.0</maml:para>
       <maml:para>In reality, we filter out all 0.00 values (e.g. tx_mb above) You can Filter for whatever parameter you like (e.g. with Select-Object)</maml:para>
     </maml:description>
@@ -438,12 +443,13 @@
       <command:verb>Get</command:verb>
       <command:noun>Unifi5minutesGatewayStats</command:noun>
       <maml:description>
-        <maml:para>Get statistics in 5 minute segments for the USG</maml:para>
+        <maml:para>Get statistics in five-minute segments for a USG via API on the UniFi SDN Controller.</maml:para>
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>Get statistics in 5 minute segments for the USG (UniFi Secure Gateway)</maml:para>
-      <maml:para>For convenience, we return the a bit more then the API, e.g. everything in KB, MB, GB, and TB instead of just bytes We also return real timestamps instead of the unix timestaps in miliseconds that the UniFi returns</maml:para>
+      <maml:para>Get statistics in five-minute segments for a UniFi Secure Gateway (USG) via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.</maml:para>
+      <maml:para>For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).</maml:para>
+      <maml:para>We also return real timestamps instead of the epoc/unix timestaps that the UniFi API returns.</maml:para>
       <maml:para>Sample output: Time           : 2/1/2019 6:20:00 PM gateway        : 78:8a:20:59:e6:88 mem            : 33.00 cpu            : 0.13 lan-rx_errors  : 0 lan-rx_bytes   : 1373037.08 lan-rx_kb      : 1340.86 lan-rx_mb      : 1.31 lan-rx_packets : 8410.58 lan-rx_dropped : 0 wan-rx_errors  : 0 wan-rx_packets : 1413.88 wan-rx_dropped : 0 lan-tx_errors  : 0 lan-tx_bytes   : 1908328.2 lan-tx_kb      : 1863.60 lan-tx_mb      : 1.82 lan-tx_packets : 8597.439999999999 lan-tx_dropped : 0 wan-tx_errors  : 0 wan-tx_bytes   : 391328.44 wan-tx_kb      : 382.16 wan-tx_mb      : 0.37 wan-tx_packets : 979.14 wan-tx_dropped : 0</maml:para>
       <maml:para>You might filter out all the 0 values, we keep them to prevent any null pointer expetions!</maml:para>
       <maml:para>You can Filter for whatever parameter you like (e.g. with Select-Object)</maml:para>
@@ -643,13 +649,13 @@
       <command:verb>Get</command:verb>
       <command:noun>Unifi5minutesSiteStats</command:noun>
       <maml:description>
-        <maml:para>Get statistics in 5 minute segments for a complete Site</maml:para>
+        <maml:para>Get statistics in five-minute segments for a complete Site via API on the UniFi SDN Controller.</maml:para>
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>Get statistics in 5 minute segments for a complete UniFi Site</maml:para>
-      <maml:para>For convenience, we return the a bit more then the API, e.g. everything in KB, MB, GB, and TB instead of just bytes</maml:para>
-      <maml:para>We also return real timestamps instead of the unix timestaps in miliseconds that the UniFi returns</maml:para>
+      <maml:para>Get statistics in five-minute segments for a complete Site via API on the UniFi SDN Controller.</maml:para>
+      <maml:para>For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).</maml:para>
+      <maml:para>We also return real timestamps instead of the epoc/unix timestaps that the UniFi API returns.</maml:para>
       <maml:para>Sample output: Time         : 1/28/2019 8:00:00 AM wan-tx_bytes : 15674710.4243137 wan-tx_kb    : 15307.33 wan-tx_mb    : 14.95 wan-tx_gb    : 0.01 wan-rx_bytes : 74608528.2870588 wan-rx_kb    : 72859.89 wan-rx_mb    : 71.15 wan-rx_gb    : 0.07 wan_bytes    : 90283238.7113726 wan_kb       : 88167.23 wan_mb       : 86.1 wan_gb       : 0.08 wlan_bytes   : 73033651.4499586 wlan_kb      : 71321.93 wlan_mb      : 69.65 wlan_gb      : 0.07 Clients      : 35 LAN_Clients  : 30 WLAN_Clients : 5</maml:para>
       <maml:para>You might filter out all the 0 values, we keep them to prevent any null pointer expetions!</maml:para>
       <maml:para>You can Filter for whatever parameter you like (e.g. with Select-Object)</maml:para>
@@ -848,11 +854,13 @@
       <command:verb>Get</command:verb>
       <command:noun>UnifiDailyApStats</command:noun>
       <maml:description>
-        <maml:para>Get daily stats Access Point stats</maml:para>
+        <maml:para>Get daily statistics for all or a given access point via API on the UniFi SDN Controller.</maml:para>
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>Get daily stats for all or just one access points in a given UniFi site For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it). We also return real timestamps instead of the unix timestaps that the UniFi returns</maml:para>
+      <maml:para>Get daily statistics for all or a given access point via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.</maml:para>
+      <maml:para>For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).</maml:para>
+      <maml:para>We also return real timestamps instead of the epoc/unix timestaps that the UniFi API returns.</maml:para>
     </maml:description>
     <command:syntax>
       <command:syntaxItem>
@@ -1047,12 +1055,13 @@
       <command:verb>Get</command:verb>
       <command:noun>UnifiDailyClientStats</command:noun>
       <maml:description>
-        <maml:para>Get daily user/client statistics for a given user/client</maml:para>
+        <maml:para>Get daily statistics for a given user/client via API on the UniFi SDN Controller.</maml:para>
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>Get daily user/client statistics for a given user/client</maml:para>
-      <maml:para>For convenience, we return the a bit more then the API, e.g. everything in KB, MB, GB, and TB instead of just bytes We also return real timestamps instead of the unix timestaps in miliseconds that the UniFi returns</maml:para>
+      <maml:para>Get daily statistics for a given user/client via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.</maml:para>
+      <maml:para>For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).</maml:para>
+      <maml:para>We also return real timestamps instead of the epoc/unix timestaps that the UniFi API returns.</maml:para>
       <maml:para>Sample output: Time          : 2/1/2019 1:00:00 AM rx_bytes      : 105.0 rx_kb         : 0.10 rx_mb         : 0.00 rx_gb         : 0.00 rx_tb         : 0.00 rx_rate       : 650000.0 rx_rate_mbps  : 634.77 rx_retries    : 0 rx_packets    : 2.5 tx_bytes      : 213.0 tx_kb         : 0.21 tx_mb         : 0.00 tx_gb         : 0.00 tx_tb         : 0.00 tx_rate       : 650000.0 tx_rate_mbps  : 634.77 tx_retries    : 1 tx_packets    : 4.5 Traffic_bytes : 318 Traffic_kb    : 0.31 Traffic_mb    : 0.00 Traffic_gb    : 0.00 Traffic_tb    : 0.00 Signal        : -65 Signal_plain  : -65.0</maml:para>
       <maml:para>In reality, we filter out all 0.00 values (e.g. tx_mb above) You can Filter for whatever parameter you like (e.g. with Select-Object)</maml:para>
     </maml:description>
@@ -1273,12 +1282,13 @@
       <command:verb>Get</command:verb>
       <command:noun>UnifiDailyGatewayStats</command:noun>
       <maml:description>
-        <maml:para>Get daily statistics for the USG</maml:para>
+        <maml:para>Get daily statistics for a USG via API on the UniFi SDN Controller.</maml:para>
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>Get daily statistics for the USG (UniFi Secure Gateway)</maml:para>
-      <maml:para>For convenience, we return the a bit more then the API, e.g. everything in KB, MB, GB, and TB instead of just bytes We also return real timestamps instead of the unix timestaps in miliseconds that the UniFi returns</maml:para>
+      <maml:para>Get daily statistics for a UniFi Secure Gateway (USG) via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.</maml:para>
+      <maml:para>For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).</maml:para>
+      <maml:para>We also return real timestamps instead of the epoc/unix timestaps that the UniFi API returns.</maml:para>
       <maml:para>Sample output: Time           : 2/1/2019 1:00:00 AM mem            : 33.23 cpu            : 3.25 lan-rx_errors  : 0 lan-rx_bytes   : 1715484318.69231 lan-rx_kb      : 1675277.65 lan-rx_mb      : 1636.01 lan-rx_gb      : 1.6 lan-rx_packets : 16370719.6153846 lan-rx_dropped : 125 wan-rx_errors  : 0 wan-rx_packets : 20559905.0769231 wan-rx_dropped : 1214 lan-tx_errors  : 0 lan-tx_bytes   : 30648673319.6923 lan-tx_kb      : 29930345.04 lan-tx_mb      : 29228.85 lan-tx_gb      : 28.54 lan-tx_tb      : 0.03 lan-tx_packets : 25358762.6923077 lan-tx_dropped : 0 wan-tx_errors  : 0 wan-tx_bytes   : 1047615654 wan-tx_kb      : 1023062.16 wan-tx_mb      : 999.08 wan-tx_gb      : 0.98 wan-tx_packets : 11374571.2307692 wan-tx_dropped : 0</maml:para>
       <maml:para>You might filter out all the 0 values, we keep them to prevent any null pointer expetions!</maml:para>
       <maml:para>You can Filter for whatever parameter you like (e.g. with Select-Object)</maml:para>
@@ -1478,13 +1488,13 @@
       <command:verb>Get</command:verb>
       <command:noun>UnifiDailySiteStats</command:noun>
       <maml:description>
-        <maml:para>Get daily statistics for a complete Site</maml:para>
+        <maml:para>Get daily statistics for a complete Site via API on the UniFi SDN Controller.</maml:para>
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>Get daily statistics for a complete UniFi Site</maml:para>
-      <maml:para>For convenience, we return the a bit more then the API, e.g. everything in KB, MB, GB, and TB instead of just bytes</maml:para>
-      <maml:para>We also return real timestamps instead of the unix timestaps in miliseconds that the UniFi returns</maml:para>
+      <maml:para>Get daily statistics for a complete Site via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.</maml:para>
+      <maml:para>For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).</maml:para>
+      <maml:para>We also return real timestamps instead of the epoc/unix timestaps that the UniFi API returns.</maml:para>
       <maml:para>Sample output: Time         : 1/28/2019 7:00:00 AM wan-tx_bytes : 5943900.402553191 wan-tx_kb    : 5804.59 wan-tx_mb    : 5.67 wan-tx_gb    : 0.01 wan-rx_bytes : 33117387.3812766 wan-rx_kb    : 32341.2 wan-rx_mb    : 31.58 wan-rx_gb    : 0.03 wan_bytes    : 39061287.783829791 wan_kb       : 38145.79 wan_mb       : 37.25 wan_gb       : 0.04 wlan_bytes   : 7030900.205833333 wlan_kb      : 6866.11 wlan_mb      : 6.71 wlan_gb      : 0.01 Clients      : 33 LAN_Clients  : 29 WLAN_Clients : 4</maml:para>
       <maml:para>You might filter out all the 0 values, we keep them to prevent any null pointer expetions!</maml:para>
       <maml:para>You can Filter for whatever parameter you like (e.g. with Select-Object)</maml:para>
@@ -1683,11 +1693,11 @@
       <command:verb>Get</command:verb>
       <command:noun>UnifiFirewallGroupDetails</command:noun>
       <maml:description>
-        <maml:para>Get the details about one Firewall Group via the API of the UniFi Controller</maml:para>
+        <maml:para>Get details about one given USG firewall groups via API on the UniFi SDN Controller.</maml:para>
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>Get the details about one Firewall Group via the API of the UniFi Controller</maml:para>
+      <maml:para>Get details about one given UniFi Secure Gateway (USG) firewall groups via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.</maml:para>
     </maml:description>
     <command:syntax>
       <command:syntaxItem>
@@ -1695,7 +1705,7 @@
         <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="FirewallGroupId">
           <maml:name>Id</maml:name>
           <maml:Description>
-            <maml:para>The ID (_id) of the Firewall Group you would like to get detaild information about. Multiple values are supported.</maml:para>
+            <maml:para>The ID (_id) of the Firewall Group, you would like to get detailed information about. Multiple values are supported.</maml:para>
           </maml:Description>
           <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
           <dev:type>
@@ -1722,7 +1732,7 @@
         <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="FirewallGroupName">
           <maml:name>Name</maml:name>
           <maml:Description>
-            <maml:para>The Name (not the _id) of the Firewall Group you would like to get detaild information about. Multiple values are supported.</maml:para>
+            <maml:para>The Name (not the _id) of the Firewall Group you would like to get detailed information about. Multiple values are supported.</maml:para>
           </maml:Description>
           <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
           <dev:type>
@@ -1749,7 +1759,7 @@
       <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="FirewallGroupId">
         <maml:name>Id</maml:name>
         <maml:Description>
-          <maml:para>The ID (_id) of the Firewall Group you would like to get detaild information about. Multiple values are supported.</maml:para>
+          <maml:para>The ID (_id) of the Firewall Group, you would like to get detailed information about. Multiple values are supported.</maml:para>
         </maml:Description>
         <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
         <dev:type>
@@ -1761,7 +1771,7 @@
       <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="FirewallGroupName">
         <maml:name>Name</maml:name>
         <maml:Description>
-          <maml:para>The Name (not the _id) of the Firewall Group you would like to get detaild information about. Multiple values are supported.</maml:para>
+          <maml:para>The Name (not the _id) of the Firewall Group you would like to get detailed information about. Multiple values are supported.</maml:para>
         </maml:Description>
         <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
         <dev:type>
@@ -1876,11 +1886,11 @@
       <command:verb>Get</command:verb>
       <command:noun>UnifiFirewallGroups</command:noun>
       <maml:description>
-        <maml:para>Get a List Firewall Groups via the API of the UniFi Controller</maml:para>
+        <maml:para>Get a list of configured USG firewall groups via API on the UniFi SDN Controller.</maml:para>
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>Get a List Firewall Groups via the API of the Ubiquiti UniFi Controller</maml:para>
+      <maml:para>Get a list of configured UniFi Secure Gateway (USG) firewall groups via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.</maml:para>
     </maml:description>
     <command:syntax>
       <command:syntaxItem>
@@ -1974,11 +1984,13 @@
       <command:verb>Get</command:verb>
       <command:noun>UnifiHourlyApStats</command:noun>
       <maml:description>
-        <maml:para>Get hourly stats Access Point stats</maml:para>
+        <maml:para>Get hourly statistics for all or a given access point via API on the UniFi SDN Controller.</maml:para>
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>Get hourly stats for all or just one access points in a given UniFi site For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it). We also return real timestamps instead of the unix timestaps that the UniFi returns</maml:para>
+      <maml:para>Get hourly statistics for all or a given access point via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.</maml:para>
+      <maml:para>For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).</maml:para>
+      <maml:para>We also return real timestamps instead of the epoc/unix timestaps that the UniFi API returns.</maml:para>
     </maml:description>
     <command:syntax>
       <command:syntaxItem>
@@ -2180,12 +2192,13 @@
       <command:verb>Get</command:verb>
       <command:noun>UnifiHourlyClientStats</command:noun>
       <maml:description>
-        <maml:para>Get hourly user/client statistics for a given user/client</maml:para>
+        <maml:para>Get hourly statistics for a given user/client via API on the UniFi SDN Controller.</maml:para>
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>Get hourly user/client statistics for a given user/client</maml:para>
-      <maml:para>For convenience, we return the a bit more then the API, e.g. everything in KB, MB, GB, and TB instead of just bytes We also return real timestamps instead of the unix timestaps in miliseconds that the UniFi returns</maml:para>
+      <maml:para>Get hourly statistics for a given user/client via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.</maml:para>
+      <maml:para>For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).</maml:para>
+      <maml:para>We also return real timestamps instead of the epoc/unix timestaps that the UniFi API returns.</maml:para>
       <maml:para>Sample output: Time          : 2/1/2019 4:00:00 PM rx_bytes      : 105.0 rx_kb         : 0.10 rx_mb         : 0.00 rx_gb         : 0.00 rx_tb         : 0.00 rx_rate       : 650000.0 rx_rate_mbps  : 634.77 rx_retries    : 0 rx_packets    : 2.5 tx_bytes      : 213.0 tx_kb         : 0.21 tx_mb         : 0.00 tx_gb         : 0.00 tx_tb         : 0.00 tx_rate       : 650000.0 tx_rate_mbps  : 634.77 tx_retries    : 1 tx_packets    : 4.5 Traffic_bytes : 318 Traffic_kb    : 0.31 Traffic_mb    : 0.00 Traffic_gb    : 0.00 Traffic_tb    : 0.00 Signal        : -65 Signal_plain  : -65.0</maml:para>
       <maml:para>In reality, we filter out all 0.00 values (e.g. tx_mb above) You can Filter for whatever parameter you like (e.g. with Select-Object)</maml:para>
     </maml:description>
@@ -2408,12 +2421,13 @@
       <command:verb>Get</command:verb>
       <command:noun>UnifiHourlyGatewayStats</command:noun>
       <maml:description>
-        <maml:para>Get hourly statistics for the USG</maml:para>
+        <maml:para>Get hourly statistics for a USG via API on the UniFi SDN Controller.</maml:para>
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>Get hourly statistics for the USG (UniFi Secure Gateway)</maml:para>
-      <maml:para>For convenience, we return the a bit more then the API, e.g. everything in KB, MB, GB, and TB instead of just bytes We also return real timestamps instead of the unix timestaps in miliseconds that the UniFi returns</maml:para>
+      <maml:para>Get hourly statistics for a UniFi Secure Gateway (USG) via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.</maml:para>
+      <maml:para>For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).</maml:para>
+      <maml:para>We also return real timestamps instead of the epoc/unix timestaps that the UniFi API returns.</maml:para>
       <maml:para>Sample output: Time           : 2/1/2019 6:00:00 PM mem            : 33.29 cpu            : 3.07 lan-rx_errors  : 0 lan-rx_bytes   : 50242070.25 lan-rx_kb      : 49064.52 lan-rx_mb      : 47.91 lan-rx_gb      : 0.05 lan-rx_packets : 298575.0 lan-rx_dropped : 0 wan-rx_errors  : 0 wan-rx_packets : 64705.74999999999 wan-rx_dropped : 0 lan-tx_errors  : 0 lan-tx_bytes   : 82506381.25 lan-tx_kb      : 80572.64 lan-tx_mb      : 78.68 lan-tx_gb      : 0.08 lan-tx_packets : 310632.50000000006 lan-tx_dropped : 0 wan-tx_errors  : 0 wan-tx_bytes   : 16211129 wan-tx_kb      : 15831.18 wan-tx_mb      : 15.46 wan-tx_gb      : 0.02 wan-tx_packets : 42872.99999999999 wan-tx_dropped : 0</maml:para>
       <maml:para>You might filter out all the 0 values, we keep them to prevent any null pointer expetions!</maml:para>
       <maml:para>You can Filter for whatever parameter you like (e.g. with Select-Object)</maml:para>
@@ -2613,13 +2627,13 @@
       <command:verb>Get</command:verb>
       <command:noun>UnifiHourlySiteStats</command:noun>
       <maml:description>
-        <maml:para>Get horly statistics for a complete Site</maml:para>
+        <maml:para>Get hourly statistics for a complete UniFi Site via API on the UniFi SDN Controller.</maml:para>
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>Get horly statistics for a complete UniFi Site</maml:para>
-      <maml:para>For convenience, we return the a bit more then the API, e.g. everything in KB, MB, GB, and TB instead of just bytes</maml:para>
-      <maml:para>We also return real timestamps instead of the unix timestaps in miliseconds that the UniFi returns</maml:para>
+      <maml:para>Get hourly statistics for a complete UniFi Site via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.</maml:para>
+      <maml:para>For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).</maml:para>
+      <maml:para>We also return real timestamps instead of the epoc/unix timestaps that the UniFi API returns.</maml:para>
       <maml:para>Sample output: Time         : 1/28/2019 8:00:00 AM wan-tx_bytes : 15674710.4243137 wan-tx_kb    : 15307.33 wan-tx_mb    : 14.95 wan-tx_gb    : 0.01 wan-rx_bytes : 74608528.2870588 wan-rx_kb    : 72859.89 wan-rx_mb    : 71.15 wan-rx_gb    : 0.07 wan_bytes    : 90283238.7113726 wan_kb       : 88167.23 wan_mb       : 86.1 wan_gb       : 0.08 wlan_bytes   : 73033651.4499586 wlan_kb      : 71321.93 wlan_mb      : 69.65 wlan_gb      : 0.07 Clients      : 35 LAN_Clients  : 30 WLAN_Clients : 5</maml:para>
       <maml:para>You might filter out all the 0 values, we keep them to prevent any null pointer expetions!</maml:para>
       <maml:para>You can Filter for whatever parameter you like (e.g. with Select-Object)</maml:para>
@@ -2749,28 +2763,28 @@
         <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
         <dev:code>Get-UnifiHourlySiteStats</dev:code>
         <dev:remarks>
-          <maml:para>Get horly statistics for a complete UniFi for the default site</maml:para>
+          <maml:para>Get hourly statistics for a complete UniFi for the default site</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
         <maml:title>-------------------------- EXAMPLE 2 --------------------------</maml:title>
         <dev:code>(Get-UnifiHourlySiteStats -Start '1548971935421' -End '1548975579019')</dev:code>
         <dev:remarks>
-          <maml:para>Get horly statistics for a complete UniFi for the default site for a given time period.</maml:para>
+          <maml:para>Get hourly statistics for a complete UniFi for the default site for a given time period.</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
         <maml:title>-------------------------- EXAMPLE 3 --------------------------</maml:title>
         <dev:code>(Get-UnifiHourlySiteStats -Start '1548980058135')</dev:code>
         <dev:remarks>
-          <maml:para>Get horly statistics for a complete UniFi for the default site for the last 60 minutes (was the timestamp while the sample was created)</maml:para>
+          <maml:para>Get hourly statistics for a complete UniFi for the default site for the last 60 minutes (was the timestamp while the sample was created)</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
         <maml:title>-------------------------- EXAMPLE 4 --------------------------</maml:title>
         <dev:code>(Get-UnifiHourlySiteStats -UnifiSite 'contoso')[-1]</dev:code>
         <dev:remarks>
-          <maml:para>Get horly statistics for a complete UniFi for the site 'contoso'</maml:para>
+          <maml:para>Get hourly statistics for a complete UniFi for the site 'contoso'</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
@@ -2818,11 +2832,11 @@
       <command:verb>Get</command:verb>
       <command:noun>UnifiNetworkDetails</command:noun>
       <maml:description>
-        <maml:para>Get the details about one network via the API of the UniFi Controller</maml:para>
+        <maml:para>Get the details about a given network via API on the UniFi SDN Controller.</maml:para>
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>Get the details about one network via the API of the UniFi Controller</maml:para>
+      <maml:para>Get the details about a given network via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.</maml:para>
     </maml:description>
     <command:syntax>
       <command:syntaxItem>
@@ -3018,11 +3032,11 @@
       <command:verb>Get</command:verb>
       <command:noun>UnifiNetworkList</command:noun>
       <maml:description>
-        <maml:para>Get a List Networks via the API of the UniFi Controller</maml:para>
+        <maml:para>Get a list of configured networks via API on the UniFi SDN Controller.</maml:para>
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>Get a List Networks via the API of the Ubiquiti UniFi Controller</maml:para>
+      <maml:para>Get a list of configured networks via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.</maml:para>
     </maml:description>
     <command:syntax>
       <command:syntaxItem>
@@ -3116,11 +3130,11 @@
       <command:verb>Get</command:verb>
       <command:noun>UnifiSpeedTestResult</command:noun>
       <maml:description>
-        <maml:para>Get the UniFi Security Gateway (USG) Speed Test results</maml:para>
+        <maml:para>Get USG speed test results via API on the UniFi SDN Controller.</maml:para>
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>Get the UniFi Security Gateway (USG) Speed Test results</maml:para>
+      <maml:para>Get UniFi Secure Gateway (USG) speed test results via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.</maml:para>
     </maml:description>
     <command:syntax>
       <command:syntaxItem>
@@ -3367,7 +3381,9 @@
     </command:returnValues>
     <maml:alertSet>
       <maml:alert>
-        <maml:para>Initial version that makes it more human readable. The filetring needs a few more tests</maml:para>
+        <maml:para>Initial version that makes it more human readable.</maml:para>
+        <maml:para>The filetring needs a few more tests.</maml:para>
+        <maml:para>A UniFi Secure Gateway (USG) is required in the UniFi site!</maml:para>
       </maml:alert>
     </maml:alertSet>
     <command:examples>
@@ -3458,11 +3474,11 @@
       <command:verb>Invoke</command:verb>
       <command:noun>UniFiApiLogin</command:noun>
       <maml:description>
-        <maml:para>Login to API of the UniFi Controller</maml:para>
+        <maml:para>It sends a login request via API on the UniFi SDN Controller.</maml:para>
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>Login to API of the Ubiquiti UniFi Controller</maml:para>
+      <maml:para>It sends a login request via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.</maml:para>
     </maml:description>
     <command:syntax>
       <command:syntaxItem>
@@ -3515,11 +3531,11 @@
       <command:verb>Invoke</command:verb>
       <command:noun>UniFiApiLogout</command:noun>
       <maml:description>
-        <maml:para>Logout from the API of the UniFi Controller</maml:para>
+        <maml:para>It sends a logout request via API on the UniFi SDN Controller.</maml:para>
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>Logout from the API of the Ubiquiti UniFi Controller</maml:para>
+      <maml:para>It sends a logout request via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.</maml:para>
     </maml:description>
     <command:syntax>
       <command:syntaxItem>
@@ -3568,11 +3584,11 @@
       <command:verb>Invoke</command:verb>
       <command:noun>UnifiAuthorizeGuest</command:noun>
       <maml:description>
-        <maml:para>Authorize a client device via the API of the UniFi Controller</maml:para>
+        <maml:para>It authorizes a given user/client via API on the UniFi SDN Controller.</maml:para>
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>Authorize a client device via the API of the Ubiquiti UniFi Controller</maml:para>
+      <maml:para>It authorizes a given user/client via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.</maml:para>
     </maml:description>
     <command:syntax>
       <command:syntaxItem>
@@ -3838,11 +3854,11 @@
       <command:verb>Invoke</command:verb>
       <command:noun>UnifiBlockClient</command:noun>
       <maml:description>
-        <maml:para>Block a client device via the API of the UniFi Controller</maml:para>
+        <maml:para>It blocks a given user/client via API on the UniFi SDN Controller.</maml:para>
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>Block a client device via the API of the Ubiquiti UniFi Controller</maml:para>
+      <maml:para>It blocks a given user/client via via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.</maml:para>
     </maml:description>
     <command:syntax>
       <command:syntaxItem>
@@ -3960,11 +3976,11 @@
       <command:verb>Invoke</command:verb>
       <command:noun>UnifiForgetClient</command:noun>
       <maml:description>
-        <maml:para>Forget one or more client devices via the API of the UniFi Controller</maml:para>
+        <maml:para>It forgets one or more given users/clients via API on the UniFi SDN Controller.</maml:para>
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>Forget one or more client devices via the API of the Ubiquiti UniFi Controller</maml:para>
+      <maml:para>It forgets one or more given users/clients via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.</maml:para>
     </maml:description>
     <command:syntax>
       <command:syntaxItem>
@@ -4082,11 +4098,11 @@
       <command:verb>Invoke</command:verb>
       <command:noun>UnifiReconnectClient</command:noun>
       <maml:description>
-        <maml:para>Reconnect a client device via the API of the UniFi Controller</maml:para>
+        <maml:para>It reconnects a given user/client via API on the UniFi SDN Controller.</maml:para>
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>Reconnect a client device via the API of the Ubiquiti UniFi Controller</maml:para>
+      <maml:para>It reconnects a given user/client via via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.</maml:para>
     </maml:description>
     <command:syntax>
       <command:syntaxItem>
@@ -4204,11 +4220,11 @@
       <command:verb>Invoke</command:verb>
       <command:noun>UnifiUnauthorizeGuest</command:noun>
       <maml:description>
-        <maml:para>Unauthorize a client device via the API of the UniFi Controller</maml:para>
+        <maml:para>It uauthorizes a user/client via API on the UniFi SDN Controller.</maml:para>
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>Unauthorize a client device via the API of the Ubiquiti UniFi Controller</maml:para>
+      <maml:para>It uauthorizes a user/client via via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.</maml:para>
     </maml:description>
     <command:syntax>
       <command:syntaxItem>
@@ -4326,11 +4342,11 @@
       <command:verb>Invoke</command:verb>
       <command:noun>UnifiUnblockClient</command:noun>
       <maml:description>
-        <maml:para>Unblock a client device via the API of the UniFi Controller</maml:para>
+        <maml:para>It unblocks a given user/client via API on the UniFi SDN Controller.</maml:para>
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>Unblock a client device via the API of the Ubiquiti UniFi Controller</maml:para>
+      <maml:para>It unblocks a given user/client via via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.</maml:para>
     </maml:description>
     <command:syntax>
       <command:syntaxItem>
@@ -4448,11 +4464,11 @@
       <command:verb>New</command:verb>
       <command:noun>UnifiClientDevice</command:noun>
       <maml:description>
-        <maml:para>Create a new user/client-device via the API of the UniFi Controller</maml:para>
+        <maml:para>It creates a new user/client via API on the UniFi SDN Controller.</maml:para>
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>Create a new user/client-device via the API of the Ubiquiti UniFi Controller</maml:para>
+      <maml:para>It creates a new user/client via via Ubiquiti (UBNT) UniFi RESTful API on the UniFi SDN Controller.</maml:para>
     </maml:description>
     <command:syntax>
       <command:syntaxItem>
@@ -4688,11 +4704,11 @@
       <command:verb>New</command:verb>
       <command:noun>UniFiConfig</command:noun>
       <maml:description>
-        <maml:para>Creates the UniFi config JSON file</maml:para>
+        <maml:para>It creates the JSON configuration file for the UniFiTooling Module.</maml:para>
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>Creates the UniFi config JSON file. If no input is given it creates one with all the defaults.</maml:para>
+      <maml:para>It creates the JSON configuration file for the UniFiTooling PowerShell Module. If no input is given it creates one with all the default settings, and you should modify the file with you favorite editor.</maml:para>
     </maml:description>
     <command:syntax>
       <command:syntaxItem>
@@ -4989,11 +5005,11 @@
       <command:verb>Set</command:verb>
       <command:noun>UnifiFirewallGroup</command:noun>
       <maml:description>
-        <maml:para>Get a given Firewall Group via the API of the UniFi Controller</maml:para>
+        <maml:para>Get information about a given Firewall Group via API of the UniFi SDN Controller.</maml:para>
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>Get a given Firewall Group via the API of the Ubiquiti UniFi Controller</maml:para>
+      <maml:para>Get information about a given Firewall Group via Ubiquiti (UBNT) UniFi RESTful API of the UniFi SDN Controller.</maml:para>
     </maml:description>
     <command:syntax>
       <command:syntaxItem>
@@ -5127,11 +5143,11 @@
       <command:verb>Set</command:verb>
       <command:noun>UnifiNetworkDetails</command:noun>
       <maml:description>
-        <maml:para>Modifies one network via the API of the UniFi Controller</maml:para>
+        <maml:para>It modifies a given network via the API of the UniFi Controller.</maml:para>
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>Modifies one network via the API of the UniFi Controller</maml:para>
+      <maml:para>It modifies a given network via the via Ubiquiti (UBNT) UniFi RESTful API of the UniFi SDN Controller.</maml:para>
     </maml:description>
     <command:syntax>
       <command:syntaxItem>

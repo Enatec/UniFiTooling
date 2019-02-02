@@ -2,14 +2,14 @@
 {
    <#
          .SYNOPSIS
-         Get statistics in 5 minute segments for a complete Site
+         Get statistics in five-minute segments for a complete Site via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         Get statistics in 5 minute segments for a complete UniFi Site
+         Get statistics in five-minute segments for a complete Site via API on the UniFi SDN Controller.
 
-         For convenience, we return the a bit more then the API, e.g. everything in KB, MB, GB, and TB instead of just bytes
+         For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).
 
-         We also return real timestamps instead of the unix timestaps in miliseconds that the UniFi returns
+         We also return real timestamps instead of the epoc/unix timestaps that the UniFi API returns.
 
          Sample output:
          Time         : 1/28/2019 8:00:00 AM

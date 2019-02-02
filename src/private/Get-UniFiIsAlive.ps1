@@ -2,10 +2,10 @@
 {
    <#
          .SYNOPSIS
-         Use a simple API call to see if the session is alive
+         It uses a simple API call to see if the API session is (still) alive.
 
          .DESCRIPTION
-         Use a simple API call to see if the session is alive
+         It uses a simple RESTful API call to see if the API session is (still) alive.
 
          .PARAMETER UnifiSite
          UniFi Site as configured. The default is: default
@@ -13,15 +13,15 @@
          .EXAMPLE
          PS C:\> Get-UniFiIsAlive
 
-         Use a simple API call to see if the session is alive
+         It uses a simple API call to see if the API session is (still) alive.
 
          .EXAMPLE
          PS C:\> Get-UniFiIsAlive -UnifiSite 'Contoso'
 
-         Use a simple API call to see if the session is alive on Site 'Contoso'
+         It uses a simple API call to see if the API session is (still) alive on Site 'Contoso'
 
          .NOTES
-         Internal Helper Function
+         This is an internal helper function, only to reduce the code duplication and maintenance within our other functions.
 
          .LINK
          Get-UniFiConfig
@@ -53,9 +53,6 @@
    {
       Write-Verbose -Message 'Start Get-UniFiIsAlive'
 
-      # Call meta function
-      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
-
       # Cleanup
       $Session = $null
 
@@ -67,6 +64,9 @@
 
       # Set the default to FALSE
       $SessionStatus = $false
+
+      # Call meta function
+      $null = (Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -ErrorAction SilentlyContinue -WarningAction SilentlyContinue)
    }
 
    process

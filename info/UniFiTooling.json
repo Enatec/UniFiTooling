@@ -1,7 +1,7 @@
 {
     "ProcessorArchitecture":  null,
     "Author":  "Joerg Hochwald",
-    "Description":  "Ubiquiti (UBNT) UniFi Security Gateway automation via the API of the Ubiquiti UniFi Controller",
+    "Description":  "PowerShell Module to configure, manage, and automate Ubiquiti (UBNT) UniFi [SDN Controller API](https://unifi-sdn.ui.com/) processes.",
     "RequiredModules":  null,
     "DscResourcesToExport":  null,
     "FunctionsToExport":  null,

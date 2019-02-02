@@ -2,10 +2,10 @@
 {
    <#
          .SYNOPSIS
-         Get the details about one network via the API of the UniFi Controller
+         Get the details about a given network via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         Get the details about one network via the API of the UniFi Controller
+         Get the details about a given network via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
          .PARAMETER Id
          The ID (network_id) of the network you would like to get detaild information about. Multiple values are supported.

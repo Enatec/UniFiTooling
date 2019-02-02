@@ -11,7 +11,7 @@ schema: 2.0.0
 # New-UnifiClientDevice
 
 ## SYNOPSIS
-Create a new user/client-device via the API of the UniFi Controller
+It creates a new user/client via API on the UniFi SDN Controller.
 
 ## SYNTAX
 
@@ -21,7 +21,7 @@ New-UnifiClientDevice [[-UnifiSite] <String>] [-Mac] <String> [-Group] <String> 
 ```
 
 ## DESCRIPTION
-Create a new user/client-device via the API of the Ubiquiti UniFi Controller
+It creates a new user/client via via Ubiquiti (UBNT) UniFi RESTful API on the UniFi SDN Controller.
 
 ## EXAMPLES
 

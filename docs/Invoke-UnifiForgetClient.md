@@ -11,7 +11,7 @@ schema: 2.0.0
 # Invoke-UnifiForgetClient
 
 ## SYNOPSIS
-Forget one or more client devices via the API of the UniFi Controller
+It forgets one or more given users/clients via API on the UniFi SDN Controller.
 
 ## SYNTAX
 
@@ -20,7 +20,7 @@ Invoke-UnifiForgetClient [[-UnifiSite] <String>] [-Mac] <String[]> [<CommonParam
 ```
 
 ## DESCRIPTION
-Forget one or more client devices via the API of the Ubiquiti UniFi Controller
+It forgets one or more given users/clients via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
 ## EXAMPLES
 

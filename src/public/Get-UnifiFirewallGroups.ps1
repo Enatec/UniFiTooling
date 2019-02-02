@@ -2,10 +2,10 @@
 {
    <#
          .SYNOPSIS
-         Get a List Firewall Groups via the API of the UniFi Controller
+         Get a list of configured USG firewall groups via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         Get a List Firewall Groups via the API of the Ubiquiti UniFi Controller
+         Get a list of configured UniFi Secure Gateway (USG) firewall groups via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
          .PARAMETER UnifiSite
          UniFi Site as configured. The default is: default
