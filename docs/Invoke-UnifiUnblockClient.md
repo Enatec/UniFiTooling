@@ -20,7 +20,7 @@ Invoke-UnifiUnblockClient [[-UnifiSite] <String>] [-Mac] <String> [<CommonParame
 ```
 
 ## DESCRIPTION
-It unblocks a given user/client via via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
+It unblocks a given user/client via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
 ## EXAMPLES
 

@@ -5,7 +5,7 @@
          It uauthorizes a user/client via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         It uauthorizes a user/client via via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
+         It uauthorizes a user/client via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
          .PARAMETER UnifiSite
          UniFi Site as configured. The default is: default

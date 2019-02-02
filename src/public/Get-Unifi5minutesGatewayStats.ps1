@@ -5,7 +5,7 @@
          Get statistics in five-minute segments for a USG via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         Get statistics in five-minute segments for a UniFi Secure Gateway (USG) via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
+         Get statistics in five-minute segments for a UniFi Security Gateway (USG) via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
          For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).
 
@@ -59,22 +59,22 @@
          .EXAMPLE
          PS C:\> Get-Unifi5minutesGatewayStats
 
-         Get statistics in 5 minute segments for the USG (UniFi Secure Gateway) in the default site
+         Get statistics in 5 minute segments for the USG (UniFi Security Gateway) in the default site
 
          .EXAMPLE
          (Get-Unifi5minutesGatewayStats -Start '1548971935421' -End '1548975579019')
 
-         Get statistics in 5 minute segments for the USG (UniFi Secure Gateway) in the default site for a given time period.
+         Get statistics in 5 minute segments for the USG (UniFi Security Gateway) in the default site for a given time period.
 
          .EXAMPLE
          (Get-Unifi5minutesGatewayStats -Start '1548980058135')
 
-         Get statistics in 5 minute segments for the USG (UniFi Secure Gateway) in the default site for the last 60 minutes (was the timestamp while the sample was created)
+         Get statistics in 5 minute segments for the USG (UniFi Security Gateway) in the default site for the last 60 minutes (was the timestamp while the sample was created)
 
          .EXAMPLE
          PS C:\> (Get-Unifi5minutesGatewayStats -UnifiSite 'contoso')[-1]
 
-         Get statistics in 5 minute segments for the USG (UniFi Secure Gateway) in the site 'contoso'
+         Get statistics in 5 minute segments for the USG (UniFi Security Gateway) in the site 'contoso'
 
          .EXAMPLE
          PS C:\> Get-Unifi5minutesGatewayStats -Attributes 'mem','cpu','loadavg_5','lan-rx_errors','wan-rx_errors','lan-tx_errors','wan-tx_errors','lan-rx_bytes','wan-rx_bytes','lan-tx_bytes','wan-tx_bytes','lan-rx_packets','wan-rx_packets','lan-tx_packets','wan-tx_packets','lan-rx_dropped','wan-rx_dropped','lan-tx_dropped','wan-tx_dropped')
@@ -86,7 +86,7 @@
          Make sure that the retention policy for 5 minutes stats is set to the correct value in the controller settings
          Ubiquiti announced this with the Controller version 5.8 - It will not work on older versions!
 
-         A USG (UniFi Secure Gateway) is required on the site you querry!
+         A USG (UniFi Security Gateway) is required on the site you querry!
 
          .LINK
          Get-UniFiConfig

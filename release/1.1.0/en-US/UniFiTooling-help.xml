@@ -447,7 +447,7 @@
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>Get statistics in five-minute segments for a UniFi Secure Gateway (USG) via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.</maml:para>
+      <maml:para>Get statistics in five-minute segments for a UniFi Security Gateway (USG) via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.</maml:para>
       <maml:para>For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).</maml:para>
       <maml:para>We also return real timestamps instead of the epoc/unix timestaps that the UniFi API returns.</maml:para>
       <maml:para>Sample output: Time           : 2/1/2019 6:20:00 PM gateway        : 78:8a:20:59:e6:88 mem            : 33.00 cpu            : 0.13 lan-rx_errors  : 0 lan-rx_bytes   : 1373037.08 lan-rx_kb      : 1340.86 lan-rx_mb      : 1.31 lan-rx_packets : 8410.58 lan-rx_dropped : 0 wan-rx_errors  : 0 wan-rx_packets : 1413.88 wan-rx_dropped : 0 lan-tx_errors  : 0 lan-tx_bytes   : 1908328.2 lan-tx_kb      : 1863.60 lan-tx_mb      : 1.82 lan-tx_packets : 8597.439999999999 lan-tx_dropped : 0 wan-tx_errors  : 0 wan-tx_bytes   : 391328.44 wan-tx_kb      : 382.16 wan-tx_mb      : 0.37 wan-tx_packets : 979.14 wan-tx_dropped : 0</maml:para>
@@ -572,7 +572,7 @@
     <maml:alertSet>
       <maml:alert>
         <maml:para>Defaults to the past 12 hours. Make sure that the retention policy for 5 minutes stats is set to the correct value in the controller settings Ubiquiti announced this with the Controller version 5.8 - It will not work on older versions!</maml:para>
-        <maml:para>A USG (UniFi Secure Gateway) is required on the site you querry!</maml:para>
+        <maml:para>A USG (UniFi Security Gateway) is required on the site you querry!</maml:para>
       </maml:alert>
     </maml:alertSet>
     <command:examples>
@@ -580,28 +580,28 @@
         <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
         <dev:code>Get-Unifi5minutesGatewayStats</dev:code>
         <dev:remarks>
-          <maml:para>Get statistics in 5 minute segments for the USG (UniFi Secure Gateway) in the default site</maml:para>
+          <maml:para>Get statistics in 5 minute segments for the USG (UniFi Security Gateway) in the default site</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
         <maml:title>-------------------------- EXAMPLE 2 --------------------------</maml:title>
         <dev:code>(Get-Unifi5minutesGatewayStats -Start '1548971935421' -End '1548975579019')</dev:code>
         <dev:remarks>
-          <maml:para>Get statistics in 5 minute segments for the USG (UniFi Secure Gateway) in the default site for a given time period.</maml:para>
+          <maml:para>Get statistics in 5 minute segments for the USG (UniFi Security Gateway) in the default site for a given time period.</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
         <maml:title>-------------------------- EXAMPLE 3 --------------------------</maml:title>
         <dev:code>(Get-Unifi5minutesGatewayStats -Start '1548980058135')</dev:code>
         <dev:remarks>
-          <maml:para>Get statistics in 5 minute segments for the USG (UniFi Secure Gateway) in the default site for the last 60 minutes (was the timestamp while the sample was created)</maml:para>
+          <maml:para>Get statistics in 5 minute segments for the USG (UniFi Security Gateway) in the default site for the last 60 minutes (was the timestamp while the sample was created)</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
         <maml:title>-------------------------- EXAMPLE 4 --------------------------</maml:title>
         <dev:code>(Get-Unifi5minutesGatewayStats -UnifiSite 'contoso')[-1]</dev:code>
         <dev:remarks>
-          <maml:para>Get statistics in 5 minute segments for the USG (UniFi Secure Gateway) in the site 'contoso'</maml:para>
+          <maml:para>Get statistics in 5 minute segments for the USG (UniFi Security Gateway) in the site 'contoso'</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
@@ -1286,7 +1286,7 @@
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>Get daily statistics for a UniFi Secure Gateway (USG) via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.</maml:para>
+      <maml:para>Get daily statistics for a UniFi Security Gateway (USG) via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.</maml:para>
       <maml:para>For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).</maml:para>
       <maml:para>We also return real timestamps instead of the epoc/unix timestaps that the UniFi API returns.</maml:para>
       <maml:para>Sample output: Time           : 2/1/2019 1:00:00 AM mem            : 33.23 cpu            : 3.25 lan-rx_errors  : 0 lan-rx_bytes   : 1715484318.69231 lan-rx_kb      : 1675277.65 lan-rx_mb      : 1636.01 lan-rx_gb      : 1.6 lan-rx_packets : 16370719.6153846 lan-rx_dropped : 125 wan-rx_errors  : 0 wan-rx_packets : 20559905.0769231 wan-rx_dropped : 1214 lan-tx_errors  : 0 lan-tx_bytes   : 30648673319.6923 lan-tx_kb      : 29930345.04 lan-tx_mb      : 29228.85 lan-tx_gb      : 28.54 lan-tx_tb      : 0.03 lan-tx_packets : 25358762.6923077 lan-tx_dropped : 0 wan-tx_errors  : 0 wan-tx_bytes   : 1047615654 wan-tx_kb      : 1023062.16 wan-tx_mb      : 999.08 wan-tx_gb      : 0.98 wan-tx_packets : 11374571.2307692 wan-tx_dropped : 0</maml:para>
@@ -1411,7 +1411,7 @@
     <maml:alertSet>
       <maml:alert>
         <maml:para>Defaults to the past year (52 7 24 hours)</maml:para>
-        <maml:para>A USG (UniFi Secure Gateway) is required on the site you querry!</maml:para>
+        <maml:para>A USG (UniFi Security Gateway) is required on the site you querry!</maml:para>
       </maml:alert>
     </maml:alertSet>
     <command:examples>
@@ -1419,28 +1419,28 @@
         <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
         <dev:code>Get-UnifiDailyGatewayStats</dev:code>
         <dev:remarks>
-          <maml:para>Get daily statistics for the USG (UniFi Secure Gateway) in the default site</maml:para>
+          <maml:para>Get daily statistics for the USG (UniFi Security Gateway) in the default site</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
         <maml:title>-------------------------- EXAMPLE 2 --------------------------</maml:title>
         <dev:code>(Get-UnifiDailyGatewayStats -Start '1548971935421' -End '1548975579019')</dev:code>
         <dev:remarks>
-          <maml:para>Get daily statistics for the USG (UniFi Secure Gateway) in the default site for a given time period.</maml:para>
+          <maml:para>Get daily statistics for the USG (UniFi Security Gateway) in the default site for a given time period.</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
         <maml:title>-------------------------- EXAMPLE 3 --------------------------</maml:title>
         <dev:code>(Get-UnifiDailyGatewayStats -Start '1548980058135')</dev:code>
         <dev:remarks>
-          <maml:para>Get daily statistics for the USG (UniFi Secure Gateway) in the default site for the last 60 minutes (was the timestamp while the sample was created)</maml:para>
+          <maml:para>Get daily statistics for the USG (UniFi Security Gateway) in the default site for the last 60 minutes (was the timestamp while the sample was created)</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
         <maml:title>-------------------------- EXAMPLE 4 --------------------------</maml:title>
         <dev:code>(Get-UnifiDailyGatewayStats -UnifiSite 'contoso')[-1]</dev:code>
         <dev:remarks>
-          <maml:para>Get daily statistics for the USG (UniFi Secure Gateway) in the site 'contoso'</maml:para>
+          <maml:para>Get daily statistics for the USG (UniFi Security Gateway) in the site 'contoso'</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
@@ -2425,7 +2425,7 @@
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>Get hourly statistics for a UniFi Secure Gateway (USG) via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.</maml:para>
+      <maml:para>Get hourly statistics for a UniFi Security Gateway (USG) via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.</maml:para>
       <maml:para>For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).</maml:para>
       <maml:para>We also return real timestamps instead of the epoc/unix timestaps that the UniFi API returns.</maml:para>
       <maml:para>Sample output: Time           : 2/1/2019 6:00:00 PM mem            : 33.29 cpu            : 3.07 lan-rx_errors  : 0 lan-rx_bytes   : 50242070.25 lan-rx_kb      : 49064.52 lan-rx_mb      : 47.91 lan-rx_gb      : 0.05 lan-rx_packets : 298575.0 lan-rx_dropped : 0 wan-rx_errors  : 0 wan-rx_packets : 64705.74999999999 wan-rx_dropped : 0 lan-tx_errors  : 0 lan-tx_bytes   : 82506381.25 lan-tx_kb      : 80572.64 lan-tx_mb      : 78.68 lan-tx_gb      : 0.08 lan-tx_packets : 310632.50000000006 lan-tx_dropped : 0 wan-tx_errors  : 0 wan-tx_bytes   : 16211129 wan-tx_kb      : 15831.18 wan-tx_mb      : 15.46 wan-tx_gb      : 0.02 wan-tx_packets : 42872.99999999999 wan-tx_dropped : 0</maml:para>
@@ -2550,7 +2550,7 @@
     <maml:alertSet>
       <maml:alert>
         <maml:para>Defaults to the past week (7*24 hours)</maml:para>
-        <maml:para>A USG (UniFi Secure Gateway) is required on the site you querry!</maml:para>
+        <maml:para>A USG (UniFi Security Gateway) is required on the site you querry!</maml:para>
       </maml:alert>
     </maml:alertSet>
     <command:examples>
@@ -2558,28 +2558,28 @@
         <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
         <dev:code>Get-UnifiHourlyGatewayStats</dev:code>
         <dev:remarks>
-          <maml:para>Get hourly statistics for the USG (UniFi Secure Gateway) in the default site</maml:para>
+          <maml:para>Get hourly statistics for the USG (UniFi Security Gateway) in the default site</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
         <maml:title>-------------------------- EXAMPLE 2 --------------------------</maml:title>
         <dev:code>(Get-UnifiHourlyGatewayStats -Start '1548971935421' -End '1548975579019')</dev:code>
         <dev:remarks>
-          <maml:para>Get hourly statistics for the USG (UniFi Secure Gateway) in the default site for a given time period.</maml:para>
+          <maml:para>Get hourly statistics for the USG (UniFi Security Gateway) in the default site for a given time period.</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
         <maml:title>-------------------------- EXAMPLE 3 --------------------------</maml:title>
         <dev:code>(Get-UnifiHourlyGatewayStats -Start '1548980058135')</dev:code>
         <dev:remarks>
-          <maml:para>Get hourly statistics for the USG (UniFi Secure Gateway) in the default site for the last 60 minutes (was the timestamp while the sample was created)</maml:para>
+          <maml:para>Get hourly statistics for the USG (UniFi Security Gateway) in the default site for the last 60 minutes (was the timestamp while the sample was created)</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
         <maml:title>-------------------------- EXAMPLE 4 --------------------------</maml:title>
         <dev:code>(Get-UnifiHourlyGatewayStats -UnifiSite 'contoso')[-1]</dev:code>
         <dev:remarks>
-          <maml:para>Get hourly statistics for the USG (UniFi Secure Gateway) in the site 'contoso'</maml:para>
+          <maml:para>Get hourly statistics for the USG (UniFi Security Gateway) in the site 'contoso'</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
@@ -3134,7 +3134,7 @@
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>Get UniFi Secure Gateway (USG) speed test results via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.</maml:para>
+      <maml:para>Get UniFi Security Gateway (USG) speed test results via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.</maml:para>
     </maml:description>
     <command:syntax>
       <command:syntaxItem>
@@ -3383,7 +3383,7 @@
       <maml:alert>
         <maml:para>Initial version that makes it more human readable.</maml:para>
         <maml:para>The filetring needs a few more tests.</maml:para>
-        <maml:para>A UniFi Secure Gateway (USG) is required in the UniFi site!</maml:para>
+        <maml:para>A UniFi Security Gateway (USG) is required in the UniFi site!</maml:para>
       </maml:alert>
     </maml:alertSet>
     <command:examples>
@@ -3858,7 +3858,7 @@
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>It blocks a given user/client via via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.</maml:para>
+      <maml:para>It blocks a given user/client via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.</maml:para>
     </maml:description>
     <command:syntax>
       <command:syntaxItem>
@@ -4102,7 +4102,7 @@
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>It reconnects a given user/client via via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.</maml:para>
+      <maml:para>It reconnects a given user/client via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.</maml:para>
     </maml:description>
     <command:syntax>
       <command:syntaxItem>
@@ -4224,7 +4224,7 @@
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>It uauthorizes a user/client via via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.</maml:para>
+      <maml:para>It uauthorizes a user/client via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.</maml:para>
     </maml:description>
     <command:syntax>
       <command:syntaxItem>
@@ -4346,7 +4346,7 @@
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>It unblocks a given user/client via via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.</maml:para>
+      <maml:para>It unblocks a given user/client via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.</maml:para>
     </maml:description>
     <command:syntax>
       <command:syntaxItem>
@@ -4468,7 +4468,7 @@
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>It creates a new user/client via via Ubiquiti (UBNT) UniFi RESTful API on the UniFi SDN Controller.</maml:para>
+      <maml:para>It creates a new user/client via Ubiquiti (UBNT) UniFi RESTful API on the UniFi SDN Controller.</maml:para>
     </maml:description>
     <command:syntax>
       <command:syntaxItem>

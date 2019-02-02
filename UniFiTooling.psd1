@@ -122,6 +122,7 @@ PrivateData = @{
 
         # ReleaseNotes of this module
         ReleaseNotes = '
+
 ### Added
 
 ### Changed

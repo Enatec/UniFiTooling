@@ -5,7 +5,7 @@
          It creates a new user/client via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         It creates a new user/client via via Ubiquiti (UBNT) UniFi RESTful API on the UniFi SDN Controller.
+         It creates a new user/client via Ubiquiti (UBNT) UniFi RESTful API on the UniFi SDN Controller.
 
          .PARAMETER UnifiSite
          UniFi Site as configured. The default is: default

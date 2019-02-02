@@ -20,7 +20,7 @@ Invoke-UnifiBlockClient [[-UnifiSite] <String>] [-Mac] <String> [<CommonParamete
 ```
 
 ## DESCRIPTION
-It blocks a given user/client via via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
+It blocks a given user/client via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
 ## EXAMPLES
 

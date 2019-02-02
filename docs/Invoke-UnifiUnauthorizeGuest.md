@@ -20,7 +20,7 @@ Invoke-UnifiUnauthorizeGuest [[-UnifiSite] <String>] [-Mac] <String> [<CommonPar
 ```
 
 ## DESCRIPTION
-It uauthorizes a user/client via via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
+It uauthorizes a user/client via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
 ## EXAMPLES
 

@@ -21,7 +21,7 @@ Get-UnifiHourlyGatewayStats [[-UnifiSite] <String>] [[-Start] <String>] [[-End] 
 ```
 
 ## DESCRIPTION
-Get hourly statistics for a UniFi Secure Gateway (USG) via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
+Get hourly statistics for a UniFi Security Gateway (USG) via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
 For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).
 
@@ -71,28 +71,28 @@ The UniFi SDN Controller does not return any values for them!
 Get-UnifiHourlyGatewayStats
 ```
 
-Get hourly statistics for the USG (UniFi Secure Gateway) in the default site
+Get hourly statistics for the USG (UniFi Security Gateway) in the default site
 
 ### EXAMPLE 2
 ```
 (Get-UnifiHourlyGatewayStats -Start '1548971935421' -End '1548975579019')
 ```
 
-Get hourly statistics for the USG (UniFi Secure Gateway) in the default site for a given time period.
+Get hourly statistics for the USG (UniFi Security Gateway) in the default site for a given time period.
 
 ### EXAMPLE 3
 ```
 (Get-UnifiHourlyGatewayStats -Start '1548980058135')
 ```
 
-Get hourly statistics for the USG (UniFi Secure Gateway) in the default site for the last 60 minutes (was the timestamp while the sample was created)
+Get hourly statistics for the USG (UniFi Security Gateway) in the default site for the last 60 minutes (was the timestamp while the sample was created)
 
 ### EXAMPLE 4
 ```
 (Get-UnifiHourlyGatewayStats -UnifiSite 'contoso')[-1]
 ```
 
-Get hourly statistics for the USG (UniFi Secure Gateway) in the site 'contoso'
+Get hourly statistics for the USG (UniFi Security Gateway) in the site 'contoso'
 
 ### EXAMPLE 5
 ```
@@ -175,7 +175,7 @@ For more information, see about_CommonParameters (http://go.microsoft.com/fwlink
 ## NOTES
 Defaults to the past week (7*24 hours)
 
-A USG (UniFi Secure Gateway) is required on the site you querry!
+A USG (UniFi Security Gateway) is required on the site you querry!
 
 ## RELATED LINKS
 

@@ -21,7 +21,7 @@ Get-Unifi5minutesGatewayStats [[-UnifiSite] <String>] [[-Start] <String>] [[-End
 ```
 
 ## DESCRIPTION
-Get statistics in five-minute segments for a UniFi Secure Gateway (USG) via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
+Get statistics in five-minute segments for a UniFi Security Gateway (USG) via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
 For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).
 
@@ -69,28 +69,28 @@ The UniFi SDN Controller does not return any values for them!
 Get-Unifi5minutesGatewayStats
 ```
 
-Get statistics in 5 minute segments for the USG (UniFi Secure Gateway) in the default site
+Get statistics in 5 minute segments for the USG (UniFi Security Gateway) in the default site
 
 ### EXAMPLE 2
 ```
 (Get-Unifi5minutesGatewayStats -Start '1548971935421' -End '1548975579019')
 ```
 
-Get statistics in 5 minute segments for the USG (UniFi Secure Gateway) in the default site for a given time period.
+Get statistics in 5 minute segments for the USG (UniFi Security Gateway) in the default site for a given time period.
 
 ### EXAMPLE 3
 ```
 (Get-Unifi5minutesGatewayStats -Start '1548980058135')
 ```
 
-Get statistics in 5 minute segments for the USG (UniFi Secure Gateway) in the default site for the last 60 minutes (was the timestamp while the sample was created)
+Get statistics in 5 minute segments for the USG (UniFi Security Gateway) in the default site for the last 60 minutes (was the timestamp while the sample was created)
 
 ### EXAMPLE 4
 ```
 (Get-Unifi5minutesGatewayStats -UnifiSite 'contoso')[-1]
 ```
 
-Get statistics in 5 minute segments for the USG (UniFi Secure Gateway) in the site 'contoso'
+Get statistics in 5 minute segments for the USG (UniFi Security Gateway) in the site 'contoso'
 
 ### EXAMPLE 5
 ```
@@ -175,7 +175,7 @@ Defaults to the past 12 hours.
 Make sure that the retention policy for 5 minutes stats is set to the correct value in the controller settings
 Ubiquiti announced this with the Controller version 5.8 - It will not work on older versions!
 
-A USG (UniFi Secure Gateway) is required on the site you querry!
+A USG (UniFi Security Gateway) is required on the site you querry!
 
 ## RELATED LINKS
 

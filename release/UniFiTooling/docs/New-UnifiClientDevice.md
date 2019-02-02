@@ -21,7 +21,7 @@ New-UnifiClientDevice [[-UnifiSite] <String>] [-Mac] <String> [-Group] <String> 
 ```
 
 ## DESCRIPTION
-It creates a new user/client via via Ubiquiti (UBNT) UniFi RESTful API on the UniFi SDN Controller.
+It creates a new user/client via Ubiquiti (UBNT) UniFi RESTful API on the UniFi SDN Controller.
 
 ## EXAMPLES
 

@@ -1,11 +1,29 @@
 # UniFiTooling
 
-PowerShell Module to configure, manage, and automate Ubiquiti (UBNT) UniFi [SDN Controller](https://unifi-sdn.ui.com/) API processes.
+PowerShell Module to configure, manage, and automate Ubiquiti (*UBNT*) UniFi [SDN Controller](https://unifi-sdn.ui.com/) API processes.
 
-It supports all the main features to configure, manage, and automate the UBNT Access Points, the Secure Gateway (USG), and a lot of other features around the [SDN Controller](https://unifi-sdn.ui.com/). It also supports the Management of Users/Clients and Guests.
+This module supports all main functions to configure, manage and automate the Ubiquiti (*UBNT*) UniFi Wi-Fi equipment, the UniFi Security Gateway (*USG*), and the UniFi Switches (*USW*). Additionally the UniFi [SDN Controller](https://unifi-sdn.ui.com/) functions are supported, for example the administration of Users/Clients and guests management.
 
-It was started this module as an internal helper for many automated updates for UniFi Security Gateway Firewall Rules and do a few other things (automated).
-We migrated everything into a regular module and published it as open source after using it for a while.
+The whole thing was started some time ago as an internal tooling to deploy, manage and update UniFi Security Gateway (*USG*) Firewall rules and to automate our (internal) administrative processes.
+
+After using it for a while, we decided to would like to have everything in a generic PowerShell Module. Shortly after starting the process, we decided to make it available as open source!
+
+The transfer of the old functions, however, is a bit more difficult than expected! Everything was built in individual and isolated tools, where everything was hard coded. In addition, the UniFi [SDN Controller](https://unifi-sdn.ui.com/) API is not really documented.
+
+## Supported Equipment
+
+* Ubiquiti (*UBNT*) UniFi Wi-Fi equipment
+  * Tested with the Ubiquiti (*UBNT*) UniFi HD series and UniFi AC series only
+* Ubiquiti (*UBNT*) UniFi Security Gateway (*USW*)
+  * Tested with the Ubiquiti (*UBNT*) UniFi Security Gateway USG-PRO‐4 and UniFi Security Gateway USG-3P only
+* Ubiquiti (*UBNT*) UniFi Switches (*USW*)
+  * Tested with the Ubiquiti (*UBNT*) UniFi Switch 24 AT-250W and UniFi Switch 8 POE-150W only
+* Ubiquiti (*UBNT*) UniFi [SDN Controller](https://unifi-sdn.ui.com/) in general
+  * Tested with the Ubiquiti (*UBNT*) UniFi [SDN Controller](https://unifi-sdn.ui.com/) running on a Ubiquiti (*UBNT*) Cloud Key (Gen1) and UniFi [SDN Controller](https://unifi-sdn.ui.com/) running on Windows Server 2016.
+
+Other Ubiquiti (*UBNT*), non UniFi SDN, equuipment is not supported, because this module uses the UniFi [SDN Controller](https://unifi-sdn.ui.com/) API only.
+
+---
 
 ### Use Cases
 
@@ -13,27 +31,27 @@ You will find some demo use cases within the [UseCases](https://github.com/Enate
 
 ### Version
 
-This document is based on UniFiTooling version 1.1.0 - Unreleased
+This document is based on UniFiTooling Module version 1.1.0 - Unreleased
 
 ### Status
 
-Beta version - Work still in progress.
+Still a beta version - Work still in progress.
 
 *Please remember this before using it in production. You have been warned :)*
 
 ### Requirements
 
-- PowerShell 5.1, or later.
-- Desktop and Core are both supported.
-- Tested on:
-  - *Windows 10, with PowerShell Desktop Version 5.1*
-  - *Windows Server 2016, with PowerShell Desktop Version 5.1*
-  - *Windows 10, with PowerShell Core Version 6.1.2*
-  - *macOS 10.14.3, with PowerShell Core Version 6.1.2*
-  - *CentOS Linux release 7.6, with PowerShell Core Version 6.1.2*
-- Ubiquiti [UBNT SDN Controller](https://unifi-sdn.ui.com/), Version 5.10.10
-  - *This is the only tested version*
-  - *Other (older, or newer) Ubiquiti [UBNT SDN Controller](https://unifi-sdn.ui.com/) Versions might work*
+* PowerShell 5.1, or later.
+* Desktop and Core are both supported.
+* Tested on:
+  * *Windows 10, with PowerShell Desktop Version 5.1*
+  * *Windows Server 2016, with PowerShell Desktop Version 5.1*
+  * *Windows 10, with PowerShell Core Version 6.1.2*
+  * *macOS 10.14.3, with PowerShell Core Version 6.1.2*
+  * *CentOS Linux release 7.6, with PowerShell Core Version 6.1.2*
+* Ubiquiti [UBNT SDN Controller](https://unifi-sdn.ui.com/), Version 5.10.10
+  * *This is the only tested version*
+  * *Other (older, or newer) Ubiquiti [UBNT SDN Controller](https://unifi-sdn.ui.com/) Versions might work*
 
 #### Dependencies
 

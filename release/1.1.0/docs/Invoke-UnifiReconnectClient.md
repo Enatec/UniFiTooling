@@ -20,7 +20,7 @@ Invoke-UnifiReconnectClient [[-UnifiSite] <String>] [-Mac] <String> [<CommonPara
 ```
 
 ## DESCRIPTION
-It reconnects a given user/client via via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
+It reconnects a given user/client via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
 ## EXAMPLES
 

@@ -5,7 +5,7 @@
          Get hourly statistics for a USG via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         Get hourly statistics for a UniFi Secure Gateway (USG) via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
+         Get hourly statistics for a UniFi Security Gateway (USG) via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
          For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).
 
@@ -61,22 +61,22 @@
          .EXAMPLE
          PS C:\> Get-UnifiHourlyGatewayStats
 
-         Get hourly statistics for the USG (UniFi Secure Gateway) in the default site
+         Get hourly statistics for the USG (UniFi Security Gateway) in the default site
 
          .EXAMPLE
          (Get-UnifiHourlyGatewayStats -Start '1548971935421' -End '1548975579019')
 
-         Get hourly statistics for the USG (UniFi Secure Gateway) in the default site for a given time period.
+         Get hourly statistics for the USG (UniFi Security Gateway) in the default site for a given time period.
 
          .EXAMPLE
          (Get-UnifiHourlyGatewayStats -Start '1548980058135')
 
-         Get hourly statistics for the USG (UniFi Secure Gateway) in the default site for the last 60 minutes (was the timestamp while the sample was created)
+         Get hourly statistics for the USG (UniFi Security Gateway) in the default site for the last 60 minutes (was the timestamp while the sample was created)
 
          .EXAMPLE
          PS C:\> (Get-UnifiHourlyGatewayStats -UnifiSite 'contoso')[-1]
 
-         Get hourly statistics for the USG (UniFi Secure Gateway) in the site 'contoso'
+         Get hourly statistics for the USG (UniFi Security Gateway) in the site 'contoso'
 
          .EXAMPLE
          PS C:\> Get-UnifiHourlyGatewayStats -Attributes 'mem','cpu','loadavg_5','lan-rx_errors','wan-rx_errors','lan-tx_errors','wan-tx_errors','lan-rx_bytes','wan-rx_bytes','lan-tx_bytes','wan-tx_bytes','lan-rx_packets','wan-rx_packets','lan-tx_packets','wan-tx_packets','lan-rx_dropped','wan-rx_dropped','lan-tx_dropped','wan-tx_dropped')
@@ -86,7 +86,7 @@
          .NOTES
          Defaults to the past week (7*24 hours)
 
-         A USG (UniFi Secure Gateway) is required on the site you querry!
+         A USG (UniFi Security Gateway) is required on the site you querry!
 
          .LINK
          Get-UniFiConfig

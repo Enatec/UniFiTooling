@@ -2417,7 +2417,7 @@ function Get-Unifi5minutesGatewayStats
          Get statistics in five-minute segments for a USG via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         Get statistics in five-minute segments for a UniFi Secure Gateway (USG) via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
+         Get statistics in five-minute segments for a UniFi Security Gateway (USG) via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
          For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).
 
@@ -2471,22 +2471,22 @@ function Get-Unifi5minutesGatewayStats
          .EXAMPLE
          PS C:\> Get-Unifi5minutesGatewayStats
 
-         Get statistics in 5 minute segments for the USG (UniFi Secure Gateway) in the default site
+         Get statistics in 5 minute segments for the USG (UniFi Security Gateway) in the default site
 
          .EXAMPLE
          (Get-Unifi5minutesGatewayStats -Start '1548971935421' -End '1548975579019')
 
-         Get statistics in 5 minute segments for the USG (UniFi Secure Gateway) in the default site for a given time period.
+         Get statistics in 5 minute segments for the USG (UniFi Security Gateway) in the default site for a given time period.
 
          .EXAMPLE
          (Get-Unifi5minutesGatewayStats -Start '1548980058135')
 
-         Get statistics in 5 minute segments for the USG (UniFi Secure Gateway) in the default site for the last 60 minutes (was the timestamp while the sample was created)
+         Get statistics in 5 minute segments for the USG (UniFi Security Gateway) in the default site for the last 60 minutes (was the timestamp while the sample was created)
 
          .EXAMPLE
          PS C:\> (Get-Unifi5minutesGatewayStats -UnifiSite 'contoso')[-1]
 
-         Get statistics in 5 minute segments for the USG (UniFi Secure Gateway) in the site 'contoso'
+         Get statistics in 5 minute segments for the USG (UniFi Security Gateway) in the site 'contoso'
 
          .EXAMPLE
          PS C:\> Get-Unifi5minutesGatewayStats -Attributes 'mem','cpu','loadavg_5','lan-rx_errors','wan-rx_errors','lan-tx_errors','wan-tx_errors','lan-rx_bytes','wan-rx_bytes','lan-tx_bytes','wan-tx_bytes','lan-rx_packets','wan-rx_packets','lan-tx_packets','wan-tx_packets','lan-rx_dropped','wan-rx_dropped','lan-tx_dropped','wan-tx_dropped')
@@ -2498,7 +2498,7 @@ function Get-Unifi5minutesGatewayStats
          Make sure that the retention policy for 5 minutes stats is set to the correct value in the controller settings
          Ubiquiti announced this with the Controller version 5.8 - It will not work on older versions!
 
-         A USG (UniFi Secure Gateway) is required on the site you querry!
+         A USG (UniFi Security Gateway) is required on the site you querry!
 
          .LINK
          Get-UniFiConfig
@@ -4616,7 +4616,7 @@ function Get-UnifiDailyGatewayStats
          Get daily statistics for a USG via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         Get daily statistics for a UniFi Secure Gateway (USG) via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
+         Get daily statistics for a UniFi Security Gateway (USG) via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
          For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).
 
@@ -4673,22 +4673,22 @@ function Get-UnifiDailyGatewayStats
          .EXAMPLE
          PS C:\> Get-UnifiDailyGatewayStats
 
-         Get daily statistics for the USG (UniFi Secure Gateway) in the default site
+         Get daily statistics for the USG (UniFi Security Gateway) in the default site
 
          .EXAMPLE
          (Get-UnifiDailyGatewayStats -Start '1548971935421' -End '1548975579019')
 
-         Get daily statistics for the USG (UniFi Secure Gateway) in the default site for a given time period.
+         Get daily statistics for the USG (UniFi Security Gateway) in the default site for a given time period.
 
          .EXAMPLE
          (Get-UnifiDailyGatewayStats -Start '1548980058135')
 
-         Get daily statistics for the USG (UniFi Secure Gateway) in the default site for the last 60 minutes (was the timestamp while the sample was created)
+         Get daily statistics for the USG (UniFi Security Gateway) in the default site for the last 60 minutes (was the timestamp while the sample was created)
 
          .EXAMPLE
          PS C:\> (Get-UnifiDailyGatewayStats -UnifiSite 'contoso')[-1]
 
-         Get daily statistics for the USG (UniFi Secure Gateway) in the site 'contoso'
+         Get daily statistics for the USG (UniFi Security Gateway) in the site 'contoso'
 
          .EXAMPLE
          PS C:\> Get-UnifiDailyGatewayStats -Attributes 'mem','cpu','loadavg_5','lan-rx_errors','wan-rx_errors','lan-tx_errors','wan-tx_errors','lan-rx_bytes','wan-rx_bytes','lan-tx_bytes','wan-tx_bytes','lan-rx_packets','wan-rx_packets','lan-tx_packets','wan-tx_packets','lan-rx_dropped','wan-rx_dropped','lan-tx_dropped','wan-tx_dropped')
@@ -4698,7 +4698,7 @@ function Get-UnifiDailyGatewayStats
          .NOTES
          Defaults to the past year (52*7*24 hours)
 
-         A USG (UniFi Secure Gateway) is required on the site you querry!
+         A USG (UniFi Security Gateway) is required on the site you querry!
 
          .LINK
          Get-UniFiConfig
@@ -7473,7 +7473,7 @@ function Get-UnifiHourlyGatewayStats
          Get hourly statistics for a USG via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         Get hourly statistics for a UniFi Secure Gateway (USG) via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
+         Get hourly statistics for a UniFi Security Gateway (USG) via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
          For convenience, we return the traffic Megabytes and not in bytes (as the UniFi does it).
 
@@ -7529,22 +7529,22 @@ function Get-UnifiHourlyGatewayStats
          .EXAMPLE
          PS C:\> Get-UnifiHourlyGatewayStats
 
-         Get hourly statistics for the USG (UniFi Secure Gateway) in the default site
+         Get hourly statistics for the USG (UniFi Security Gateway) in the default site
 
          .EXAMPLE
          (Get-UnifiHourlyGatewayStats -Start '1548971935421' -End '1548975579019')
 
-         Get hourly statistics for the USG (UniFi Secure Gateway) in the default site for a given time period.
+         Get hourly statistics for the USG (UniFi Security Gateway) in the default site for a given time period.
 
          .EXAMPLE
          (Get-UnifiHourlyGatewayStats -Start '1548980058135')
 
-         Get hourly statistics for the USG (UniFi Secure Gateway) in the default site for the last 60 minutes (was the timestamp while the sample was created)
+         Get hourly statistics for the USG (UniFi Security Gateway) in the default site for the last 60 minutes (was the timestamp while the sample was created)
 
          .EXAMPLE
          PS C:\> (Get-UnifiHourlyGatewayStats -UnifiSite 'contoso')[-1]
 
-         Get hourly statistics for the USG (UniFi Secure Gateway) in the site 'contoso'
+         Get hourly statistics for the USG (UniFi Security Gateway) in the site 'contoso'
 
          .EXAMPLE
          PS C:\> Get-UnifiHourlyGatewayStats -Attributes 'mem','cpu','loadavg_5','lan-rx_errors','wan-rx_errors','lan-tx_errors','wan-tx_errors','lan-rx_bytes','wan-rx_bytes','lan-tx_bytes','wan-tx_bytes','lan-rx_packets','wan-rx_packets','lan-tx_packets','wan-tx_packets','lan-rx_dropped','wan-rx_dropped','lan-tx_dropped','wan-tx_dropped')
@@ -7554,7 +7554,7 @@ function Get-UnifiHourlyGatewayStats
          .NOTES
          Defaults to the past week (7*24 hours)
 
-         A USG (UniFi Secure Gateway) is required on the site you querry!
+         A USG (UniFi Security Gateway) is required on the site you querry!
 
          .LINK
          Get-UniFiConfig
@@ -9352,7 +9352,7 @@ function Get-UnifiSpeedTestResult
          Get USG speed test results via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         Get UniFi Secure Gateway (USG) speed test results via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
+         Get UniFi Security Gateway (USG) speed test results via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
          .PARAMETER Timeframe
          Timeframe in hours, default is 24
@@ -9417,7 +9417,7 @@ function Get-UnifiSpeedTestResult
 
          The filetring needs a few more tests.
 
-         A UniFi Secure Gateway (USG) is required in the UniFi site!
+         A UniFi Security Gateway (USG) is required in the UniFi site!
 
          .LINK
          Get-UniFiConfig
@@ -10653,7 +10653,7 @@ function Invoke-UnifiBlockClient
          It blocks a given user/client via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         It blocks a given user/client via via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
+         It blocks a given user/client via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
          .PARAMETER UnifiSite
          UniFi Site as configured. The default is: default
@@ -11307,7 +11307,7 @@ function Invoke-UnifiReconnectClient
          It reconnects a given user/client via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         It reconnects a given user/client via via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
+         It reconnects a given user/client via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
          .PARAMETER UnifiSite
          UniFi Site as configured. The default is: default
@@ -11634,7 +11634,7 @@ function Invoke-UnifiUnauthorizeGuest
          It uauthorizes a user/client via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         It uauthorizes a user/client via via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
+         It uauthorizes a user/client via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
          .PARAMETER UnifiSite
          UniFi Site as configured. The default is: default
@@ -11966,7 +11966,7 @@ function Invoke-UnifiUnblockClient
          It unblocks a given user/client via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         It unblocks a given user/client via via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
+         It unblocks a given user/client via Ubiquiti (UBNT) UniFi RESTful API request on the UniFi SDN Controller.
 
          .PARAMETER UnifiSite
          UniFi Site as configured. The default is: default
@@ -12293,7 +12293,7 @@ function New-UnifiClientDevice
          It creates a new user/client via API on the UniFi SDN Controller.
 
          .DESCRIPTION
-         It creates a new user/client via via Ubiquiti (UBNT) UniFi RESTful API on the UniFi SDN Controller.
+         It creates a new user/client via Ubiquiti (UBNT) UniFi RESTful API on the UniFi SDN Controller.
 
          .PARAMETER UnifiSite
          UniFi Site as configured. The default is: default
@@ -13475,13 +13475,15 @@ function Set-UnifiNetworkDetails
 <#
       Version: 1.0.11 - 2019-02-01
 
+      
       Added
+      
       - Get-UnifiHourlySiteStats - Get horly statistics for a complete UniFi Site
       - Get-UnifiDailySiteStats - Get daily statistics for a complete UniFi Site
       - Get-Unifi5minutesSiteStats - Get statistics in 5 minute segments for a complete UniFi Site
-      - Get-Unifi5minutesGatewayStats - Get statistics in 5 minute segments for the USG (UniFi Secure Gateway)
-      - Get-UnifiHourlyGatewayStats - Get hourly statistics for the USG (UniFi Secure Gateway)
-      - Get-UnifiDailyGatewayStats - Get daily statistics for the USG (UniFi Secure Gateway)
+      - Get-Unifi5minutesGatewayStats - Get statistics in 5 minute segments for the USG (UniFi Security Gateway)
+      - Get-UnifiHourlyGatewayStats - Get hourly statistics for the USG (UniFi Security Gateway)
+      - Get-UnifiDailyGatewayStats - Get daily statistics for the USG (UniFi Security Gateway)
       - Get-UnifiDailyClientStats - Get daily user/client statistics for a given user/client
       - Get-UnifiHourlyClientStats - Get hourly user/client statistics for a given user/client
       - Get-Unifi5minutesClientStats - Get user/client statistics in 5 minute segments for a given client
@@ -13496,6 +13498,7 @@ function Set-UnifiNetworkDetails
       - New-UnifiClientDevice - Create a new user/client-device (unfinished beta)
       
       Changed
+      
       - New-UnifiClientDevice now use ConvertTo-UniFiValidMacAddress to check and make sure we have the right format
       - Invoke-UnifiUnblockClient now use ConvertTo-UniFiValidMacAddress to check and make sure we have the right format
       - Invoke-UnifiUnauthorizeGuest now use ConvertTo-UniFiValidMacAddress to check and make sure we have the right format
@@ -13506,17 +13509,21 @@ function Set-UnifiNetworkDetails
       - Get-CallerPreference - Implemented private meta function usage to all (public/private) functions
       
       Removed
+      
       - Get-HostsFile should never be a part of this module. I just use them for some internal tests.
       - Add-HostsEntry should never be a part of this module. I just use them for some internal tests.
       - Get-HostsFile should never be a part of this module. I just use them for some internal tests.
       
       Fixed
+      
       - Fixed the Get-CallerPreference usage
       
       
       Version: 1.0.10 - 2019-01-23
 
+      
       Deprecated
+      
       - Get-HostsFile should never be a part of this module. I just use them for some internal tests.
       - Get-HostsFile should never be a part of this module. I just use them for some internal tests.
       - Get-HostsFile should never be a part of this module. I just use them for some internal tests.
@@ -13524,7 +13531,9 @@ function Set-UnifiNetworkDetails
       
       Version: 1.0.9 - 2019-01-20
 
+      
       Added
+      
       - Invoke-UnifiForgetClient - Forget one or more client devices via the API of the UniFi Controller
       - Invoke-UnifiUnblockClient - Unblock a client device via the API of the UniFi Controller
       - Invoke-UnifiBlockClient - Block a client device via the API of the UniFi Controller
@@ -13534,6 +13543,7 @@ function Set-UnifiNetworkDetails
       - Get-UnifiSpeedTestResult has now a -last parameter to get only the latest result
       
       Changed
+      
       - Change some links to the GitHub Wiki
       - Change the Verbose output (Detailed connection details)
       - Refactored a lot of code.
@@ -13541,7 +13551,9 @@ function Set-UnifiNetworkDetails
       
       Version: 1.0.8 - 2019-01-19
 
+      
       Added
+      
       - Get-UnifiSpeedTestResult - Get the UniFi Security Gateway (USG) Speed Test results
       - Add-HostsEntry - Add a single Hosts Entry to the HOSTS File (Helper)
       - Remove-HostsEntry - Removes a single Hosts Entry from the HOSTS File (Helper)
@@ -13551,6 +13563,7 @@ function Set-UnifiNetworkDetails
       - Get-UniFiIsAlive - Use a simple API call to see if the session is alive (internal not exported function)
       
       Changed
+      
       - Refactored some of the code that handles all errors.
       - All commands now use Get-UniFiIsAlive internally. That should make it easier for new users.
       - Get-UnifiSpeedTestResult has now filtering and returns values human readable
@@ -13558,13 +13571,16 @@ function Set-UnifiNetworkDetails
       
       Version: 1.0.7 - 2019-01-14
 
+      
       Added
+      
       - Add License.md, a Markdown version of LICENSE
       - Editor Config
       - Git Attributes File
       - Get-UnifiFirewallGroupDetails - Related to #10
       
       Changed
+      
       - Moved Get-UnifiFirewallGroupBody from Public to Private (No longer exported as command)
       - Add -name parameter to Get-UnifiNetworkDetails - Related to #9
       - Get-UnifiNetworkDetails: For the parameter -UnifiNetworkName an ID (Network_id) must be used, necessary to make it a non breaking change
@@ -13575,13 +13591,16 @@ function Set-UnifiNetworkDetails
       - Markdown Documents tweaked (Header)
       
       Fixed
+      
       - Found the following issue: Even if an obejct is not found (e.g. network) the UniFi API returns OK (200) with null bytes in Data. That is OK, but we need a workaround. Added the Workaround to Get-UnifiFirewallGroupDetails and Get-UnifiNetworkDetails for testing.
       - Position numbers corrected (Now starts with 0 instead off 1)
       
       
       Version: 1.0.6 - 2019-01-13
 
+      
       Added
+      
       - New function New-UniFiConfig - #1
       - CHANGELOG.md (this file) is back
       - Set $ProgressPreference to 'SilentlyContinue' - #7
@@ -13589,7 +13608,9 @@ function Set-UnifiNetworkDetails
       
       Version: 1.0.5 - 2019-01-12
 
+      
       Changed
+      
       - Invoke-UniFiCidrWorkaround now has the parameter -6 to handle IPv6 CIDR data - #5
       - Describe the config.json handling #2
       - Changed the Build System - #3
@@ -13597,112 +13618,146 @@ function Set-UnifiNetworkDetails
       - Tweak the build system
       
       Removed
+      
       - Invoke-UniFiCidrWorkaroundV6 is now part of Invoke-UniFiCidrWorkaround - #5
       
       
       Version: 1.0.4 - 2019-01-08
 
+      
       Changed
+      
       - Samples optimized
       - Tweak the build system
       
       
       Version: 1.0.3 - 2019-01-07
 
+      
       Added
+      
       - Sample: UpdateUniFiVpnPeerIP - Update a VPN PeerIp for a given UniFi Network (IPSec VPN with dynamic IP)
       - Sample: UpdateUniFiWithLatestExchangeOnlineEndpoints - Update existing UniFi Firewall Groups with the latest Exchange Online Endpoints.
       
       Fixed
+      
       - Debug output removed
       
       
       Version: 1.0.2 - 2019-01-07
 
+      
       Changed
+      
       - Internal Build Process: Initial internal release
       
       
       Version: 1.0.1 - 2019-01-07
 
+      
       Added
+      
       - Invoke-UniFiCidrWorkaround for CIDR handling
       - Invoke-UniFiCidrWorkaroundV6 for CIDR handling
       
       
       Version: 1.0.0 - 2019-01-01
 
+      
       Added
+      
       - config.json instead of hardcoded configuration
       - SYNOPSIS for all functions
       - XML/MAML Documentation
       - Samples
       
       Changed
+      
       - Removed all internal systems (hardcoded for internal use)
       
       
       Version: 0.9.1 - 2019-01-01
 
+      
       Deprecated
+      
       - Invoke-UBNT* is now Invoke-UniFi*
       
       
       Version: 0.9.0 - 2019-01-01
 
+      
       Added
+      
       - Controller Parameter (URI) in the Header of the PS1 File
       
       Changed
+      
       - Migrated Invoke-UBNTApiLogin and Invoke-UBNTApiLogout from Invoke-WebRequest to Invoke-RestMethod
       - Better Session handling for Invoke-UBNTApiRequest
       
       
       Version: 0.8.0 - 2019-01-01
 
+      
       Security
+      
       - Removed Hard coded credentials from the code
       
       
       Version: 0.7.0 - 2019-01-01
 
+      
       Changed
+      
       - Internal Build Process: Initial internal release
       
       
       Version: 0.6.0 - 2019-01-01
 
+      
       Changed
+      
       - Internal Build Process: Initial internal release
       
       
       Version: 0.5.0 - 2019-01-01
 
+      
       Changed
+      
       - Internal Build Process: Initial internal release
       
       
       Version: 0.4.0 - 2019-01-01
 
+      
       Changed
+      
       - Internal Build Process: Initial internal release
       
       
       Version: 0.3.0 - 2019-01-01
 
+      
       Changed
+      
       - Internal Build Process: Initial internal release
       
       
       Version: 0.2.0 - 2019-01-01
 
+      
       Changed
+      
       - Internal Build Process: Initial internal release
       
       
       Version: 0.1.0 - 2019-01-01
 
+      
       Added
+      
       - Invoke-UBNTApiLogout - With harcoded Controller info
       - Invoke-UBNTApiRequest - Universal Invoke-RestMethod wrapper, tweaked for UBNT Equipment
       - Invoke-UBNTApiLogin - With harcoded credentials and Controller info
