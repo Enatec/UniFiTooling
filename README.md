@@ -21,7 +21,7 @@ The transfer of the old functions, however, is a bit more difficult than expecte
 * Ubiquiti (*UBNT*) UniFi [SDN Controller](https://unifi-sdn.ui.com/) in general
   * Tested with the Ubiquiti (*UBNT*) UniFi [SDN Controller](https://unifi-sdn.ui.com/) running on a Ubiquiti (*UBNT*) Cloud Key (Gen1) and UniFi [SDN Controller](https://unifi-sdn.ui.com/) running on Windows Server 2016.
 
-Other Ubiquiti (*UBNT*), non UniFi SDN, equuipment is not supported, because this module uses the UniFi [SDN Controller](https://unifi-sdn.ui.com/) API only.
+Other Ubiquiti (*UBNT*), non UniFi SDN, equipment is not supported, because this module uses the UniFi [SDN Controller](https://unifi-sdn.ui.com/) API only.
 
 ---
 
