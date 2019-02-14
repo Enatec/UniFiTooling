@@ -247,7 +247,7 @@
                   $Session = (Invoke-RestMethod @paramInvokeRestMethod)
 
                   Write-Verbose -Message "Session Meta: $(($Session.meta.rc | Out-String).Trim())"
-                  Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+                  Write-Verbose -Message "Session Data: $([Environment]::NewLine + ($Session.data | Out-String).Trim())"
 
                   # check result
                   if ($Session.meta.rc -ne 'ok')

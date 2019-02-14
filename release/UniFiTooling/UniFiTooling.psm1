@@ -1722,7 +1722,7 @@ function Get-Unifi5minutesApStats
 
          Write-Verbose -Message "Session Meta: $(($Session.meta.rc | Out-String).Trim())"
 
-         Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+         Write-Verbose -Message "Session Data: $([Environment]::NewLine + ($Session.data | Out-String).Trim())"
          #endregion Request
 
          #region CreateOutput
@@ -2177,7 +2177,7 @@ function Get-Unifi5minutesClientStats
 
          Write-Verbose -Message "Session Meta: $(($Session.meta.rc | Out-String).Trim())"
 
-         Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+         Write-Verbose -Message "Session Data: $([Environment]::NewLine + ($Session.data | Out-String).Trim())"
          #endregion Request
 
          #region CreateOutput
@@ -2752,7 +2752,7 @@ function Get-Unifi5minutesGatewayStats
 
          Write-Verbose -Message "Session Meta: $(($Session.meta.rc | Out-String).Trim())"
 
-         Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+         Write-Verbose -Message "Session Data: $([Environment]::NewLine + ($Session.data | Out-String).Trim())"
          #endregion Request
 
          #region CreateOutput
@@ -3371,7 +3371,7 @@ function Get-Unifi5minutesSiteStats
 
          Write-Verbose -Message "Session Meta: $(($Session.meta.rc | Out-String).Trim())"
 
-         Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+         Write-Verbose -Message "Session Data: $([Environment]::NewLine + ($Session.data | Out-String).Trim())"
          #endregion Request
 
          #region CreateOutput
@@ -3922,7 +3922,7 @@ function Get-UnifiDailyApStats
 
          Write-Verbose -Message "Session Meta: $(($Session.meta.rc | Out-String).Trim())"
 
-         Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+         Write-Verbose -Message "Session Data: $([Environment]::NewLine + ($Session.data | Out-String).Trim())"
          #endregion Request
 
          #region CreateOutput
@@ -4376,7 +4376,7 @@ function Get-UnifiDailyClientStats
 
          Write-Verbose -Message "Session Meta: $(($Session.meta.rc | Out-String).Trim())"
 
-         Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+         Write-Verbose -Message "Session Data: $([Environment]::NewLine + ($Session.data | Out-String).Trim())"
          #endregion Request
 
          #region CreateOutput
@@ -4952,7 +4952,7 @@ function Get-UnifiDailyGatewayStats
 
          Write-Verbose -Message "Session Meta: $(($Session.meta.rc | Out-String).Trim())"
 
-         Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+         Write-Verbose -Message "Session Data: $([Environment]::NewLine + ($Session.data | Out-String).Trim())"
          #endregion Request
 
          #region CreateOutput
@@ -5571,7 +5571,7 @@ function Get-UnifiDailySiteStats
 
          Write-Verbose -Message "Session Meta: $(($Session.meta.rc | Out-String).Trim())"
 
-         Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+         Write-Verbose -Message "Session Data: $([Environment]::NewLine + ($Session.data | Out-String).Trim())"
          #endregion Request
 
          #region CreateOutput
@@ -6069,7 +6069,7 @@ function Get-UnifiFirewallGroupDetails
                   $Session = (Invoke-RestMethod @paramInvokeRestMethod)
 
                   Write-Verbose -Message "Session Meta: $(($Session.meta.rc | Out-String).Trim())"
-                  Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+                  Write-Verbose -Message "Session Data: $([Environment]::NewLine + ($Session.data | Out-String).Trim())"
 
                   # check result
                   if ($Session.meta.rc -ne 'ok')
@@ -6388,7 +6388,7 @@ function Get-UnifiFirewallGroups
          }
          $Session = (Invoke-RestMethod @paramInvokeRestMethod)
          Write-Verbose -Message "Session Meta: $(($Session.meta.rc | Out-String).Trim())"
-         Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+         Write-Verbose -Message "Session Data: $([Environment]::NewLine + ($Session.data | Out-String).Trim())"
          #endregion Request
       }
       catch
@@ -6777,7 +6777,7 @@ function Get-UnifiHourlyApStats
 
          Write-Verbose -Message "Session Meta: $(($Session.meta.rc | Out-String).Trim())"
 
-         Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+         Write-Verbose -Message "Session Data: $([Environment]::NewLine + ($Session.data | Out-String).Trim())"
          #endregion Request
 
          #region CreateOutput
@@ -7233,7 +7233,7 @@ function Get-UnifiHourlyClientStats
 
          Write-Verbose -Message "Session Meta: $(($Session.meta.rc | Out-String).Trim())"
 
-         Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+         Write-Verbose -Message "Session Data: $([Environment]::NewLine + ($Session.data | Out-String).Trim())"
          #endregion Request
 
          #region CreateOutput
@@ -7808,7 +7808,7 @@ function Get-UnifiHourlyGatewayStats
 
          Write-Verbose -Message "Session Meta: $(($Session.meta.rc | Out-String).Trim())"
 
-         Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+         Write-Verbose -Message "Session Data: $([Environment]::NewLine + ($Session.data | Out-String).Trim())"
          #endregion Request
 
          #region CreateOutput
@@ -8427,7 +8427,7 @@ function Get-UnifiHourlySiteStats
 
          Write-Verbose -Message "Session Meta: $(($Session.meta.rc | Out-String).Trim())"
 
-         Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+         Write-Verbose -Message "Session Data: $([Environment]::NewLine + ($Session.data | Out-String).Trim())"
          #endregion Request
 
          #region CreateOutput
@@ -8931,7 +8931,7 @@ function Get-UnifiNetworkDetails
                   $Session = (Invoke-RestMethod @paramInvokeRestMethod)
 
                   Write-Verbose -Message "Session Meta: $(($Session.meta.rc | Out-String).Trim())"
-                  Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+                  Write-Verbose -Message "Session Data: $([Environment]::NewLine + ($Session.data | Out-String).Trim())"
 
                   # check result
                   if ($Session.meta.rc -ne 'ok')
@@ -9262,7 +9262,7 @@ function Get-UnifiNetworkList
          $Session = (Invoke-RestMethod @paramInvokeRestMethod)
 
          Write-Verbose -Message "Session Meta: $(($Session.meta.rc | Out-String).Trim())"
-         Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+         Write-Verbose -Message "Session Data: $([Environment]::NewLine + ($Session.data | Out-String).Trim())"
          #endregion Request
       }
       catch
@@ -9713,7 +9713,7 @@ function Get-UnifiSpeedTestResult
          $Session = (Invoke-RestMethod @paramInvokeRestMethod)
 
          Write-Verbose -Message "Session Meta: $(($Session.meta.rc | Out-String).Trim())"
-         Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+         Write-Verbose -Message "Session Data: $([Environment]::NewLine + ($Session.data | Out-String).Trim())"
          #endregion Request
       }
       catch
@@ -9960,7 +9960,7 @@ function Invoke-UniFiApiLogin
 
          if ($Session.data)
          {
-            Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+            Write-Verbose -Message "Session Data: $([Environment]::NewLine + ($Session.data | Out-String).Trim())"
          }
 
          $Global:RestSession = $RestSession
@@ -10128,7 +10128,7 @@ function Invoke-UniFiApiLogout
 
          if ($Session.data)
          {
-            Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+            Write-Verbose -Message "Session Data: $([Environment]::NewLine + ($Session.data | Out-String).Trim())"
          }
          #region Request
       }
@@ -10557,7 +10557,7 @@ function Invoke-UnifiAuthorizeGuest
 
          if ($Session.data)
          {
-            Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+            Write-Verbose -Message "Session Data: $([Environment]::NewLine + ($Session.data | Out-String).Trim())"
             $Result = $true
          }
          else
@@ -10886,7 +10886,7 @@ function Invoke-UnifiBlockClient
 
          Write-Verbose -Message "Session Meta: $(($Session.meta.rc | Out-String).Trim())"
 
-         Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+         Write-Verbose -Message "Session Data: $([Environment]::NewLine + ($Session.data | Out-String).Trim())"
          #endregion Request
       }
       catch
@@ -10946,7 +10946,7 @@ function Invoke-UnifiBlockClient
 
          if ($Session.data)
          {
-            Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+            Write-Verbose -Message "Session Data: $([Environment]::NewLine + ($Session.data | Out-String).Trim())"
          }
 
          # Error Message
@@ -11213,7 +11213,7 @@ function Invoke-UnifiForgetClient
 
          Write-Verbose -Message "Session Meta: $(($Session.meta.rc | Out-String).Trim())"
 
-         Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+         Write-Verbose -Message "Session Data: $([Environment]::NewLine + ($Session.data | Out-String).Trim())"
          #endregion Request
       }
       catch
@@ -11273,7 +11273,7 @@ function Invoke-UnifiForgetClient
 
          if ($Session.data)
          {
-            Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+            Write-Verbose -Message "Session Data: $([Environment]::NewLine + ($Session.data | Out-String).Trim())"
          }
 
          # Error Message
@@ -11540,7 +11540,7 @@ function Invoke-UnifiReconnectClient
 
          Write-Verbose -Message "Session Meta: $(($Session.meta.rc | Out-String).Trim())"
 
-         Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+         Write-Verbose -Message "Session Data: $([Environment]::NewLine + ($Session.data | Out-String).Trim())"
          #endregion Request
       }
       catch
@@ -11600,7 +11600,7 @@ function Invoke-UnifiReconnectClient
 
          if ($Session.data)
          {
-            Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+            Write-Verbose -Message "Session Data: $([Environment]::NewLine + ($Session.data | Out-String).Trim())"
          }
 
          # Error Message
@@ -11867,7 +11867,7 @@ function Invoke-UnifiUnauthorizeGuest
 
          Write-Verbose -Message "Session Meta: $(($Session.meta.rc | Out-String).Trim())"
 
-         Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+         Write-Verbose -Message "Session Data: $([Environment]::NewLine + ($Session.data | Out-String).Trim())"
          #endregion Request
       }
       catch
@@ -11927,7 +11927,7 @@ function Invoke-UnifiUnauthorizeGuest
 
          if ($Session.data)
          {
-            Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+            Write-Verbose -Message "Session Data: $([Environment]::NewLine + ($Session.data | Out-String).Trim())"
             $Result = $true
          }
          else
@@ -12199,7 +12199,7 @@ function Invoke-UnifiUnblockClient
 
          Write-Verbose -Message "Session Meta: $(($Session.meta.rc | Out-String).Trim())"
 
-         Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+         Write-Verbose -Message "Session Data: $([Environment]::NewLine + ($Session.data | Out-String).Trim())"
          #endregion Request
       }
       catch
@@ -12259,7 +12259,7 @@ function Invoke-UnifiUnblockClient
 
          if ($Session.data)
          {
-            Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+            Write-Verbose -Message "Session Data: $([Environment]::NewLine + ($Session.data | Out-String).Trim())"
          }
 
          # Error Message
@@ -12570,7 +12570,7 @@ function New-UnifiClientDevice
 
             Write-Verbose -Message "Session Meta: $(($Session.meta.rc | Out-String).Trim())"
 
-            Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+            Write-Verbose -Message "Session Data: $([Environment]::NewLine + ($Session.data | Out-String).Trim())"
             #endregion Request
          }
          catch
@@ -12630,7 +12630,7 @@ function New-UnifiClientDevice
 
             if ($Session.data)
             {
-               Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+               Write-Verbose -Message "Session Data: $([Environment]::NewLine + ($Session.data | Out-String).Trim())"
             }
 
             # Error Message
@@ -13100,7 +13100,7 @@ function Set-UnifiFirewallGroup
          $Session = (Invoke-RestMethod @paramInvokeRestMethod)
 
          Write-Verbose -Message "Session Meta: $(($Session.meta.rc | Out-String).Trim())"
-         Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+         Write-Verbose -Message "Session Data: $([Environment]::NewLine + ($Session.data | Out-String).Trim())"
          #endregion Request
       }
       catch
@@ -13392,7 +13392,7 @@ function Set-UnifiNetworkDetails
          $Session = (Invoke-RestMethod @paramInvokeRestMethod)
 
          Write-Verbose -Message "Session Meta: $(($Session.meta.rc | Out-String).Trim())"
-         Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+         Write-Verbose -Message "Session Data: $([Environment]::NewLine + ($Session.data | Out-String).Trim())"
          #endregion Request
       }
       catch

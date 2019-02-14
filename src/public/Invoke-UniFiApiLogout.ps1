@@ -93,7 +93,7 @@
 
          if ($Session.data)
          {
-            Write-Verbose -Message "Session Data: $("`n" + ($Session.data | Out-String).Trim())"
+            Write-Verbose -Message "Session Data: $([Environment]::NewLine + ($Session.data | Out-String).Trim())"
          }
          #region Request
       }
