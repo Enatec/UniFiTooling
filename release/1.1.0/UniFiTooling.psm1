@@ -13478,7 +13478,7 @@ function Set-UnifiNetworkDetails
       
       Added
       
-      - Get-UnifiHourlySiteStats - Get horly statistics for a complete UniFi Site
+      - Get-UnifiHourlySiteStats - Get hourly statistics for a complete UniFi Site
       - Get-UnifiDailySiteStats - Get daily statistics for a complete UniFi Site
       - Get-Unifi5minutesSiteStats - Get statistics in 5 minute segments for a complete UniFi Site
       - Get-Unifi5minutesGatewayStats - Get statistics in 5 minute segments for the USG (UniFi Security Gateway)
@@ -13592,7 +13592,7 @@ function Set-UnifiNetworkDetails
       
       Fixed
       
-      - Found the following issue: Even if an obejct is not found (e.g. network) the UniFi API returns OK (200) with null bytes in Data. That is OK, but we need a workaround. Added the Workaround to Get-UnifiFirewallGroupDetails and Get-UnifiNetworkDetails for testing.
+      - Found the following issue: Even if an object is not found (e.g. network) the UniFi API returns OK (200) with null bytes in Data. That is OK, but we need a workaround. Added the Workaround to Get-UnifiFirewallGroupDetails and Get-UnifiNetworkDetails for testing.
       - Position numbers corrected (Now starts with 0 instead off 1)
       
       
@@ -13666,14 +13666,14 @@ function Set-UnifiNetworkDetails
       
       Added
       
-      - config.json instead of hardcoded configuration
+      - config.json instead of hard coded configuration
       - SYNOPSIS for all functions
       - XML/MAML Documentation
       - Samples
       
       Changed
       
-      - Removed all internal systems (hardcoded for internal use)
+      - Removed all internal systems (hard coded for internal use)
       
       
       Version: 0.9.1 - 2019-01-01
@@ -13758,9 +13758,9 @@ function Set-UnifiNetworkDetails
       
       Added
       
-      - Invoke-UBNTApiLogout - With harcoded Controller info
+      - Invoke-UBNTApiLogout - With hard coded Controller info
       - Invoke-UBNTApiRequest - Universal Invoke-RestMethod wrapper, tweaked for UBNT Equipment
-      - Invoke-UBNTApiLogin - With harcoded credentials and Controller info
+      - Invoke-UBNTApiLogin - With hard coded credentials and Controller info
 #>
 #endregion CHANGELOG
 

@@ -1,7 +1,9 @@
 {
     "ProcessorArchitecture":  null,
     "Author":  "Joerg Hochwald",
-    "Description":  "PowerShell Module to configure, manage, and automate Ubiquiti (UBNT) UniFi [SDN Controller API](https://unifi-sdn.ui.com/) processes.",
+    "Description":  "PowerShell Module to configure, manage, and automate Ubiquiti (*UBNT*) UniFi [SDN Controller](https://unifi-sdn.ui.com/) API processes.
+
+    This module supports all main functions to configure, manage and automate the Ubiquiti (*UBNT*) UniFi Wi-Fi equipment, the UniFi Security Gateway (*USG*), and the UniFi Switches (*USW*). Additionally the UniFi [SDN Controller](https://unifi-sdn.ui.com/) functions are supported, for example the administration of Users/Clients and guests management.",
     "RequiredModules":  null,
     "DscResourcesToExport":  null,
     "FunctionsToExport":  null,
@@ -27,7 +29,12 @@
                  "Ubiquiti",
                  "UBNT",
                  "USG",
-                 "RESTful"
+                 "USW",
+                 "SDN",
+                 "RESTful",
+                 "Hotspot",
+                 "Management",
+                 "Reporting"
              ],
     "IconUri":  "https://github.com/Enatec/UniFiTooling/raw/master/src/other/powershell-project.png",
     "PowerShellHostName":  null,
