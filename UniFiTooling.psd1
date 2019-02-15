@@ -30,7 +30,9 @@ CompanyName = 'enabling Technology'
 Copyright = '(c) 2019 by enabling Technology. All rights reserved.'
 
 # Description of the functionality provided by this module
-Description = 'PowerShell Module to configure, manage, and automate Ubiquiti (UBNT) UniFi [SDN Controller API](https://unifi-sdn.ui.com/) processes.'
+Description = 'PowerShell Module to configure, manage, and automate Ubiquiti (*UBNT*) UniFi [SDN Controller](https://unifi-sdn.ui.com/) API processes.
+
+This module supports all main functions to configure, manage and automate the Ubiquiti (*UBNT*) UniFi Wi-Fi equipment, the UniFi Security Gateway (*USG*), and the UniFi Switches (*USW*). Additionally the UniFi [SDN Controller](https://unifi-sdn.ui.com/) functions are supported, for example the administration of Users/Clients and guests management.'
 
 # Minimum version of the Windows PowerShell engine required by this module
 PowerShellVersion = '5.1'
@@ -109,7 +111,7 @@ PrivateData = @{
     PSData = @{
 
         # Tags applied to this module. These help with module discovery in online galleries.
-        Tags = 'UniFi','API','Automation','Ubiquiti','UBNT','USG','RESTful'
+        Tags = 'UniFi','API','Automation','Ubiquiti','UBNT','USG','USW','SDN','RESTful','Hotspot','Management','Reporting'
 
         # A URL to the license for this module.
         LicenseUri = 'https://github.com/Enatec/UniFiTooling/wiki/License'
